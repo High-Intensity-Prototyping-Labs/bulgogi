@@ -27,3 +27,41 @@ bulgogi rm module/
 # bulgogi module rm module1/
 # bulgogi module rm --cached module1/
 # (simply removes module from tracking but preserves files)
+
+# Display project structure (tree)
+bulgogi tree
+
+# Sample output from bulgogi tree
+# target1
+#  |_ module1 (C++)
+#  |_ module2 (C++)
+# 
+# target2
+#  |_ module3 (Py3)
+#  |_ target1 (C++)
+
+###########################################################
+
+# File: project.yaml
+# Contains the project structure persistent state.
+# Bulgogi primarily works by reading and updating this file.
+
+# project.yaml
+default:
+	module1
+	module2
+
+# project directory
+project/
+	|- module1/
+		|- inc/
+			|- header1.h
+			|- header2.h 
+		|- src/
+			|- source1.c 
+			|- source2.c 
+			|- inc/
+				|- private1.h 
+				|- private2.h 
+
+/* Repeat the same for module 2 */
