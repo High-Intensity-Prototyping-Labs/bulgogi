@@ -24,6 +24,13 @@ fn cli() -> Command {
                 .arg(arg!(<PATH> "Path to the module in question"))
                 .arg(arg!(--create))
             )
+            .subcommand(
+                Command::new("rm")
+                .about("Removed a module from the bulgogi project")
+                .alias("remove")
+                .arg(arg!(<PATH> "Path to the module in question"))
+                .arg(arg!(--cached))
+            )
         )
         .subcommand(
             Command::new("build")
@@ -32,13 +39,6 @@ fn cli() -> Command {
         .subcommand(
             Command::new("clean")
             .about("Cleans the local project build files and cache")
-        )
-        .subcommand(
-            Command::new("rm")
-            .alias("remove")
-            .about("Removes a module from the bulgogi project")
-            .arg(arg!(<PATH> "Path to the module to remove"))
-            .arg(arg!(--cached))
         )
 }
 
@@ -63,6 +63,15 @@ fn main() {
                         create,
                     );
                 }
+                Some(("rm", sub2_matches)) => {
+                    let cached = sub2_matches.get_flag("cached");
+
+                    println!(
+                        "Removing project module {} (--cached = {})",
+                        sub2_matches.get_one::<String>("PATH").expect("required"),
+                        cached,
+                    );
+                }
                 _ => unreachable!(),
             }
         }
@@ -74,15 +83,6 @@ fn main() {
         Some(("clean", _)) => {
             println!(
                 "Cleaning bulgogi project..."
-            );
-        }
-        Some(("rm", sub_matches)) => {
-            let cached = sub_matches.get_flag("cached");
-
-            println!(
-                "Remove project module {} (--cached = {})",
-                sub_matches.get_one::<String>("PATH").expect("required"),
-                cached,
             );
         }
         Some((ext, sub_matches)) => {
