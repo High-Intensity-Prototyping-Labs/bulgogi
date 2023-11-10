@@ -17,9 +17,13 @@ fn cli() -> Command {
         .subcommand(
             Command::new("module")
             .about("Manage project modules")
-            .arg(arg!(<COMMAND> "What to do with the module"))
-            .arg(arg!(<PATH> "Path to the module in question"))
-            .arg(arg!(--create))
+            .arg_required_else_help(true)
+            .subcommand(
+                Command::new("add")
+                .about("Adds a new module to the bulgogi project")
+                .arg(arg!(<PATH> "Path to the module in question"))
+                .arg(arg!(--create))
+            )
         )
         .subcommand(
             Command::new("build")
@@ -49,14 +53,18 @@ fn main() {
             );
         }
         Some(("module", sub_matches)) => {
-            let create = sub_matches.get_flag("create");
+            match sub_matches.subcommand() {
+                Some(("add", sub2_matches)) => {
+                    let create = sub2_matches.get_flag("create");
 
-            println!(
-                "Doing {} to module {} (--create = {})",
-                sub_matches.get_one::<String>("COMMAND").expect("required"),
-                sub_matches.get_one::<String>("PATH").expect("required"),
-                create,
-            );
+                    println!(
+                        "Adding module {} (--create = {})",
+                        sub2_matches.get_one::<String>("PATH").expect("required"),
+                        create,
+                    );
+                }
+                _ => unreachable!(),
+            }
         }
         Some(("build", _)) => {
             println!(
