@@ -1,0 +1,29 @@
+# Bulgogi Synopsis
+# InDev v1.0.0
+
+# NOTE: Largely inspired by git cli.
+
+# Initializes a new bulgogi project
+bulgogi init .
+
+# Adds a module to the bulgogi project
+bulgogi add module/
+
+# Alternative module ideas
+# bulgogi module add module1/
+# bulgogi module add --create module1/
+# (solves 'no existing module module1')
+
+# Build project
+bulgogi build
+
+# Clean project
+bulgogi clean
+
+# Removes module from the project
+bulgogi rm module/
+
+# Alternative ideas
+# bulgogi module rm module1/
+# bulgogi module rm --cached module1/
+# (simply removes module from tracking but preserves files)
