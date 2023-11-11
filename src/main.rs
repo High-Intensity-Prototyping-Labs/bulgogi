@@ -2,10 +2,22 @@ use std::ffi::OsString;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[serde(transparent)]
 struct Project {
-    targets: Vec<String>,
+    targets: Vec<Target>,
+}
+
+struct Target {
+    name: String,
+    deps: Vec<Dependency>
+}
+
+struct Module {
+    name: String,
+}
+
+enum Dependency {
+    Module(Module),
+    Target(Target),
 }
 
 fn cli() -> Command {
@@ -53,18 +65,10 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", sub_matches)) => {
-            let project = Project {
-                targets: vec![String::from("default"), String::from("module1")],
-            };
-
-            let yaml = serde_yaml::to_string(&project);
-
             println!(
                 "Initialized bulgogi project {}",
                 sub_matches.get_one::<String>("PATH").expect("required")
             );
-
-            println!("Serialized project.yml:\n{}", yaml.expect("error"));
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
