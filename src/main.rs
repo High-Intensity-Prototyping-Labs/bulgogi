@@ -1,6 +1,28 @@
 use std::ffi::OsString;
-
 use clap::{arg, Command};
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Module {
+    path: String,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Dependency {
+    module: Option<Module>,
+    target: Option<Target>,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Target {
+    name: String,
+    deps: Vec<Dependency>,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Project {
+    targets: Vec<Target>
+}
 
 fn cli() -> Command {
     Command::new("bulgogi")
