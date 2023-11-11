@@ -3,25 +3,9 @@ use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Module {
-    path: String,
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Dependency {
-    module: Option<Module>,
-    target: Option<Target>,
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Target {
-    name: String,
-    deps: Vec<Dependency>,
-}
-
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(transparent)]
 struct Project {
-    targets: Vec<Target>
+    targets: Vec<String>,
 }
 
 fn cli() -> Command {
@@ -69,30 +53,11 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", sub_matches)) => {
-            let module1 = Module {
-                path: String::from("module1"),
-            };
-            let module2 = Module {
-                path: String::from("module2"),
-            };
-            let dep1 = Dependency {
-                module: Some(module1),
-                target: None,
-            };
-            let dep2 = Dependency {
-                module: Some(module2),
-                target: None,
-            };
-            let target = Target {
-                name: String::from("default"),
-                deps: vec![dep1, dep2],
-            };
             let project = Project {
-                targets: vec![target],
+                targets: vec![String::from("default"), String::from("module1")],
             };
 
             let yaml = serde_yaml::to_string(&project);
-            let yaml2 = serde_yaml::to_string(&project.targets);
 
             println!(
                 "Initialized bulgogi project {}",
@@ -100,7 +65,6 @@ fn main() {
             );
 
             println!("Serialized project.yml:\n{}", yaml.expect("error"));
-            println!("Serialized2 project.yml:\n{}", yaml2.expect("error"));
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
