@@ -93,3 +93,13 @@ vs the expected output:
 default:
 	module1
 	module2
+
+################ A note on serde yaml:
+# Yaml supports mapping types, which are key-value pairs primitives in rust and the markup.
+# https://docs.rs/serde_yaml/latest/serde_yaml/struct.Mapping.html
+# Basically, do some background reading on how the map works, because all the rust structs 
+# are really just proxy attempts at making this work.
+#
+# The annoyance of the struct field names being fixed vs my desire for customizable keys comes
+# from a misuse or misundertanding of the parent data structure. A map is truly the custom key 
+# custom value structure that I am looking for.
