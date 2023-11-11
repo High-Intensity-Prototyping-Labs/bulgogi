@@ -2,19 +2,23 @@ use std::ffi::OsString;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 struct Project {
     targets: Vec<Target>,
 }
 
+#[derive(Serialize, Deserialize)]
 struct Target {
     name: String,
     deps: Vec<Dependency>
 }
 
+#[derive(Serialize, Deserialize)]
 struct Module {
     name: String,
 }
 
+#[derive(Serialize, Deserialize)]
 enum Dependency {
     Module(Module),
     Target(Target),
@@ -65,10 +69,41 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", sub_matches)) => {
+            let project = Project {
+                targets: vec![
+                    Target { 
+                        name: String::from("default"), 
+                        deps: vec![
+                            Dependency::Module(Module {
+                                name: String::from("module1"),
+                            }),
+                            Dependency::Module(Module {
+                                name: String::from("module2"),
+                            }),
+                        ]
+                    },
+                    Target { 
+                        name: String::from("target1"), 
+                        deps: vec![
+                            Dependency::Module(Module {
+                                name: String::from("module3"),
+                            }),
+                            Dependency::Module(Module {
+                                name: String::from("module4"),
+                            }),
+                        ]
+                    },
+                ],
+            };
+
+            let yaml = serde_yaml::to_string(&project);
+
             println!(
                 "Initialized bulgogi project {}",
                 sub_matches.get_one::<String>("PATH").expect("required")
             );
+
+            println!("Serialized yaml string:\n{}", yaml.expect("error"));
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
