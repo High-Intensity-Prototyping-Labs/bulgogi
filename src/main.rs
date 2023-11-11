@@ -14,8 +14,9 @@ struct Target {
 }
 
 #[derive(Serialize, Deserialize)]
-struct Module {
-    name: String,
+#[serde(untagged)]
+enum Module {
+    Name(String),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -75,23 +76,23 @@ fn main() {
                     Target { 
                         name: String::from("default"), 
                         deps: vec![
-                            Dependency::Module(Module {
-                                name: String::from("module1"),
-                            }),
-                            Dependency::Module(Module {
-                                name: String::from("module2"),
-                            }),
+                            Dependency::Module(Module::Name (
+                               String::from("module1"),
+                            )),
+                            Dependency::Module(Module::Name (
+                                String::from("module2"),
+                            )),
                         ]
                     },
                     Target { 
                         name: String::from("target1"), 
                         deps: vec![
-                            Dependency::Module(Module {
-                                name: String::from("module3"),
-                            }),
-                            Dependency::Module(Module {
-                                name: String::from("module4"),
-                            }),
+                            Dependency::Module(Module::Name (
+                               String::from("module1"),
+                            )),
+                            Dependency::Module(Module::Name (
+                                String::from("module2"),
+                            )),
                         ]
                     },
                 ],
