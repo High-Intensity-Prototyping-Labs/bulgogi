@@ -69,10 +69,38 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", sub_matches)) => {
+            let module1 = Module {
+                path: String::from("module1"),
+            };
+            let module2 = Module {
+                path: String::from("module2"),
+            };
+            let dep1 = Dependency {
+                module: Some(module1),
+                target: None,
+            };
+            let dep2 = Dependency {
+                module: Some(module2),
+                target: None,
+            };
+            let target = Target {
+                name: String::from("default"),
+                deps: vec![dep1, dep2],
+            };
+            let project = Project {
+                targets: vec![target],
+            };
+
+            let yaml = serde_yaml::to_string(&project);
+            let yaml2 = serde_yaml::to_string(&project.targets);
+
             println!(
                 "Initialized bulgogi project {}",
                 sub_matches.get_one::<String>("PATH").expect("required")
             );
+
+            println!("Serialized project.yml:\n{}", yaml.expect("error"));
+            println!("Serialized2 project.yml:\n{}", yaml2.expect("error"));
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {

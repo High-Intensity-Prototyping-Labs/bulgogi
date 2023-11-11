@@ -75,3 +75,21 @@ project/
 				|- private2.h 
 
 /* Repeat the same for module 2 */
+
+Results from serde_yaml for the current structure:
+
+targets:
+- name: default
+  deps:
+  - module:
+      path: module1
+    target: null
+  - module:
+      path: module2
+    target: null
+
+vs the expected output:
+
+default:
+	module1
+	module2
