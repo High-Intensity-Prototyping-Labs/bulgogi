@@ -19,6 +19,7 @@ struct Module {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(untagged)]
 enum Dependency {
     Module(Module),
     Target(Target),
