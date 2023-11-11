@@ -47,9 +47,19 @@ bulgogi tree
 # Bulgogi primarily works by reading and updating this file.
 
 # project.yaml
-default:
-	module1
-	module2
+default:		# Target 
+	module1		# Dependency 1
+	module2		# Dependency 2
+
+target1:		# Target
+	module3		# Dependency 1
+	module4		# Dependency 2
+
+target2:		# Target
+	module3		# Dependency 1
+	target1		# Dependency 2 (implies target1 is a lib)
+
+**NOTE: A dependency can be a target OR a module. Targets used as dependencies imply lib.
 
 # project directory
 project/
