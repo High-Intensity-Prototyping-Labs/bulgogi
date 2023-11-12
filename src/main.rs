@@ -2,29 +2,24 @@ use std::ffi::OsString;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize)]
 struct Project {
     targets: Vec<Target>,
 }
 
-#[derive(Serialize, Deserialize)]
 struct Target {
     name: String,
     deps: Vec<Dependency>
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(untagged)]
 enum Module {
     Name(String),
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(untagged)]
 enum Dependency {
     Module(Module),
     Target(Target),
 }
+use serde_yaml::{Mapping};
 
 fn cli() -> Command {
     Command::new("bulgogi")
@@ -98,7 +93,11 @@ fn main() {
                 ],
             };
 
-            let yaml = serde_yaml::to_string(&project);
+            let mut m = Mapping::new();
+            m.insert("default".into(), vec!["module1", "module2"].into());
+            m.insert("target1".into(), vec!["module3", "module4"].into());
+            m.insert("target2".into(), vec!["module1", "target1"].into());
+            let yaml = serde_yaml::to_string(&m);
 
             println!(
                 "Initialized bulgogi project {}",
