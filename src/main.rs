@@ -41,6 +41,16 @@ impl From<Dependency> for Value {
     }
 }
 
+impl From<Project> for Mapping {
+    fn from(value: Project) -> Self {
+        let mut m = Mapping::new();
+        for target in &value.targets {
+            m.insert(target.name.clone().into(), target.deps.clone().into());
+        }
+        m
+    }
+}
+
 impl Project {
     fn new() -> Project {
         Project {
@@ -52,14 +62,6 @@ impl Project {
         Project {
             targets,
         }
-    }
-
-    fn yaml(&self) -> Result<String, Error> {
-        let mut m = Mapping::new();
-        for target in &self.targets {
-            m.insert(target.name.clone().into(), target.deps.clone().into());
-        }
-        serde_yaml::to_string(&m)
     }
 }
 
@@ -143,7 +145,8 @@ fn main() {
             println!("Serialized yaml string:\n{}", yaml.expect("error"));
             
             // Now using the fancy rust types
-            let fancy_yaml = project.yaml();
+            let fancy_map = Mapping::from(project);
+            let fancy_yaml = serde_yaml::to_string(&fancy_map);
             println!("Fancy yaml project:\n{}", fancy_yaml.expect("error"));
         }
         Some(("module", sub_matches)) => {
