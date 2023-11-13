@@ -1,25 +1,60 @@
 use std::ffi::OsString;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
+use serde_yaml::{Mapping, Error};
 
 struct Project {
     targets: Vec<Target>,
 }
 
+#[derive(Serialize, Deserialize)]
 struct Target {
     name: String,
     deps: Vec<Dependency>
 }
 
-enum Module {
-    Name(String),
+#[derive(Serialize, Deserialize)]
+struct Module {
+    name: String,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
 enum Dependency {
     Module(Module),
     Target(Target),
 }
-use serde_yaml::{Mapping};
+
+impl Project {
+    fn new() -> Project {
+        Project {
+            targets: vec![],
+        }
+    }
+
+    fn from(targets: Vec<Target>) -> Project {
+        Project {
+            targets,
+        }
+    }
+
+    fn yaml(&self) -> Result<String, Error> {
+        let mut m = Mapping::new();
+        for target in &self.targets {
+            for dep in &target.deps {
+                match dep {
+                    Dependency::Module(module) => {
+                        m.insert(target.name.clone().into(), module.name.clone().into());
+                    }
+                    Dependency::Target(target_dep) => {
+                        m.insert(target.name.clone().into(), target_dep.name.clone().into());
+                    }
+                }
+            }
+        }
+        serde_yaml::to_string(&m)
+    }
+}
 
 fn cli() -> Command {
     Command::new("bulgogi")
@@ -71,23 +106,15 @@ fn main() {
                     Target { 
                         name: String::from("default"), 
                         deps: vec![
-                            Dependency::Module(Module::Name (
-                               String::from("module1"),
-                            )),
-                            Dependency::Module(Module::Name (
-                                String::from("module2"),
-                            )),
+                            Dependency::Module(Module { name: String::from("module1") }),
+                            Dependency::Module(Module { name: String::from("module2") }),
                         ]
                     },
                     Target { 
                         name: String::from("target1"), 
                         deps: vec![
-                            Dependency::Module(Module::Name (
-                               String::from("module1"),
-                            )),
-                            Dependency::Module(Module::Name (
-                                String::from("module2"),
-                            )),
+                            Dependency::Module(Module { name: String::from("module1") }),
+                            Dependency::Module(Module { name: String::from("module2") }),
                         ]
                     },
                 ],
