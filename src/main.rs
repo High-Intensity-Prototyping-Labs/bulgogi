@@ -7,28 +7,36 @@ struct Project {
     targets: Vec<Target>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Target {
     name: String,
     deps: Vec<Dependency>
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Module {
     name: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 enum Dependency {
     Module(Module),
     Target(Target),
 }
 
+// Add support for implicit conversion from Dependency to YAML Value
 impl From<Dependency> for Value {
     fn from(value: Dependency) -> Self {
-        Value::Sequence(
-            vec![Value::String(String::from("ok"))],
+        Value::String(
+            match value {
+                Dependency::Module(module) => {
+                    module.name
+                }
+                Dependency::Target(target) => {
+                    target.name
+                }
+            }
         )
     }
 }
@@ -49,7 +57,7 @@ impl Project {
     fn yaml(&self) -> Result<String, Error> {
         let mut m = Mapping::new();
         for target in &self.targets {
-            m.insert(target.name.clone().into(), target.deps.into());
+            m.insert(target.name.clone().into(), target.deps.clone().into());
         }
         serde_yaml::to_string(&m)
     }
@@ -100,6 +108,7 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", sub_matches)) => {
+            // Test project structure
             let project = Project {
                 targets: vec![
                     Target { 
@@ -119,6 +128,7 @@ fn main() {
                 ],
             };
 
+            // Doing a yaml project manually
             let mut m = Mapping::new();
             m.insert("default".into(), vec!["module1", "module2"].into());
             m.insert("target1".into(), vec!["module3", "module4"].into());
@@ -131,6 +141,10 @@ fn main() {
             );
 
             println!("Serialized yaml string:\n{}", yaml.expect("error"));
+            
+            // Now using the fancy rust types
+            let fancy_yaml = project.yaml();
+            println!("Fancy yaml project:\n{}", fancy_yaml.expect("error"));
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
