@@ -1,7 +1,7 @@
 use std::ffi::OsString;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
-use serde_yaml::{Mapping, Error};
+use serde_yaml::{Mapping, Error, Value, Sequence};
 
 struct Project {
     targets: Vec<Target>,
@@ -25,6 +25,14 @@ enum Dependency {
     Target(Target),
 }
 
+impl From<Dependency> for Value {
+    fn from(value: Dependency) -> Self {
+        Value::Sequence(
+            vec![Value::String(String::from("ok"))],
+        )
+    }
+}
+
 impl Project {
     fn new() -> Project {
         Project {
@@ -41,16 +49,7 @@ impl Project {
     fn yaml(&self) -> Result<String, Error> {
         let mut m = Mapping::new();
         for target in &self.targets {
-            for dep in &target.deps {
-                match dep {
-                    Dependency::Module(module) => {
-                        m.insert(target.name.clone().into(), module.name.clone().into());
-                    }
-                    Dependency::Target(target_dep) => {
-                        m.insert(target.name.clone().into(), target_dep.name.clone().into());
-                    }
-                }
-            }
+            m.insert(target.name.clone().into(), target.deps.into());
         }
         serde_yaml::to_string(&m)
     }
