@@ -43,6 +43,41 @@ impl From<Vec<Target>> for Project {
     }
 }
 
+impl From<Mapping> for Project {
+    fn from(mapping: Mapping) -> Self {
+        let mut project = Project::new();
+
+        // 1. First pass -- assume all deps to be modules
+        for (key, value) in mapping.iter() {
+            if let (Value::String(target), Value::Sequence(deps)) = (key, value) {
+                project.targets.push(
+                    Target { 
+                        name: target.clone(), 
+                        deps: deps.iter().map(|d| Dependency::from(d)).collect(),
+                    }
+                );
+            }
+        }
+
+        project
+    }
+}
+
+impl From<Value> for Dependency {
+    fn from(value: Value) -> Self {
+        match value {
+            Value::String(str) => {
+                Dependency::Module(
+                    Module {
+                        name: str,
+                    }
+                )
+            }
+            _ => unreachable!(),
+        }
+    }
+}
+
 // Add support for implicit conversion from Dependency to YAML Value
 impl From<Dependency> for Value {
     fn from(value: Dependency) -> Self {
