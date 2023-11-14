@@ -5,3 +5,17 @@ default:
 target1:
 - module1
 - module2
+
+custom_target:
+- module4
+- module6
+- target1
+- indirect_target
+
+custom_dep:
+- module1
+- custom_target
+
+indirect_target:
+- module1
+- custom_dep
