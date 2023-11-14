@@ -132,20 +132,6 @@ fn main() {
                 ],
             };
 
-            // Doing a yaml project manually
-            let mut m = Mapping::new();
-            m.insert("default".into(), vec!["module1", "module2"].into());
-            m.insert("target1".into(), vec!["module3", "module4"].into());
-            m.insert("target2".into(), vec!["module1", "target1"].into());
-            let yaml = serde_yaml::to_string(&m);
-
-            println!(
-                "Initialized bulgogi project {}",
-                sub_matches.get_one::<String>("PATH").expect("required")
-            );
-
-            println!("Serialized yaml string:\n{}", yaml.expect("error"));
-            
             // Now using the fancy rust types
             let fancy_map = Mapping::from(project);
             let fancy_yaml = serde_yaml::to_string(&fancy_map);
