@@ -36,13 +36,59 @@ impl Project {
             targets: vec![],
         }
     }
+
+    fn check_cylic(&self) -> bool {
+        // Start with the first target. For each dependency of type target,
+        // follow its dependencies. For each of those dependencies of type target,
+        // repeat and continue the sequence. At every step, deliberately test the
+        // name of the target against the original target that is being checked.
+        // **IF EVER** there is a match down the road, this necessarily means that directly
+        // or indirectly, one of the OG target's dependencies include IT, thus circular.
+
+        for target in &self.targets {
+            for dep in &target.deps {
+                if let Dependency::Target(search_target) = dep {
+                    if let Some(t) = self.find(search_target.into()) {
+
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    fn find(&self, name: String) -> Option<&Target> {
+        for target in &self.targets {
+            if target.name == name {
+                return Some(&target);
+            }
+        }
+        None
+    }
+}
+
+impl Target {
+    fn check_deps(&self, parent: Option<&Target>) -> bool {
+        // Checks through its own dependencies.
+        // First by testing one level down into its target-type dependencies,
+        // then if any target-type dependencies are found at that level, recursively
+        // call the check_deps function.
+        // First (top-level) caller should pass None as parent Option, subsequent recursive calls
+        // must pass the parent down as this is the determining criterion for the check.
+        for dep in &self.deps {
+            if let Dependency::Target(target_dep) = dep {
+                if let Some
+            }
+        }
+        false
+    }
 }
 
 impl Default for Project {
     fn default() -> Self {
         Project {
             targets: vec![Target::default()],
-        }
+        }:write!
     }
 }
 
