@@ -159,6 +159,9 @@ impl From<Mapping> for Project {
             }
         }
 
+        // DEBUG 
+        println!("PROJECT before re-mapping:\n{:#?}", project);
+
         // Re-map dependencies into their corresponding Module or Target variants 
         let ref_project = project.clone();
         for target in &mut project.targets {
@@ -173,6 +176,9 @@ impl From<Mapping> for Project {
                 }
             }
         }
+
+        // DEBUG 
+        println!("PROJECT after re-mapping:\n{:#?}", project);
         
         // Check for cyclic dependencies 
         if project.check_cylic() {
@@ -267,9 +273,13 @@ fn init(matches: &ArgMatches) {
     let file = File::open(&path);
 
     match file {
-        Ok(_) => {
+        Ok(f) => {
             // Project exists, notify user that init was useless.
             println!("Found project.yaml -- no need to initialize ({:?}).", path);
+
+            // Passing f to print debugging info
+            let map: Mapping = serde_yaml::from_reader(&f).expect("required");
+            let project = Project::from(map);
         }
         Err(e) => {
             match e.kind() {
