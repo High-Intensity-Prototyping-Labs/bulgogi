@@ -1,4 +1,6 @@
 use std::ffi::OsString;
+use std::io::prelude::*;
+use std::fs::File;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 use serde_yaml::{Mapping, Error, Value, Sequence};
@@ -31,6 +33,7 @@ impl Project {
             targets: vec![],
         }
     }
+}
 
 impl From<Vec<Target>> for Project {
     fn from(targets: Vec<Target>) -> Self {
@@ -136,6 +139,11 @@ fn main() {
             let fancy_map = Mapping::from(project);
             let fancy_yaml = serde_yaml::to_string(&fancy_map);
             println!("Fancy yaml project:\n{}", fancy_yaml.expect("error"));
+
+            // Load project.yaml file 
+            let mut f = File::open("project.yaml").expect("failed to open file");
+            let map_f: Mapping = serde_yaml::from_reader(f).expect("error");
+            let proj = Project::from(map_f);
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
