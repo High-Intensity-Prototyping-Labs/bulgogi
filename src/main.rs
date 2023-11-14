@@ -1,6 +1,8 @@
 use std::ffi::OsString;
 use std::fs::File;
-use clap::{arg, Command};
+use std::io::ErrorKind;
+use std::path::Path;
+use clap::{arg, Command, ArgMatches};
 use serde::{Serialize, Deserialize};
 use serde_yaml::{Mapping, Value};
 
@@ -50,6 +52,33 @@ impl Project {
             }
         }
         false
+    }
+}
+
+impl Default for Project {
+    fn default() -> Self {
+        Project {
+            targets: vec![Target::default()],
+        }
+    }
+}
+
+impl Default for Target {
+    fn default() -> Self {
+        Target {
+            name: String::from("default"),
+            deps: vec![Dependency::default()],
+        }
+    }
+}
+
+impl Default for Dependency {
+    fn default() -> Self {
+        Dependency::Module(
+            Module {
+                name: String::from("module1"),
+            }
+        )
     }
 }
 
@@ -206,44 +235,42 @@ fn cli() -> Command {
         )
 }
 
+fn init(matches: &ArgMatches) {
+    // Load project.yaml file 
+    let dir = matches.get_one::<String>("PATH").expect("error");
+    let path = Path::new(dir).join("project.yaml");
+    let file = File::open(&path);
+
+    match file {
+        Ok(_) => {
+            // Project exists, notify user that init was useless.
+            println!("Found project.yaml -- no need to initialize ({:?}).", path);
+        }
+        Err(e) => {
+            match e.kind() {
+                ErrorKind::NotFound => {
+                    // Create directory structure
+
+                    // Create default project
+                    let new_file = File::create("project.yaml").expect("Could not create new file");
+                    let new_map = Mapping::from(Project::default());
+                    serde_yaml::to_writer(new_file, &new_map).expect("Failed to write default project to file");
+
+                    // Test created file
+                    println!("Could not find project.yaml -- default project loaded and saved:\n{:#?}", Project::default());
+                }
+                _ => panic!("Unable to open project.yaml file"),
+            }
+        }
+    }
+
+}
+
 fn main() {
     let matches = cli().get_matches();
 
     match matches.subcommand() {
-        Some(("init", sub_matches)) => {
-            // Test project structure
-            let project = Project {
-                targets: vec![
-                    Target { 
-                        name: String::from("default"), 
-                        deps: vec![
-                            Dependency::Module(Module { name: String::from("module1") }),
-                            Dependency::Module(Module { name: String::from("module2") }),
-                        ]
-                    },
-                    Target { 
-                        name: String::from("target1"), 
-                        deps: vec![
-                            Dependency::Module(Module { name: String::from("module1") }),
-                            Dependency::Module(Module { name: String::from("module2") }),
-                        ]
-                    },
-                ],
-            };
-
-            // Now using the fancy rust types
-            let fancy_map = Mapping::from(project);
-            let fancy_yaml = serde_yaml::to_string(&fancy_map);
-            println!("Fancy yaml project:\n{}", fancy_yaml.expect("error"));
-
-            // Load project.yaml file 
-            let f = File::open("project.yaml").expect("failed to open file");
-            let map_f: Mapping = serde_yaml::from_reader(f).expect("error");
-            let project_f = Project::from(map_f);
-
-            // Test loaded file 
-            println!("Loaded project successfully:\n{:#?}", project_f);
-        }
+        Some(("init", sub_matches)) => init(&sub_matches),
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
                 Some(("add", sub2_matches)) => {
