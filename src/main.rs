@@ -32,7 +32,8 @@ impl Project {
         }
     }
 
-    fn from(targets: Vec<Target>) -> Project {
+impl From<Vec<Target>> for Project {
+    fn from(targets: Vec<Target>) -> Self {
         Project {
             targets,
         }
