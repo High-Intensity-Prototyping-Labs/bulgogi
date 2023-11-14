@@ -160,6 +160,19 @@ impl From<Mapping> for Project {
         }
 
         // Re-map dependencies into their corresponding Module or Target variants 
+        let ref_project = project.clone();
+        for target in &mut project.targets {
+            for dep in &mut target.deps {
+                /* dep can be Dependency::Module or Dependency::Target type */
+                if let Dependency::Module(m) = dep {
+                    if let Some(_) = ref_project.find(m.clone()) {
+                        /* we've found a match for the dependency in the project's targets */
+                        // Update the current dep's type to Dep::Target
+                        *dep = Dependency::Target(m.clone());
+                    }
+                }
+            }
+        }
         
         // Check for cyclic dependencies 
         if project.check_cylic() {
