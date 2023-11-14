@@ -35,6 +35,23 @@ impl Project {
             targets: vec![],
         }
     }
+
+    fn check_circ_dep(&self) -> bool {
+        for target in &self.targets {
+            for dep in &target.deps {
+                if let Dependency::Target(target_dep) = dep {
+                    for dep_dep in &target_dep.deps {
+                        if let Dependency::Name(dep_dep_name) = dep_dep {
+                            if &target.name == dep_dep_name {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        false
+    }
 }
 
 impl From<Vec<Target>> for Project {
@@ -94,6 +111,11 @@ impl From<Mapping> for Project {
                     }
                 }
             }
+        }
+
+        // Check for circular dependencies
+        if project.check_circ_dep() {
+            panic!("Circular dependencies detected, cannot proceed");
         }
 
         project
