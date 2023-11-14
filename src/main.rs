@@ -5,7 +5,7 @@ use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 use serde_yaml::{Mapping, Error, Value, Sequence};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Project {
     targets: Vec<Target>,
 }
@@ -77,7 +77,24 @@ impl From<Mapping> for Project {
             }
         }
 
-        // For now -- dependencies are loaded as strings
+        // Second pass -- infer which dependencies are targets and which are modules
+        let ref_project = project.clone();
+        for target in &mut project.targets {
+            for dep in &mut target.deps {
+                let mut found = false;
+                if let Dependency::Name(dep_name) = dep.clone() {
+                    for search_target in ref_project.clone().targets {
+                        if dep_name.to_owned() == search_target.name {
+                            *dep = Dependency::Target(search_target);
+                            found = true;
+                        }
+                    }
+                    if !found {
+                        *dep = Dependency::Module(Module{ name: dep_name });
+                    }
+                }
+            }
+        }
 
         project
     }
@@ -204,7 +221,7 @@ fn main() {
             let project_f = Project::from(map_f);
 
             // Test loaded file 
-            println!("Loaded project successfully: {:?}", project_f);
+            println!("Loaded project successfully:\n{:#?}", project_f);
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
