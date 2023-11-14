@@ -1,9 +1,8 @@
 use std::ffi::OsString;
-use std::io::prelude::*;
 use std::fs::File;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
-use serde_yaml::{Mapping, Error, Value, Sequence};
+use serde_yaml::{Mapping, Value};
 
 #[derive(Debug, Clone)]
 struct Project {
