@@ -46,12 +46,8 @@ impl Project {
         // or indirectly, one of the OG target's dependencies include IT, thus circular.
 
         for target in &self.targets {
-            for dep in &target.deps {
-                if let Dependency::Target(search_target) = dep {
-                    if let Some(t) = self.find(search_target.into()) {
-
-                    }
-                }
+            if target.check_deps(self, None) {
+                return true;
             }
         }
         false
@@ -68,16 +64,47 @@ impl Project {
 }
 
 impl Target {
-    fn check_deps(&self, parent: Option<&Target>) -> bool {
+    fn check_deps(&self, project: &Project, mut parent: Option<&Target>) -> bool {
         // Checks through its own dependencies.
         // First by testing one level down into its target-type dependencies,
         // then if any target-type dependencies are found at that level, recursively
         // call the check_deps function.
         // First (top-level) caller should pass None as parent Option, subsequent recursive calls
         // must pass the parent down as this is the determining criterion for the check.
+        //
+        // Returns true if a match for the parent is found
+    
+        // For each dependency in self target
         for dep in &self.deps {
+            // Match the depdencies of the target kind
             if let Dependency::Target(target_dep) = dep {
-                if let Some
+                // Find the actual target struct from the project
+                if let Some(t) = project.find(target_dep.into()) {
+                    // Recurse into dependencies of found target-type dependency
+                    for recursed_dep in &t.deps {
+                        // Match the target-type dependencies in the recursed target
+                        if let Dependency::Target(recursed_target_dep) = recursed_dep {
+                            // Retrieve the actual target struct of the matched target-type
+                            // dependencies
+                            if let Some(recursed_t) = project.find(recursed_target_dep.into()) {
+                                // Check if current target dependency's target-dependency matches
+                                // parent name 
+                                if recursed_t.name == parent.unwrap_or(self).name {
+                                    return true;
+                                }
+
+                                // Continue down the road for the target's target dependency
+                                else if recursed_t.check_deps(project, parent.or(Some(self))) {
+                                    return true;
+                                }
+
+                                // Otherwise move on to the next target-dependency's
+                                // target-dependency 
+                                else { continue };
+                            }
+                        }
+                    }
+                }
             }
         }
         false
@@ -88,7 +115,7 @@ impl Default for Project {
     fn default() -> Self {
         Project {
             targets: vec![Target::default()],
-        }:write!
+        }
     }
 }
 
@@ -130,6 +157,13 @@ impl From<Mapping> for Project {
                     }
                 );
             }
+        }
+
+        // Re-map dependencies into their corresponding Module or Target variants 
+        
+        // Check for cyclic dependencies 
+        if project.check_cylic() {
+            panic!("Cyclic dependencies detected -- cannot proceed");
         }
 
         project
