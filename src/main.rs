@@ -25,6 +25,20 @@ enum Dependency {
     Target(Target),
 }
 
+impl Project {
+    fn new() -> Project {
+        Project {
+            targets: vec![],
+        }
+    }
+
+    fn from(targets: Vec<Target>) -> Project {
+        Project {
+            targets,
+        }
+    }
+}
+
 // Add support for implicit conversion from Dependency to YAML Value
 impl From<Dependency> for Value {
     fn from(value: Dependency) -> Self {
@@ -41,6 +55,7 @@ impl From<Dependency> for Value {
     }
 }
 
+// Add support for implicit conversion from Project to YAML Mapping
 impl From<Project> for Mapping {
     fn from(value: Project) -> Self {
         let mut m = Mapping::new();
@@ -48,20 +63,6 @@ impl From<Project> for Mapping {
             m.insert(target.name.clone().into(), target.deps.clone().into());
         }
         m
-    }
-}
-
-impl Project {
-    fn new() -> Project {
-        Project {
-            targets: vec![],
-        }
-    }
-
-    fn from(targets: Vec<Target>) -> Project {
-        Project {
-            targets,
-        }
     }
 }
 
