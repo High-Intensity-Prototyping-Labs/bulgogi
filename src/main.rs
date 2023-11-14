@@ -14,20 +14,26 @@ struct Project {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct Target {
     name: String,
-    deps: Vec<Dependency>
+    deps: Vec<Dependency>,
+    kind: TargetKind,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct Module {
+enum TargetKind {
+    Binary,
+    Library,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct Dependency {
     name: String,
+    kind: DependencyKind,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-#[serde(untagged)]
-enum Dependency {
-    Module(Module),
-    Target(Target),
-    Name(String),
+enum DependencyKind {
+    Module,
+    Target,
 }
 
 impl Project {
@@ -35,23 +41,6 @@ impl Project {
         Project {
             targets: vec![],
         }
-    }
-
-    fn check_circ_dep(&self) -> bool {
-        for target in &self.targets {
-            for dep in &target.deps {
-                if let Dependency::Target(target_dep) = dep {
-                    for dep_dep in &target_dep.deps {
-                        if let Dependency::Name(dep_dep_name) = dep_dep {
-                            if &target.name == dep_dep_name {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        false
     }
 }
 
@@ -68,17 +57,17 @@ impl Default for Target {
         Target {
             name: String::from("default"),
             deps: vec![Dependency::default()],
+            kind: TargetKind::Binary,
         }
     }
 }
 
 impl Default for Dependency {
     fn default() -> Self {
-        Dependency::Module(
-            Module {
-                name: String::from("module1"),
-            }
-        )
+        Dependency {
+            name: String::from("module1"),
+            kind: DependencyKind::Module,
+        }
     }
 }
 
@@ -94,56 +83,16 @@ impl From<Mapping> for Project {
     fn from(mapping: Mapping) -> Self {
         let mut project = Project::new();
 
-        // First pass -- does not infer targets against dependencies
-        for (key, value) in mapping.iter() {
-            if let (Value::String(target), Value::Sequence(deps)) = (key, value) {
-                // Create empty vector of dependency names
-                let mut deps_str: Vec<String> = Vec::new();
-
-                // Convert the entries in the YAML Value Sequence into strings for the 
-                // vector of dependency names
-                for dep in deps {
-                    match dep {
-                        Value::String(s) => {
-                            deps_str.push(String::from(s));
-                        }
-                        _ => unreachable!(),
+        for (key, value) in mapping {
+            if let (Value::String(key_string), Value::Sequence(value_seq)) = (key, value) {
+                project.targets.push(
+                    Target {
+                        name: key_string,
+                        kind: TargetKind::Binary,
+                        deps: value_seq.into_iter().map(|v| Dependency::from(v)).collect(),
                     }
-                }
-
-                // Create the target to append to the project using the vector of dependency 
-                // names.
-                let target = Target {
-                    name: String::from(target),
-                    deps: deps_str.into_iter().map(|ds| Dependency::Name(ds)).collect(),
-                };
-
-                project.targets.push(target);
+                );
             }
-        }
-
-        // Second pass -- infer which dependencies are targets and which are modules
-        let ref_project = project.clone();
-        for target in &mut project.targets {
-            for dep in &mut target.deps {
-                let mut found = false;
-                if let Dependency::Name(dep_name) = dep.clone() {
-                    for search_target in ref_project.clone().targets {
-                        if dep_name.to_owned() == search_target.name {
-                            *dep = Dependency::Target(search_target);
-                            found = true;
-                        }
-                    }
-                    if !found {
-                        *dep = Dependency::Module(Module{ name: dep_name });
-                    }
-                }
-            }
-        }
-
-        // Check for circular dependencies
-        if project.check_circ_dep() {
-            panic!("Circular dependencies detected, cannot proceed");
         }
 
         project
@@ -152,35 +101,21 @@ impl From<Mapping> for Project {
 
 impl From<Value> for Dependency {
     fn from(value: Value) -> Self {
-        match value {
-            Value::String(str) => {
-                Dependency::Module(
-                    Module {
-                        name: str,
-                    }
-                )
+        if let Value::String(val_string) = value {
+            Dependency {
+                name: val_string,
+                ..Default::default()
             }
-            _ => unreachable!(),
+        } else {
+            Default::default()
         }
     }
 }
 
 // Add support for implicit conversion from Dependency to YAML Value
 impl From<Dependency> for Value {
-    fn from(value: Dependency) -> Self {
-        Value::String(
-            match value {
-                Dependency::Module(module) => {
-                    module.name
-                }
-                Dependency::Target(target) => {
-                    target.name
-                }
-                Dependency::Name(name) => {
-                    name
-                }
-            }
-        )
+    fn from(dep: Dependency) -> Self {
+        Value::String(dep.name)
     }
 }
 
