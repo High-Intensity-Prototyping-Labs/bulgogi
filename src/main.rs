@@ -5,26 +5,28 @@ use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 use serde_yaml::{Mapping, Error, Value, Sequence};
 
+#[derive(Debug)]
 struct Project {
     targets: Vec<Target>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Target {
     name: String,
     deps: Vec<Dependency>
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Module {
     name: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
 enum Dependency {
     Module(Module),
     Target(Target),
+    Name(String),
 }
 
 impl Project {
@@ -47,17 +49,35 @@ impl From<Mapping> for Project {
     fn from(mapping: Mapping) -> Self {
         let mut project = Project::new();
 
-        // 1. First pass -- assume all deps to be modules
+        // First pass -- does not infer targets against dependencies
         for (key, value) in mapping.iter() {
             if let (Value::String(target), Value::Sequence(deps)) = (key, value) {
-                project.targets.push(
-                    Target { 
-                        name: target.clone(), 
-                        deps: deps.iter().map(|d| Dependency::from(d)).collect(),
+                // Create empty vector of dependency names
+                let mut deps_str: Vec<String> = Vec::new();
+
+                // Convert the entries in the YAML Value Sequence into strings for the 
+                // vector of dependency names
+                for dep in deps {
+                    match dep {
+                        Value::String(s) => {
+                            deps_str.push(String::from(s));
+                        }
+                        _ => unreachable!(),
                     }
-                );
+                }
+
+                // Create the target to append to the project using the vector of dependency 
+                // names.
+                let target = Target {
+                    name: String::from(target),
+                    deps: deps_str.into_iter().map(|ds| Dependency::Name(ds)).collect(),
+                };
+
+                project.targets.push(target);
             }
         }
+
+        // For now -- dependencies are loaded as strings
 
         project
     }
@@ -88,6 +108,9 @@ impl From<Dependency> for Value {
                 }
                 Dependency::Target(target) => {
                     target.name
+                }
+                Dependency::Name(name) => {
+                    name
                 }
             }
         )
@@ -176,9 +199,12 @@ fn main() {
             println!("Fancy yaml project:\n{}", fancy_yaml.expect("error"));
 
             // Load project.yaml file 
-            let mut f = File::open("project.yaml").expect("failed to open file");
+            let f = File::open("project.yaml").expect("failed to open file");
             let map_f: Mapping = serde_yaml::from_reader(f).expect("error");
-            let proj = Project::from(map_f);
+            let project_f = Project::from(map_f);
+
+            // Test loaded file 
+            println!("Loaded project successfully: {:?}", project_f);
         }
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
