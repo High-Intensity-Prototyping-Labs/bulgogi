@@ -172,6 +172,11 @@ impl From<Mapping> for Project {
                         /* we've found a match for the dependency in the project's targets */
                         // Update the current dep's type to Dep::Target
                         *dep = Dependency::Target(m.clone());
+
+                        // Also update target type to be a library
+                        // TODO: For this to work, project needs a find_ref function which Returns
+                        // not just the complete copy of a Target struct but actually returns a
+                        // mutable reference which can be used to change the target type itself.
                     }
                 }
             }
