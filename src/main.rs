@@ -25,15 +25,9 @@ enum TargetKind {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct Dependency {
-    name: String,
-    kind: DependencyKind,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-enum DependencyKind {
-    Module,
-    Target,
+enum Dependency {
+    Module(String),
+    Target(String),
 }
 
 impl Project {
@@ -64,10 +58,7 @@ impl Default for Target {
 
 impl Default for Dependency {
     fn default() -> Self {
-        Dependency {
-            name: String::from("module1"),
-            kind: DependencyKind::Module,
-        }
+        Dependency::Module(String::from("module1"))
     }
 }
 
@@ -102,12 +93,18 @@ impl From<Mapping> for Project {
 impl From<Value> for Dependency {
     fn from(value: Value) -> Self {
         if let Value::String(val_string) = value {
-            Dependency {
-                name: val_string,
-                ..Default::default()
-            }
+            Dependency::Module(val_string)
         } else {
             Default::default()
+        }
+    }
+}
+
+impl From<Dependency> for String {
+    fn from(dep: Dependency) -> Self {
+        match dep {
+            Dependency::Module(m) => m,
+            Dependency::Target(t) => t,
         }
     }
 }
@@ -115,7 +112,7 @@ impl From<Value> for Dependency {
 // Add support for implicit conversion from Dependency to YAML Value
 impl From<Dependency> for Value {
     fn from(dep: Dependency) -> Self {
-        Value::String(dep.name)
+        Value::String(dep.into())
     }
 }
 
