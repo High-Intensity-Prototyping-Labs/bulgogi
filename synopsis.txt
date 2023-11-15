@@ -76,30 +76,42 @@ project/
 
 /* Repeat the same for module 2 */
 
-Results from serde_yaml for the current structure:
-
-targets:
-- name: default
-  deps:
-  - module:
-      path: module1
-    target: null
-  - module:
-      path: module2
-    target: null
-
-vs the expected output:
-
-default:
-	module1
-	module2
-
-################ A note on serde yaml:
-# Yaml supports mapping types, which are key-value pairs primitives in rust and the markup.
-# https://docs.rs/serde_yaml/latest/serde_yaml/struct.Mapping.html
-# Basically, do some background reading on how the map works, because all the rust structs 
-# are really just proxy attempts at making this work.
+################## Cyclic Dependencies 
+# A cyclic dependency check has been implemented for every conversion
+# from a serde_yaml mapping into a Project struct.
 #
-# The annoyance of the struct field names being fixed vs my desire for customizable keys comes
-# from a misuse or misundertanding of the parent data structure. A map is truly the custom key 
-# custom value structure that I am looking for.
+# This is largely for A. safety (mistakes happen) and B. to prevent panics,
+# runoffs and disasters down the road when those cyclic dependencies appear
+# elsewhere (like in the CMake files which we are trying to keep the user
+# out of in the first place).
+#
+# It currently works by iterating over each of the project targets and searching
+# for target-type dependencies in other targets (or in itself for that matter).
+# Further recursing is performed into each of the dependencies associated to the
+# target-type dependencies until a match to the 'parent' target is found -- implying
+# that by travelling laterally across the dependency tree we found our way back to the
+# start.
+#
+# The user is notified and the program panics if this is encountered. No work should been
+# done or attempted if the configuration suggests something impossible (or which could 
+# easily be addressed using a common abstraction target which prevents the cycle).
+
+################### Adding Modules
+# As per the suggested synopsis, modules are to be added using the 
+# $(bulgogi module add <name>) command.
+#
+# Unique to the init command, a default project and project directory must be spawned.
+# Internally this is easy since the project struct just needs to be initialized to its 
+# default value. 
+#
+# Ideas to spawn module directories:
+# 1. Provide a .spawn() method for the project 
+# 	- This would ensure that all module folders exist for the current project.
+# 	- If any folders are missing (including child src and inc folders) they would be created.
+#	- If any modules are missing in the project.yaml but a directory is found, they are ignored.
+# 	** Module directories in this case must be removed using the $(bulgogi module remove <name>) command.
+# 2. Provide a .sync() method for the project 
+# 	- This would read the project.yaml file and enforce the project directory structure onto the fs.
+# 	x The problem with this is that this would necessarily include removing directories which are not 
+#		found in the project.yaml 
+#	x It is also unecessarily complex at this stage, but may be needed or wanted down the road.
