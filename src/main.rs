@@ -181,9 +181,6 @@ impl From<Mapping> for Project {
             }
         }
 
-        // DEBUG 
-        println!("PROJECT before re-mapping:\n{:#?}", project);
-
         // Re-map dependencies into their corresponding Module or Target variants 
         let ref_project = project.clone();
         for target in &mut project.targets {
@@ -209,15 +206,9 @@ impl From<Mapping> for Project {
             }
         }
 
-        // DEBUG 
-        println!("PROJECT after re-mapping:\n{:#?}", project);
-        
         // Check for cyclic dependencies 
         if project.check_cylic() {
             help(HelpKind::CyclicDependency);
-        } else {
-            // DEBUG
-            println!("Cyclic redundancy check: OK");
         }
 
         project
