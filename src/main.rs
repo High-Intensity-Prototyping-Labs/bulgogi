@@ -30,6 +30,10 @@ enum Dependency {
     Target(String),
 }
 
+enum HelpKind {
+    CyclicDependency,
+}
+
 impl Project {
     fn new() -> Project {
         Project {
@@ -210,7 +214,10 @@ impl From<Mapping> for Project {
         
         // Check for cyclic dependencies 
         if project.check_cylic() {
-            panic!("Cyclic dependencies detected -- cannot proceed");
+            help(HelpKind::CyclicDependency);
+        } else {
+            // DEBUG
+            println!("Cyclic redundancy check: OK");
         }
 
         project
@@ -292,6 +299,12 @@ fn cli() -> Command {
             Command::new("clean")
             .about("Cleans the local project build files and cache")
         )
+}
+
+fn help(msg: HelpKind) {
+    match msg {
+        HelpKind::CyclicDependency => println!("A cyclic dependency in your project.yaml file was detected. Consider fixing this and trying again."),
+    }
 }
 
 fn init(matches: &ArgMatches) {
