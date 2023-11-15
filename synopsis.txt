@@ -115,3 +115,18 @@ project/
 # 	x The problem with this is that this would necessarily include removing directories which are not 
 #		found in the project.yaml 
 #	x It is also unecessarily complex at this stage, but may be needed or wanted down the road.
+
+################# Universalizing directories
+# Something to think about for the future: everything works path-wise as long as the project.yaml 
+# file is in the PWD of the current shell.
+#
+# However, if in any instance that a project which was initialized in a parent or child directory 
+# of the PWD, locating module folders etc. would be impossible to do correctly without losing things 
+# and create redundant copies of the same folders along differing hierarchical levels.
+#
+# For now it's fine to assume that project.yaml location = PWD. But at one point it would be very nice 
+# to be able to be in a module directory or deeper in a subdirectory and still be able to call bulgogi 
+# functions and have the thing build etc.
+#
+# It could be achieved if modules had module.yaml files which could be read for reference info (i.e.: where is the 
+# project.yaml? what is this module called? etc.) but we're not there yet.
