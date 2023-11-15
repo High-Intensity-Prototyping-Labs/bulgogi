@@ -65,19 +65,10 @@ impl Project {
         }
         None
     }
-
-    fn find_mut(&mut self, name: String) -> Option<&mut Target> {
-        for target in &mut self.targets {
-            if target.name == name {
-                return Some(target);
-            }
-        }
-        None
-    }
 }
 
 impl Target {
-    fn check_deps(&self, project: &Project, mut parent: Option<&Target>) -> bool {
+    fn check_deps(&self, project: &Project, parent: Option<&Target>) -> bool {
         // Checks through its own dependencies.
         // First by testing one level down into its target-type dependencies,
         // then if any target-type dependencies are found at that level, recursively
@@ -311,7 +302,7 @@ fn init(matches: &ArgMatches) {
 
             // Passing f to print debugging info
             let map: Mapping = serde_yaml::from_reader(&f).expect("required");
-            let project = Project::from(map);
+            let _project = Project::from(map);
         }
         Err(e) => {
             match e.kind() {
