@@ -61,6 +61,15 @@ impl Project {
         }
         None
     }
+
+    fn find_mut(&mut self, name: String) -> Option<&mut Target> {
+        for target in &mut self.targets {
+            if target.name == name {
+                return Some(target);
+            }
+        }
+        None
+    }
 }
 
 impl Target {
@@ -108,6 +117,15 @@ impl Target {
             }
         }
         false
+    }
+
+    fn find(&self, name: &String) -> Option<&Dependency> {
+        for dep in &self.deps {
+            if &String::from(dep.clone()) == name {
+                return Some(&dep);
+            }
+        }
+        None
     }
 }
 
@@ -165,6 +183,8 @@ impl From<Mapping> for Project {
         // Re-map dependencies into their corresponding Module or Target variants 
         let ref_project = project.clone();
         for target in &mut project.targets {
+            // Convert dependencies to ::Target type if a target is found with the 
+            // same name.
             for dep in &mut target.deps {
                 /* dep can be Dependency::Module or Dependency::Target type */
                 if let Dependency::Module(m) = dep {
@@ -177,7 +197,20 @@ impl From<Mapping> for Project {
                         // TODO: For this to work, project needs a find_ref function which Returns
                         // not just the complete copy of a Target struct but actually returns a
                         // mutable reference which can be used to change the target type itself.
+                        //
+                        // Another idea for this to work is to avoid needing to 
+                        // re-borrow the project to perform a find() and instead create a
+                        // target-level function which searches for matching dependecies *given* a
+                        // known target.
                     }
+                }
+            }
+
+            // Then convert target kinds to library when target dependencies 
+            // adjacent to it contain itself as a dependency (inferring library vs binary).
+            for search_target in &ref_project.targets {
+                if let Some(_) = search_target.find(&target.name) {
+                    target.kind = TargetKind::Library;
                 }
             }
         }
