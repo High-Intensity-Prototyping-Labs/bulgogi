@@ -65,6 +65,27 @@ impl Project {
     // TODO: Implement some kind of spawn or sync function which
     //          creates and manages directories according to the modules
     //          in a project.
+    fn spawn(&self) {
+        for target in &self.targets {
+            for dep in &target.deps {
+                // Match against module-type dependencies
+                if let Dependency::Module(m) = dep {
+                    // Assume project.yaml path = PWD
+                    let path = Path::new(m);
+
+                    // Make sure module path doesn't exist
+                    if !path.exists() {
+                        // Create source and include subdirectories
+                        let src_path = path.join("src");
+                        let inc_path = path.join("inc");
+
+                        std::fs::create_dir_all(src_path).expect("error");
+                        std::fs::create_dir_all(inc_path).expect("error");
+                    }
+                }
+            }
+        }
+    }
 }
 
 impl Target {
