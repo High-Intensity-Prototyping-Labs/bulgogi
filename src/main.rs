@@ -61,6 +61,10 @@ impl Project {
         }
         None
     }
+
+    // TODO: Implement some kind of spawn or sync function which
+    //          creates and manages directories according to the modules
+    //          in a project.
 }
 
 impl Target {
