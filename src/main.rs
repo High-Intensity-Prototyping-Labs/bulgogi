@@ -30,10 +30,6 @@ enum Dependency {
     Target(String),
 }
 
-enum HelpKind {
-    CyclicDependency,
-}
-
 impl Project {
     fn new() -> Project {
         Project {
@@ -283,9 +279,15 @@ fn cli() -> Command {
         )
 }
 
+enum HelpKind {
+    CyclicDependency,
+    ProjectFound,
+}
+
 fn help(msg: HelpKind) {
     match msg {
         HelpKind::CyclicDependency => println!("A cyclic dependency in your project.yaml file was detected. Consider fixing this and trying again."),
+        HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize"),
     }
 }
 
@@ -296,21 +298,17 @@ fn init(matches: &ArgMatches) {
     let file = File::open(&path);
 
     match file {
-        Ok(f) => {
-            // Project exists, notify user that init was useless.
-            println!("Found project.yaml -- no need to initialize ({:?}).", path);
-
-            // Passing f to print debugging info
-            let map: Mapping = serde_yaml::from_reader(&f).expect("required");
-            let _project = Project::from(map);
+        Ok(_) => {
+            help(HelpKind::ProjectFound);
         }
         Err(e) => {
             match e.kind() {
                 ErrorKind::NotFound => {
                     // Create directory structure
+                    std::fs::create_dir_all(dir).expect("Could not create dir");
 
                     // Create default project
-                    let new_file = File::create("project.yaml").expect("Could not create new file");
+                    let new_file = File::create(path).expect("Could not create new file");
                     let new_map = Mapping::from(Project::default());
                     serde_yaml::to_writer(new_file, &new_map).expect("Failed to write default project to file");
 
