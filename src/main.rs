@@ -1,6 +1,7 @@
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::ErrorKind;
+use std::io;
 use std::path::Path;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
@@ -62,25 +63,30 @@ impl Project {
         None
     }
 
-    // TODO: Implement some kind of spawn or sync function which
-    //          creates and manages directories according to the modules
-    //          in a project.
-    fn spawn(&self) {
+    /// Initializes the module directories in the FS.
+    /// Ignores any missing entries in project.yaml (true negatives).
+    ///
+    /// # Arguments
+    ///
+    /// * `root` - Root directory of the project to spawn.
+    fn spawn(&self, root: &Path) {
         for target in &self.targets {
             for dep in &target.deps {
                 // Match against module-type dependencies
                 if let Dependency::Module(m) = dep {
                     // Assume project.yaml path = PWD
-                    let path = Path::new(m);
+                    let path = Path::new(root).join(m);
 
                     // Make sure module path doesn't exist
                     if !path.exists() {
                         // Create source and include subdirectories
                         let src_path = path.join("src");
                         let inc_path = path.join("inc");
+                        let private_inc_path = src_path.join("inc");
 
-                        std::fs::create_dir_all(src_path).expect("error");
-                        std::fs::create_dir_all(inc_path).expect("error");
+                        std::fs::create_dir_all(src_path).expect("required");
+                        std::fs::create_dir_all(inc_path).expect("required");
+                        std::fs::create_dir_all(private_inc_path).expect("required");
                     }
                 }
             }
@@ -221,6 +227,7 @@ impl From<Mapping> for Project {
         // Check for cyclic dependencies 
         if project.check_cylic() {
             help(HelpKind::CyclicDependency);
+            panic!("cyclic dependency");
         }
 
         project
@@ -275,6 +282,10 @@ fn cli() -> Command {
                 .about("Initializes bulgogi project directory")
                 .arg(arg!(<PATH> "The directory to initialize"))
                 .arg_required_else_help(true),
+        )
+        .subcommand(
+            Command::new("spawn")
+                .about("Spawns project directory structure and ignores missing entries")
         )
         .subcommand(
             Command::new("module")
@@ -336,9 +347,22 @@ fn help(msg: HelpKind) {
     }
 }
 
-fn init(matches: &ArgMatches) {
+fn load(root: &String) -> Option<Project> {
+    let dir = Path::new(root).join("project.yaml");
+    let file = File::open(dir);
+
+    match file {
+        Ok(f) => {
+            let map: Mapping = serde_yaml::from_reader(f).expect("required");
+            let project = Project::from(map);
+            Some(project)
+        }
+        Err(_) => None,
+    }
+}
+
+fn init(dir: &String) {
     // Load project.yaml file 
-    let dir = matches.get_one::<String>("PATH").expect("error");
     let path = Path::new(dir).join("project.yaml");
     let file = File::open(&path);
 
@@ -349,19 +373,45 @@ fn init(matches: &ArgMatches) {
         Err(e) => {
             match e.kind() {
                 ErrorKind::NotFound => {
-                    // Create directory structure
+                    // Create project directory
                     std::fs::create_dir_all(dir).expect("Could not create dir");
 
                     // Create default project
+                    let project = Project::default();
                     let new_file = File::create(path).expect("Could not create new file");
-                    let new_map = Mapping::from(Project::default());
+                    let new_map = Mapping::from(project.clone());
                     serde_yaml::to_writer(new_file, &new_map).expect("Failed to write default project to file");
 
-                    // Test created file
-                    println!("Could not find project.yaml -- default project loaded and saved:\n{:#?}", Project::default());
+                    // Spawn project directory structure 
+                    project.spawn(&Path::new(dir));
+
+                    info(InfoKind::InitSuccess);
                 }
                 _ => panic!("Unable to open project.yaml file"),
             }
+        }
+    }
+
+}
+
+fn spawn() {
+    // Load project
+    if let Some(project) = load(&String::from(".")) {
+        project.spawn(Path::new("."));
+        info(InfoKind::SpawnSuccess);
+    } else {
+        // Prompt user to init project 
+        help(HelpKind::NotInitialized);
+        print!("Automatically initialize project in the current directory? (Y/n): ");
+
+        let mut answer = String::new();
+        io::stdin().read_line(&mut answer).expect("stdio");
+        if answer.trim() == "Y" || answer.trim() == "y" {
+            // Try the whole thing again after init if user agrees
+            init(&String::from("."));
+            spawn();
+        } else {
+            help(HelpKind::InitRequired);
         }
     }
 
@@ -374,7 +424,8 @@ fn main() {
     let matches = cli().get_matches();
 
     match matches.subcommand() {
-        Some(("init", sub_matches)) => init(&sub_matches),
+        Some(("init", sub_matches)) => init(&sub_matches.get_one::<String>("PATH").expect("required")),
+        Some(("spawn", _)) => spawn(),
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
                 Some(("add", sub2_matches)) => {
