@@ -55,10 +55,25 @@ impl Project {
         false
     }
 
+    /// Returns an immutable reference to a matching target in the project.
+    ///
+    /// See `.find_mut()` if you need a mutable reference.
     fn find(&self, name: String) -> Option<&Target> {
         for target in &self.targets {
             if target.name == name {
                 return Some(&target);
+            }
+        }
+        None
+    }
+
+    /// Returns a mutable reference to a matching target in the project.
+    ///
+    /// See `.find()` for an immutable reference equivalent.
+    fn find_mut(&mut self, name: String) -> Option<&mut Target> {
+        for target in &mut self.targets {
+            if target.name == name {
+                return Some(target);
             }
         }
         None
