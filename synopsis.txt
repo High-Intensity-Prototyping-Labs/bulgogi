@@ -7,12 +7,14 @@
 bulgogi init .
 
 # Adds a module to the bulgogi project
-bulgogi add module/
+bulgogi module add module1
+bulgogi module add --create telemetry
 
-# Alternative module ideas
-# bulgogi module add module1/
-# bulgogi module add --create module1/
-# (solves 'no existing module module1')
+# Adds a module to a specific target 
+# (Adds to the default target if not specified)
+# (--create flag specifies that the module folder does not yet exist)
+bulgogi module add module1 target1
+bulgogi module add --create telemetry utils 
 
 # Build project
 bulgogi build
