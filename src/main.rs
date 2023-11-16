@@ -128,6 +128,12 @@ impl Project {
                         }
                     }
                 }
+                if !result {
+                    break;
+                }
+            }
+            if !result {
+                break;
             }
         }
         result
