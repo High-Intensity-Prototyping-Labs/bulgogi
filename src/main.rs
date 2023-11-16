@@ -326,6 +326,7 @@ enum InfoKind {
 }
 
 fn info(msg: InfoKind) {
+    print!("[i] ");
     match msg {
         InfoKind::InitSuccess => println!("Successfully initialized project."),
         InfoKind::SpawnSuccess => println!("Successfully spawned project directories."),
@@ -340,12 +341,66 @@ enum HelpKind {
 }
 
 fn help(msg: HelpKind) {
+    print!("[?] ");
     match msg {
         HelpKind::CyclicDependency => println!("A cyclic dependency in your project.yaml file was detected. Consider fixing this and trying again."),
         HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize."),
         HelpKind::NotInitialized => println!("Cannot find a project.yaml in the current directory."),
         HelpKind::InitRequired => println!("An initialized project is required to continue."),
     }
+}
+
+enum Prompt {
+    AutoInit,
+}
+
+fn get_prompt(prompt: Prompt) -> String {
+    match prompt {
+        Prompt::AutoInit => String::from("Automatically initialize project in current directory?"),
+    }
+}
+
+enum PromptKind {
+    YesNo,
+    Generic,
+}
+
+enum Answer {
+    Yes,
+    No,
+    Neither,
+}
+
+/// Prompts the user for an answer.
+///
+/// # Arguments 
+///
+/// * `kind` - Indicates the prompt type (supports y/n).
+/// * `prompt` - The prompt to show the user.
+/// * `default` - Specifies default answer if user hits enter.
+///
+/// # Returns 
+///
+/// A string containing the user's answer. Blank (trimmed) otherwise.
+fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> String {
+    let mut answer = String::new();
+    print!("[u] ");
+    match kind {
+        PromptKind::YesNo => {
+            print!("{}", get_prompt(prompt));
+            match default {
+                Answer::Yes => print!(" (Y/n): "),
+                Answer::No => print!(" (y/N): "),
+                Answer::Neither => print!(" (y/n): "),
+            }
+        }
+        PromptKind::Generic => {
+            print!("{}: ", get_prompt(prompt));
+        }
+    }
+    io::stdout().flush().expect("stdio");
+    io::stdin().read_line(&mut answer).expect("stdio");
+    answer.trim().to_string()
 }
 
 fn load(root: &String) -> Option<Project> {
@@ -403,12 +458,9 @@ fn spawn() {
     } else {
         // Prompt user to init project 
         help(HelpKind::NotInitialized);
-        print!("Automatically initialize project in the current directory? (Y/n): ");
-        io::stdout().flush().expect("stdio");
+        let answer = prompt(PromptKind::YesNo, Prompt::AutoInit, Answer::Yes);
 
-        let mut answer = String::new();
-        io::stdin().read_line(&mut answer).expect("stdio");
-        if answer.trim() == "Y" || answer.trim() == "y" || answer.trim().is_empty() {
+        if answer == "Y" || answer.trim() == "y" || answer.trim().is_empty() {
             // Try the whole thing again after init if user agrees
             init(&String::from("."));
             spawn();
