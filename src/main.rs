@@ -11,6 +11,12 @@ struct Project {
     targets: Vec<Target>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(transparent)]
+struct Genius {
+    targets: Mapping,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct Target {
     name: String,
@@ -302,6 +308,10 @@ fn cli() -> Command {
             Command::new("clean")
             .about("Cleans the local project build files and cache")
         )
+        .subcommand(
+            Command::new("test")
+            .about("Performs test functions -- used for development.")
+        )
 }
 
 enum HelpKind {
@@ -347,6 +357,12 @@ fn init(matches: &ArgMatches) {
 
 }
 
+fn test() {
+    let file = File::open("project.yaml").expect("error");
+    let project: Genius = serde_yaml::from_reader(&file).expect("error");
+    println!("{:#?}", project);
+}
+
 fn main() {
     let matches = cli().get_matches();
 
@@ -385,6 +401,7 @@ fn main() {
                 "Cleaning bulgogi project..."
             );
         }
+        Some(("test", _)) => test(),
         Some((ext, sub_matches)) => {
             let args = sub_matches
                 .get_many::<OsString>("")
