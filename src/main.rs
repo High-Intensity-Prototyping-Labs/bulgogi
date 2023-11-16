@@ -591,6 +591,7 @@ fn module_add(name: &String, target: &String, create: bool) {
 
     } else {
         auto_init();
+        module_add(name, target, create);
     }
 }
 
