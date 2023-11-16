@@ -132,3 +132,15 @@ project/
 #
 # It could be achieved if modules had module.yaml files which could be read for reference info (i.e.: where is the 
 # project.yaml? what is this module called? etc.) but we're not there yet.
+
+################# A note on spawn and module add behavior
+# The current implementation of 'spawn' -- both in the direct use of the bulgogi spawn command 
+# and the indirect need to spawn directories when adding modules -- will 'create' any and all 
+# modules found to be without a directory even if *adjacent* to the one being created.
+#
+# In other words, in the instance where module1 and module2 are defined in the project.yaml and one
+# entry is removed, a calling to $(bulgogi module add --create module3) will re-spawn module1 as a 
+# blank module.
+#
+# This behavior is not bad, but questionable: why is module1 missing from the project directory? Was this 
+# done on purpose? If so, should the default behavior be to re-create the directory in its empty format?
