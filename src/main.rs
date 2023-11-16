@@ -1,5 +1,6 @@
 use std::ffi::OsString;
 use std::fs::File;
+use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::io;
 use std::path::Path;
@@ -403,10 +404,11 @@ fn spawn() {
         // Prompt user to init project 
         help(HelpKind::NotInitialized);
         print!("Automatically initialize project in the current directory? (Y/n): ");
+        io::stdout().flush().expect("stdio");
 
         let mut answer = String::new();
         io::stdin().read_line(&mut answer).expect("stdio");
-        if answer.trim() == "Y" || answer.trim() == "y" {
+        if answer.trim() == "Y" || answer.trim() == "y" || answer.trim().is_empty() {
             // Try the whole thing again after init if user agrees
             init(&String::from("."));
             spawn();
