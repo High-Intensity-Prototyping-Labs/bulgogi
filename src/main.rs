@@ -308,15 +308,31 @@ fn cli() -> Command {
         )
 }
 
+enum InfoKind {
+    InitSuccess,
+    SpawnSuccess,
+}
+
+fn info(msg: InfoKind) {
+    match msg {
+        InfoKind::InitSuccess => println!("Successfully initialized project."),
+        InfoKind::SpawnSuccess => println!("Successfully spawned project directories."),
+    }
+}
+
 enum HelpKind {
     CyclicDependency,
     ProjectFound,
+    NotInitialized,
+    InitRequired,
 }
 
 fn help(msg: HelpKind) {
     match msg {
         HelpKind::CyclicDependency => println!("A cyclic dependency in your project.yaml file was detected. Consider fixing this and trying again."),
-        HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize"),
+        HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize."),
+        HelpKind::NotInitialized => println!("Cannot find a project.yaml in the current directory."),
+        HelpKind::InitRequired => println!("An initialized project is required to continue."),
     }
 }
 
