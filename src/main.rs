@@ -1,5 +1,6 @@
 use std::ffi::OsString;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::io;
@@ -85,28 +86,63 @@ impl Project {
     /// # Arguments
     ///
     /// * `root` - Root directory of the project to spawn.
-    fn spawn(&self, root: &Path) {
+    ///
+    /// # Return 
+    /// Boolean true or false returned based on whether project spawned
+    /// completely and successfully or not. 
+    fn spawn(&self, root: &String, create: bool) -> bool {
+        let mut result = true;
         for target in &self.targets {
             for dep in &target.deps {
                 // Match against module-type dependencies
                 if let Dependency::Module(m) = dep {
                     // Assume project.yaml path = PWD
                     let path = Path::new(root).join(m);
+                    let src_path = path.join("src");
+                    let inc_path = path.join("inc");
+                    let private_inc_path = src_path.join("inc");
+
 
                     // Make sure module path doesn't exist
                     if !path.exists() {
-                        // Create source and include subdirectories
-                        let src_path = path.join("src");
-                        let inc_path = path.join("inc");
-                        let private_inc_path = src_path.join("inc");
+                        if create {
+                            // Create source and include subdirectories
+                            std::fs::create_dir_all(src_path).expect("required");
+                            std::fs::create_dir_all(inc_path).expect("required");
+                            std::fs::create_dir_all(private_inc_path).expect("required");
 
-                        std::fs::create_dir_all(src_path).expect("required");
-                        std::fs::create_dir_all(inc_path).expect("required");
-                        std::fs::create_dir_all(private_inc_path).expect("required");
+                            info(InfoKind::SpawnSuccess);
+                        } else {
+                            help(HelpKind::NoModuleDir);
+                            result = false;
+                        }
+                    } else {
+                        // Path exists, check good structure
+                        if !src_path.exists() || !inc_path.exists() || !private_inc_path.exists() {
+                            help(HelpKind::MissingSubdirs);
+                            if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddSubdirs, Answer::Yes) {
+                                self.spawn(root, true);
+                            } else {
+                                result = false;
+                            }
+                        }
                     }
                 }
             }
         }
+        result
+    }
+
+    /// Persists the project struct to disk into project.yaml.
+    /// Overwrites any content in the file by default.
+    /// MAKE SURE you've first loaded the project or it may be lost **forever**.
+    fn persist(&self) -> Result<(), io::Error> {
+        let mut opt = OpenOptions::new();
+        let file = opt.write(true).open("project.yaml")?;
+        let map = Mapping::from(self.clone());
+        serde_yaml::to_writer(file, &map).expect("required");
+
+        Ok(())
     }
 }
 
@@ -310,7 +346,12 @@ fn cli() -> Command {
             .subcommand(
                 Command::new("add")
                 .about("Adds a new module to the bulgogi project")
-                .arg(arg!(<PATH> "Path to the module in question"))
+                .arg(arg!(<MODULE> "Path to the module in question"))
+                .arg(
+                    arg!(<TARGET> "Which target to add the module to")
+                    .default_value("default")
+                    .required(false)
+                )
                 .arg(arg!(--create))
             )
             .subcommand(
@@ -338,6 +379,8 @@ fn cli() -> Command {
 enum InfoKind {
     InitSuccess,
     SpawnSuccess,
+    AddModuleSuccess,
+    NoChange,
 }
 
 fn info(msg: InfoKind) {
@@ -345,6 +388,8 @@ fn info(msg: InfoKind) {
     match msg {
         InfoKind::InitSuccess => println!("Successfully initialized project."),
         InfoKind::SpawnSuccess => println!("Successfully spawned project directories."),
+        InfoKind::AddModuleSuccess => println!("Successfully added module to project."),
+        InfoKind::NoChange => println!("No changes were made to the project state (project.yaml)"),
     }
 }
 
@@ -353,6 +398,9 @@ enum HelpKind {
     ProjectFound,
     NotInitialized,
     InitRequired,
+    TargetNotFound,
+    NoModuleDir,
+    MissingSubdirs,
 }
 
 fn help(msg: HelpKind) {
@@ -362,24 +410,31 @@ fn help(msg: HelpKind) {
         HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize."),
         HelpKind::NotInitialized => println!("Cannot find a project.yaml in the current directory."),
         HelpKind::InitRequired => println!("An initialized project is required to continue."),
+        HelpKind::TargetNotFound => println!("Could not find specified or default target in project."),
+        HelpKind::NoModuleDir => println!("Could not find the specified module directory. Try using the --create flag to automatically populate the module directories."),
+        HelpKind::MissingSubdirs => println!("One or more of the module subdirs (/src, /inc, /src/inc) were not found."),
     }
 }
 
 enum Prompt {
     AutoInit,
+    AutoAddTarget,
+    AutoAddSubdirs,
 }
 
 fn get_prompt(prompt: Prompt) -> String {
     match prompt {
         Prompt::AutoInit => String::from("Automatically initialize project in current directory?"),
+        Prompt::AutoAddTarget => String::from("Automatically add the default target to the project?"),
+        Prompt::AutoAddSubdirs => String::from("Automatically create missing subdirs for the module?"),
     }
 }
 
 enum PromptKind {
     YesNo,
-    Generic,
 }
 
+#[derive(PartialEq)]
 enum Answer {
     Yes,
     No,
@@ -397,7 +452,7 @@ enum Answer {
 /// # Returns 
 ///
 /// A string containing the user's answer. Blank (trimmed) otherwise.
-fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> String {
+fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> Answer {
     let mut answer = String::new();
     print!("[u] ");
     match kind {
@@ -409,13 +464,17 @@ fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> String {
                 Answer::Neither => print!(" (y/n): "),
             }
         }
-        PromptKind::Generic => {
-            print!("{}: ", get_prompt(prompt));
-        }
     }
     io::stdout().flush().expect("stdio");
     io::stdin().read_line(&mut answer).expect("stdio");
-    answer.trim().to_string()
+
+    if answer.trim().is_empty() {
+        default
+    } else if answer.trim() == "Y" || answer.trim() == "y" {
+        Answer::Yes
+    } else {
+        Answer::No
+    }
 }
 
 fn load(root: &String) -> Option<Project> {
@@ -429,6 +488,18 @@ fn load(root: &String) -> Option<Project> {
             Some(project)
         }
         Err(_) => None,
+    }
+}
+
+fn auto_init() {
+    // Prompt user to init project 
+    help(HelpKind::NotInitialized);
+    if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoInit, Answer::Yes) {
+        // Try the whole thing again after init if user agrees
+        init(&String::from("."));
+        spawn();
+    } else {
+        help(HelpKind::InitRequired);
     }
 }
 
@@ -454,7 +525,7 @@ fn init(dir: &String) {
                     serde_yaml::to_writer(new_file, &new_map).expect("Failed to write default project to file");
 
                     // Spawn project directory structure 
-                    project.spawn(&Path::new(dir));
+                    project.spawn(&String::from(dir), true);
 
                     info(InfoKind::InitSuccess);
                 }
@@ -468,22 +539,53 @@ fn init(dir: &String) {
 fn spawn() {
     // Load project
     if let Some(project) = load(&String::from(".")) {
-        project.spawn(Path::new("."));
-        info(InfoKind::SpawnSuccess);
+        project.spawn(&String::from("."), true);
     } else {
-        // Prompt user to init project 
-        help(HelpKind::NotInitialized);
-        let answer = prompt(PromptKind::YesNo, Prompt::AutoInit, Answer::Yes);
-
-        if answer == "Y" || answer.trim() == "y" || answer.trim().is_empty() {
-            // Try the whole thing again after init if user agrees
-            init(&String::from("."));
-            spawn();
-        } else {
-            help(HelpKind::InitRequired);
-        }
+        auto_init();
     }
 
+}
+
+/// Cli function which adds a module to the bulgogi project.
+/// Specifying no target will default to the `default` target.
+///
+/// # Arguments 
+///
+/// * `name` - Name of the module to add (eq. to directory).
+/// * `target` - Name of the target to append the module as a dependency.
+fn module_add(name: &String, target: &String, create: bool) {
+
+    if let Some(mut project) = load(&String::from(".")) {
+        // Create module struct based on new module name
+        let module = Dependency::Module(name.clone());
+
+        // Search for matching target in project
+        if let Some(t) = project.find_mut(target.clone()) {
+            // Matched -- add module to deps
+            t.deps.push(module);
+        } else {
+            // Not found (incl. potential default) -- ask to add default target with this module
+            help(HelpKind::TargetNotFound);
+            if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddTarget, Answer::Yes) {
+                project.targets.push(Target { deps: vec![module], ..Default::default() });
+            } else {
+                info(InfoKind::NoChange);
+                return;
+            }
+        }
+
+        // Spawn directories 
+        if project.spawn(&String::from("."), create) {
+            // Update project.yaml 
+            project.persist().expect("stdio");
+            info(InfoKind::AddModuleSuccess);
+        } else {
+            info(InfoKind::NoChange);
+        }
+
+    } else {
+        auto_init();
+    }
 }
 
 fn test() {
@@ -498,13 +600,11 @@ fn main() {
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
                 Some(("add", sub2_matches)) => {
+                    let module = sub2_matches.get_one::<String>("MODULE").expect("required");
+                    let target = sub2_matches.get_one::<String>("TARGET").expect("required");
                     let create = sub2_matches.get_flag("create");
 
-                    println!(
-                        "Adding module {} (--create = {})",
-                        sub2_matches.get_one::<String>("PATH").expect("required"),
-                        create,
-                    );
+                    module_add(module, target, create);
                 }
                 Some(("rm", sub2_matches)) => {
                     let cached = sub2_matches.get_flag("cached");
