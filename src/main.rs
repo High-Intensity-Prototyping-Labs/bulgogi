@@ -2,7 +2,7 @@ use std::ffi::OsString;
 use std::fs::File;
 use std::io::ErrorKind;
 use std::path::Path;
-use clap::{arg, Command, ArgMatches};
+use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
 use serde_yaml::{Mapping, Value};
 
