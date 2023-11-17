@@ -372,7 +372,7 @@ fn cli() -> Command {
         )
         .subcommand(
             Command::new("spawn")
-                .about("Spawns project directory structure and ignores missing entries")
+                .about("Spawns project directory structure.")
         )
         .subcommand(
             Command::new("module")
