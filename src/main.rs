@@ -646,6 +646,4 @@ fn main() {
         }
         _ => unreachable!(),
     }
-
-    println!("Hello, world!");
 }
