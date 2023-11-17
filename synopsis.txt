@@ -90,6 +90,15 @@ project/
 
 /* Repeat the same for module 2 */
 
+###########################################################
+
+List of bugs:
+---------------
+1. Adding a module from an existing folder causes it to loop after accepting Y or default option to 
+create missing subdirs automatically.
+
+###########################################################
+
 ################## Cyclic Dependencies 
 # A cyclic dependency check has been implemented for every conversion
 # from a serde_yaml mapping into a Project struct.
