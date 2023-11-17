@@ -94,7 +94,8 @@ project/
 
 List of bugs:
 ---------------
-0. 
+1. Adding a module which already exists in the project.yaml but had its folder subsequently removed will be added twice 
+	to the project.yaml when the appropriate --create flag is passed.
 
 List of annoyances:
 -------------------
