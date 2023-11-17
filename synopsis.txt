@@ -16,10 +16,16 @@ bulgogi module add --create telemetry
 bulgogi module add module1 target1
 bulgogi module add --create telemetry utils 
 
+# Adds a new target to the project 
+# (--library or --binary) specifies which type explicitly (default binary)
+bulgogi target add target1 
+bulgogi target add --library utils
+
 # Build project
 bulgogi build
 
 # Clean project
+# Specifically, removes all untracked project files and directories
 bulgogi clean
 
 # Removes module from the project
@@ -41,6 +47,12 @@ bulgogi tree
 # target2
 #  |_ module3 (Py3)
 #  |_ target1 (C++)
+
+# Smart functions (educated guesses)
+bulgogi add module2   # Detects module, aliases to module add module2 
+bulgogi rm telemetry  # Detects module, aliases to module rm module2 
+bulgogi add source3.c # Source detected, creates a module for it and moves it 
+bulgogi add source5.c module2 # Adds source to specific module 
 
 ###########################################################
 
