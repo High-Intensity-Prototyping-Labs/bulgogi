@@ -5,6 +5,7 @@ use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::io;
 use std::fs;
+use std::process;
 use std::path::Path;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
@@ -397,6 +398,10 @@ fn cli() -> Command {
             )
         )
         .subcommand(
+            Command::new("tree")
+            .about("Prints the project tree")
+        )
+        .subcommand(
             Command::new("build")
             .about("Builds the bulgogi project")
         )
@@ -511,6 +516,11 @@ fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> Answer {
     }
 }
 
+/// Loads prompt.yaml at the provided root directory
+///
+/// # Arguments
+///
+/// * `root` - The root directory to load the project.yaml
 fn load(root: &String) -> Option<Project> {
     let dir = Path::new(root).join("project.yaml");
     let file = File::open(dir);
@@ -623,6 +633,21 @@ fn module_add(name: &String, target: &String, create: bool) {
     }
 }
 
+fn tree() {
+    if let Some(project) = load(&String::from(".")) {
+        let mut cmd = process::Command::new("tree");
+        for target in project.targets {
+            for dep in target.deps {
+                if let Dependency::Module(m) = dep {
+                    cmd.arg(m);
+                }
+            }
+        }
+        let tree = cmd.output().expect("required").stdout;
+        println!("{}", String::from_utf8(tree).expect("required"));
+    }
+}
+
 fn test() {
 }
 
@@ -653,6 +678,7 @@ fn main() {
                 _ => unreachable!(),
             }
         }
+        Some(("tree", _)) => tree(),
         Some(("build", _)) => {
             println!(
                 "Building bulgogi project..."
