@@ -94,8 +94,15 @@ project/
 
 List of bugs:
 ---------------
-1. Adding a module from an existing folder causes it to loop after accepting Y or default option to 
-create missing subdirs automatically.
+0. 
+
+List of annoyances:
+-------------------
+1. The 'spawned directories' message seems too verbose for high-level use. Should probably be kept for the spawn command.
+2. When adding an existing module before the project is initialized, the default module1 is added and spawned despite the
+	user clearly providing a module to use instead of the default module1.
+* It may be best to consider not needing to add module1 to the project by default.
+3. Compared to git, bulgogi seems to be pretty verbose.
 
 ###########################################################
 
