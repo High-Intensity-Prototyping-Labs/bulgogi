@@ -4,6 +4,7 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::io;
+use std::fs;
 use std::path::Path;
 use clap::{arg, Command};
 use serde::{Serialize, Deserialize};
@@ -96,36 +97,25 @@ impl Project {
             for dep in &target.deps {
                 // Match against module-type dependencies
                 if let Dependency::Module(m) = dep {
-                    // Assume project.yaml path = PWD
-                    let path = Path::new(root).join(m);
-                    let src_path = path.join("src");
-                    let inc_path = path.join("inc");
-                    let private_inc_path = src_path.join("inc");
-
-
                     // Make sure module path doesn't exist
-                    if !path.exists() {
+                    if !Project::module_has_dir(root, m) {
                         if create {
                             // Create source and include subdirectories
-                            std::fs::create_dir_all(src_path).expect("required");
-                            std::fs::create_dir_all(inc_path).expect("required");
-                            std::fs::create_dir_all(private_inc_path).expect("required");
-
-                            info(InfoKind::SpawnSuccess);
+                            Project::create_module_subdirs(root, m);
                         } else {
                             help(HelpKind::NoModuleDir);
                             result = false;
                         }
                     } else {
                         // Path exists, check good structure
-                        if !src_path.exists() || !inc_path.exists() || !private_inc_path.exists() {
+                        if !Project::module_has_subdirs(root, m) {
                             help(HelpKind::MissingSubdirs);
                             if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddSubdirs, Answer::Yes) {
-                                self.spawn(root, true);
+                                Project::create_module_subdirs(root, m);
                             } else {
                                 result = false;
                             }
-                        }
+                        } 
                     }
                 }
                 if !result {
@@ -135,6 +125,9 @@ impl Project {
             if !result {
                 break;
             }
+        }
+        if result {
+            info(InfoKind::SpawnSuccess);
         }
         result
     }
@@ -149,6 +142,41 @@ impl Project {
         serde_yaml::to_writer(file, &map).expect("required");
 
         Ok(())
+    }
+
+    /// Returns whether a project module 
+    fn module_has_dir(root: &String, name: &String) -> bool {
+        let path = Path::new(root).join(name);
+        path.exists()
+    }
+
+    /// Returns whether a project module has required subdirs 
+    fn module_has_subdirs(root: &String, name: &String) -> bool {
+        let path = Path::new(root).join(name);
+        let src_path = path.join("src");
+        let inc_path = path.join("inc");
+        let private_inc_path = src_path.join("inc");
+
+        src_path.exists() && inc_path.exists() && private_inc_path.exists()
+    }
+
+    /// Creates the module directory 
+    fn create_module_dir(root: &String, name: &String) {
+        let path = Path::new(root).join(name);
+        fs::create_dir_all(path).expect("stdio");
+    }
+
+    /// Creates the required subdirectories for the module.
+    /// Note: will automatically make the module directory if missing.
+    fn create_module_subdirs(root: &String, name: &String) {
+        let path = Path::new(root).join(name);
+        let src_path = path.join("src");
+        let inc_path = path.join("inc");
+        let private_inc_path = src_path.join("inc");
+
+        fs::create_dir_all(src_path).expect("stdio");
+        fs::create_dir_all(inc_path).expect("stdio");
+        fs::create_dir_all(private_inc_path).expect("stdio");
     }
 }
 
