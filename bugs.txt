@@ -1,0 +1,12 @@
+List of bugs:
+---------------
+1. Adding a module which already exists in the project.yaml but had its folder subsequently removed will be added twice 
+	to the project.yaml when the appropriate --create flag is passed.
+
+List of annoyances:
+-------------------
+1. The 'spawned directories' message seems too verbose for high-level use. Should probably be kept for the spawn command.
+2. When adding an existing module before the project is initialized, the default module1 is added and spawned despite the
+	user clearly providing a module to use instead of the default module1.
+* It may be best to consider not needing to add module1 to the project by default.
+3. Compared to git, bulgogi seems to be pretty verbose.
