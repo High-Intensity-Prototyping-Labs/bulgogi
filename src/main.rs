@@ -179,6 +179,20 @@ impl Project {
         fs::create_dir_all(inc_path).expect("stdio");
         fs::create_dir_all(private_inc_path).expect("stdio");
     }
+
+    /// Returns whether or not a module is listed as a dependency in the project
+    fn has_module(&self, name: &String) -> bool {
+        for target in &self.targets {
+            for dep in &target.deps {
+                if let Dependency::Module(m) = dep {
+                    if m == name {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
 }
 
 impl Target {
@@ -420,6 +434,7 @@ enum InfoKind {
     SpawnSuccess,
     AddModuleSuccess,
     NoChange,
+    DuplicateModule,
 }
 
 fn info(msg: InfoKind) {
@@ -429,6 +444,7 @@ fn info(msg: InfoKind) {
         InfoKind::SpawnSuccess => println!("Successfully spawned project directories."),
         InfoKind::AddModuleSuccess => println!("Successfully added module to project."),
         InfoKind::NoChange => println!("No changes were made to the project state (project.yaml)"),
+        InfoKind::DuplicateModule => println!("Duplicate module detected."),
     }
 }
 
@@ -598,38 +614,67 @@ fn spawn() {
 /// * `name` - Name of the module to add (eq. to directory).
 /// * `target` - Name of the target to append the module as a dependency.
 fn module_add(name: &String, target: &String, create: bool) {
-
-    if let Some(mut project) = load(&String::from(".")) {
-        // Create module struct based on new module name
-        let module = Dependency::Module(name.clone());
-
-        // Search for matching target in project
-        if let Some(t) = project.find_mut(target.clone()) {
-            // Matched -- add module to deps
-            t.deps.push(module);
+    let root = String::from(".");
+    if let Some(mut project) = load(&root) {
+    // Project loaded
+        if project.has_module(name) {
+        // Duplicate module found in project config
+            info(InfoKind::DuplicateModule);
         } else {
-            // Not found (incl. potential default) -- ask to add default target with this module
-            help(HelpKind::TargetNotFound);
-            if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddTarget, Answer::Yes) {
-                project.targets.push(Target { deps: vec![module], ..Default::default() });
+        // No duplicates found
+            if Project::module_has_dir(&root, name) {
+            // Module has its own directory
+                if Project::module_has_subdirs(&root, name) {
+                // Module has all required subdirs
+                    if let Some(t) = project.find_mut(target.clone()) {
+                    // Default or specified target found
+                        t.deps.push(Dependency::Module(name.clone()));
+                        info(InfoKind::AddModuleSuccess);
+                    } else {
+                    // Project has neither desired target nor default
+                        help(HelpKind::TargetNotFound);
+                        info(InfoKind::NoChange);
+                    }
+                } else {
+                // Module is missing at least one subdir
+                    help(HelpKind::MissingSubdirs);
+                    if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddSubdirs, Answer::Yes) {
+                    // User agreed to auto-add subdirs to module folder
+                        Project::create_module_subdirs(&root, name);
+                        module_add(name, target, create);
+                    } else {
+                    // User refused to auto-add subdirs to module folder
+                        info(InfoKind::NoChange);
+                    }
+                }
             } else {
-                info(InfoKind::NoChange);
-                return;
+            // Module has no directory
+                if create {
+                // Create flag was passed -- user would like to auto-create module dir and subdirs
+                    Project::create_module_dir(&root, name);
+                    Project::create_module_subdirs(&root, name);
+                    module_add(name, target, create);
+                } else {
+                // The create flag was not passed
+                    help(HelpKind::NoModuleDir);
+                    info(InfoKind::NoChange);
+                }
             }
         }
 
-        // Spawn directories 
-        if project.spawn(&String::from("."), create) {
-            // Update project.yaml 
-            project.persist().expect("stdio");
-            info(InfoKind::AddModuleSuccess);
+        // Always persist project
+        project.persist().expect("stdio");
+    } else {
+    // No project loaded
+        help(HelpKind::InitRequired);
+        if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoInit, Answer::Yes) {
+        // User agreed to auto-init project
+            init(&String::from("."));
+            module_add(name, target, create);
         } else {
+        // User did not want to auto-init project
             info(InfoKind::NoChange);
         }
-
-    } else {
-        auto_init();
-        module_add(name, target, create);
     }
 }
 
