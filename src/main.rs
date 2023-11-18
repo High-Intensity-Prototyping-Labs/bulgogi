@@ -92,10 +92,10 @@ impl Project {
     /// # Return 
     /// Boolean true or false returned based on whether project spawned
     /// completely and successfully or not. 
-    fn spawn(&self, root: &String, create: bool) -> bool {
+    fn spawn(&self, root: String, create: bool) -> bool {
         let mut result = true;
-        for target in &self.targets {
-            for dep in &target.deps {
+        for target in self.targets {
+            for dep in target.deps {
                 // Match against module-type dependencies
                 if let Dependency::Module(m) = dep {
                     // Make sure module path doesn't exist
@@ -146,14 +146,14 @@ impl Project {
     }
 
     /// Returns whether a project module 
-    fn module_has_dir(root: &String, name: &String) -> bool {
-        let path = Path::new(root).join(name);
+    fn module_has_dir(root: String, name: String) -> bool {
+        let path = Path::new(&root).join(&name);
         path.exists()
     }
 
     /// Returns whether a project module has required subdirs 
-    fn module_has_subdirs(root: &String, name: &String) -> bool {
-        let path = Path::new(root).join(name);
+    fn module_has_subdirs(root: String, name: String) -> bool {
+        let path = Path::new(&root).join(name);
         let src_path = path.join("src");
         let inc_path = path.join("inc");
         let private_inc_path = src_path.join("inc");
@@ -162,15 +162,15 @@ impl Project {
     }
 
     /// Creates the module directory 
-    fn create_module_dir(root: &String, name: &String) {
-        let path = Path::new(root).join(name);
+    fn create_module_dir(root: String, name: String) {
+        let path = Path::new(&root).join(name);
         fs::create_dir_all(path).expect("stdio");
     }
 
     /// Creates the required subdirectories for the module.
     /// Note: will automatically make the module directory if missing.
-    fn create_module_subdirs(root: &String, name: &String) {
-        let path = Path::new(root).join(name);
+    fn create_module_subdirs(root: String, name: String) {
+        let path = Path::new(&root).join(name);
         let src_path = path.join("src");
         let inc_path = path.join("inc");
         let private_inc_path = src_path.join("inc");
@@ -178,6 +178,11 @@ impl Project {
         fs::create_dir_all(src_path).expect("stdio");
         fs::create_dir_all(inc_path).expect("stdio");
         fs::create_dir_all(private_inc_path).expect("stdio");
+    }
+
+    /// Checks a project for a module by name 
+    fn has_module(name: String) -> bool {
+
     }
 }
 
@@ -521,8 +526,8 @@ fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> Answer {
 /// # Arguments
 ///
 /// * `root` - The root directory to load the project.yaml
-fn load(root: &String) -> Option<Project> {
-    let dir = Path::new(root).join("project.yaml");
+fn load(root: String) -> Option<Project> {
+    let dir = Path::new(&root).join("project.yaml");
     let file = File::open(dir);
 
     match file {
@@ -540,16 +545,16 @@ fn auto_init() {
     help(HelpKind::NotInitialized);
     if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoInit, Answer::Yes) {
         // Try the whole thing again after init if user agrees
-        init(&String::from("."));
+        init(String::from("."));
         spawn();
     } else {
         help(HelpKind::InitRequired);
     }
 }
 
-fn init(dir: &String) {
+fn init(dir: String) {
     // Load project.yaml file 
-    let path = Path::new(dir).join("project.yaml");
+    let path = Path::new(&dir).join("project.yaml");
     let file = File::open(&path);
 
     match file {
@@ -569,7 +574,7 @@ fn init(dir: &String) {
                     serde_yaml::to_writer(new_file, &new_map).expect("Failed to write default project to file");
 
                     // Spawn project directory structure 
-                    project.spawn(&String::from(dir), true);
+                    project.spawn(String::from(dir), true);
 
                     info(InfoKind::InitSuccess);
                 }
@@ -582,8 +587,8 @@ fn init(dir: &String) {
 
 fn spawn() {
     // Load project
-    if let Some(project) = load(&String::from(".")) {
-        project.spawn(&String::from("."), true);
+    if let Some(project) = load(String::from(".")) {
+        project.spawn(String::from("."), true);
     } else {
         auto_init();
     }
@@ -597,44 +602,50 @@ fn spawn() {
 ///
 /// * `name` - Name of the module to add (eq. to directory).
 /// * `target` - Name of the target to append the module as a dependency.
+// fn module_add(name: &String, target: &String, create: bool) {
+// 
+//     if let Some(mut project) = load(&String::from(".")) {
+//         // Create module struct based on new module name
+//         let module = Dependency::Module(name.clone());
+// 
+//         // Search for matching target in project
+//         if let Some(t) = project.find_mut(target.clone()) {
+//             // Matched -- add module to deps
+//             t.deps.push(module);
+//         } else {
+//             // Not found (incl. potential default) -- ask to add default target with this module
+//             help(HelpKind::TargetNotFound);
+//             if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddTarget, Answer::Yes) {
+//                 project.targets.push(Target { deps: vec![module], ..Default::default() });
+//             } else {
+//                 info(InfoKind::NoChange);
+//                 return;
+//             }
+//         }
+// 
+//         // Spawn directories 
+//         if project.spawn(&String::from("."), create) {
+//             // Update project.yaml 
+//             project.persist().expect("stdio");
+//             info(InfoKind::AddModuleSuccess);
+//         } else {
+//             info(InfoKind::NoChange);
+//         }
+// 
+//     } else {
+//         auto_init();
+//         module_add(name, target, create);
+//     }
+// }
 fn module_add(name: &String, target: &String, create: bool) {
-
-    if let Some(mut project) = load(&String::from(".")) {
-        // Create module struct based on new module name
-        let module = Dependency::Module(name.clone());
-
-        // Search for matching target in project
-        if let Some(t) = project.find_mut(target.clone()) {
-            // Matched -- add module to deps
-            t.deps.push(module);
-        } else {
-            // Not found (incl. potential default) -- ask to add default target with this module
-            help(HelpKind::TargetNotFound);
-            if let Answer::Yes = prompt(PromptKind::YesNo, Prompt::AutoAddTarget, Answer::Yes) {
-                project.targets.push(Target { deps: vec![module], ..Default::default() });
-            } else {
-                info(InfoKind::NoChange);
-                return;
-            }
-        }
-
-        // Spawn directories 
-        if project.spawn(&String::from("."), create) {
-            // Update project.yaml 
-            project.persist().expect("stdio");
-            info(InfoKind::AddModuleSuccess);
-        } else {
-            info(InfoKind::NoChange);
-        }
-
-    } else {
-        auto_init();
-        module_add(name, target, create);
-    }
+    // Load project 
+    let project = load(String::from("."));
+    
+    // Check for duplicate
 }
 
 fn tree() {
-    if let Some(project) = load(&String::from(".")) {
+    if let Some(project) = load(String::from(".")) {
         let mut cmd = process::Command::new("tree");
         for target in project.targets {
             for dep in target.deps {
@@ -655,7 +666,10 @@ fn main() {
     let matches = cli().get_matches();
 
     match matches.subcommand() {
-        Some(("init", sub_matches)) => init(&sub_matches.get_one::<String>("PATH").expect("required")),
+        Some(("init", sub_matches)) => {
+            let dir = sub_matches.get_one::<String>("PATH").expect("required");
+            init(String::from(dir));
+        }
         Some(("spawn", _)) => spawn(),
         Some(("module", sub_matches)) => {
             match sub_matches.subcommand() {
