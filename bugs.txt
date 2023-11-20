@@ -1,7 +1,6 @@
 List of bugs:
 ---------------
-1. Adding a module which already exists in the project.yaml but had its folder subsequently removed will be added twice 
-	to the project.yaml when the appropriate --create flag is passed.
+1. When adding a new module from an existing folder in an uninitialized project directory, agreeing to auto-init the project with no modules/dependencies and **then** continuing with the adding process results in a corrupted yaml file.
 
 List of annoyances:
 -------------------
