@@ -264,7 +264,7 @@ impl Default for Target {
     fn default() -> Self {
         Target {
             name: String::from("default"),
-            deps: vec![Dependency::default()],
+            deps: vec![],
             kind: TargetKind::Binary,
         }
     }
