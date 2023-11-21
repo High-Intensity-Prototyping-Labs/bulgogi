@@ -1,5 +1,7 @@
 // Project module
 use crate::target::Target;
+use crate::client;
+
 use std::fs::File;
 use std::path::Path;
 
@@ -19,8 +21,10 @@ impl Project {
         // Check if project.yaml exists 
         if Path::new("project.yaml").exists() {
             // Advise that project exists
+            client::help(client::HelpKind::ProjectFound);
         } else {
             // Create project file with nothing in it
+            
         }
     }
 }

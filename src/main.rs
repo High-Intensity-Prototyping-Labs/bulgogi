@@ -10,7 +10,7 @@ fn main() {
 
     match matches.subcommand() {
         Some(("init", _)) => {
-            // Initialize project
+            // Initialize project in the PWD
             Project::init();
         }
         _ => unreachable!(),
