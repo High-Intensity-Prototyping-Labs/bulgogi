@@ -1,10 +1,10 @@
 # Bulgogi Synopsis
-# InDev v1.0.0
+# InDev v0.2.0
 
 # NOTE: Largely inspired by git cli.
 
-# Initializes a new bulgogi project
-bulgogi init .
+# Initializes a new bulgogi project in the current dir
+bulgogi init
 
 # Adds a module to the bulgogi project
 bulgogi module add module1
