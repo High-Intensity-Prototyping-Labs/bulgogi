@@ -5,10 +5,15 @@ use crate::dependency::{Dependency, DepKind};
 use crate::client;
 use crate::client::{InfoKind, HelpKind};
 
+use std::fs;
 use std::fs::File;
 use std::path::Path;
 
+use std::io;
+
 const PROJECT_YAML: &str = "project.yaml";
+const SRC_DIR: &str = "src";
+const INC_DIR: &str = "inc";
 
 pub struct Project {
     targets: Vec<Target>,
@@ -93,5 +98,22 @@ impl Project {
         } else {
         // Project file does not exist
         }
+    }
+
+    /// Spawns a module directory with required subdirs
+    pub fn spawn_module(module_name: String) -> Result<(), io::Error> {
+        let path = Path::new(&module_name);
+        let src = path.join(SRC_DIR);
+        let inc = path.join(INC_DIR);
+        let pinc = src.join(SRC_DIR);
+
+        if !path.exists() {
+        // Module dir missing -- create 
+            fs::create_dir_all(src)?;
+            fs::create_dir_all(inc)?;
+            fs::create_dir_all(pinc)?;
+        }
+
+        Ok(())
     }
 }
