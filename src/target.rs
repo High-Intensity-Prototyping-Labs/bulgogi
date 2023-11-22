@@ -3,6 +3,6 @@
 use crate::dependency::Dependency;
 
 pub struct Target {
-    name: String,
-    deps: Vec<Dependency>,
+    pub name: String,
+    pub deps: Vec<Dependency>,
 }

@@ -1,7 +1,7 @@
 // Dependency Module
 pub struct Dependency {
-    name: String,
-    depkind: DepKind,
+    pub name: String,
+    pub depkind: DepKind,
 }
 
 pub enum DepKind {
