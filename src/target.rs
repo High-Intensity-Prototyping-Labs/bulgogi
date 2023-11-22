@@ -4,7 +4,7 @@ use crate::dependency::{Dependency, DepKind};
 
 pub const TARGET_DEFAULT: &str = "default";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Target {
     pub name: String,
     pub deps: Vec<Dependency>,

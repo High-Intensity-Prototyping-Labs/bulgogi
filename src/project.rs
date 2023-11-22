@@ -16,7 +16,7 @@ const PROJECT_YAML: &str = "project.yaml";
 const SRC_DIR: &str = "src";
 const INC_DIR: &str = "inc";
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Project {
     targets: Vec<Target>,
 }
@@ -101,15 +101,31 @@ impl Project {
 
     /// Loads project from disk 
     pub fn load() -> Result<Self, io::Error> {
-        
+        match File::open(PROJECT_YAML) {
+            Ok(f) => {
+            // Project file exists -- load it
+                let yaml = serde_yaml::from_reader::<File, Mapping>(f).or_else(|_| {
+                    client::help(HelpKind::YamlParsingError);
+                    Err(Mapping::new())
+                });
+
+                let mapping = yaml.unwrap(); // panic here if YAML failed to parse
+                let project = Project::from(mapping);
+
+                Ok(project)
+            }
+            Err(e) => {
+            // Project not found or initialized -- notify 
+                client::help(HelpKind::ProjectLoadFailed);
+                Err(e)
+            }
+        }
     }
 
     /// Saves the project to disk 
     pub fn save(&self) -> () {
-        if let Ok(f) = File::options().write(true).open(PROJECT_YAML) {
-        // Project file exists -- overwrite previous config
-        } else {
-        // Project file does not exist
+        if let Ok(f) = File::options().write(true).create(true).open(PROJECT_YAML) {
+            serde_yaml::to_writer(f, &Mapping::from(self.clone()));
         }
     }
 

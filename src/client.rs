@@ -79,6 +79,8 @@ pub enum HelpKind {
     NoModuleDir,
     MissingSubdirs,
     ProjectInitFailed,
+    YamlParsingError,
+    ProjectLoadFailed,
 }
 
 pub fn help(msg: HelpKind) {
@@ -91,6 +93,8 @@ pub fn help(msg: HelpKind) {
         HelpKind::NoModuleDir => println!("Could not find the specified module directory. Try using the --create flag to automatically populate the module directories."),
         HelpKind::MissingSubdirs => println!("One or more of the module subdirs (/src, /inc, /src/inc) were not found."),
         HelpKind::ProjectInitFailed => println!("Failed to initialize project -- could not create project.yaml"),
+        HelpKind::YamlParsingError => println!("Failed to parse YAML into mapping -- check structure for corruption"),
+        HelpKind::ProjectLoadFailed => println!("Failed to load project."),
     }
 }
 
