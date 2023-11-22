@@ -1,12 +1,19 @@
 // Target module
 
-use crate::dependency::Dependency;
+use crate::dependency::{Dependency, DepKind};
 
 pub const TARGET_DEFAULT: &str = "default";
 
 pub struct Target {
     pub name: String,
     pub deps: Vec<Dependency>,
+}
+
+impl Target {
+    /// Adds a module to this target 
+    pub fn add(&mut self, module: String) {
+        self.deps.push((module, DepKind::Module));
+    }
 }
 
 impl Default for Target {

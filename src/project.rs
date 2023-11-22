@@ -39,17 +39,8 @@ impl Project {
         }
     }
 
-    /// Adds a module to the project 
-    ///
-    /// TODO: Here's the idea: the struct-level API should reflect the terminal.
-    ///         The project-level '.add_module' should simply add a module to the default target.
-    ///         If a specific target is needed, the target should first be .found() and *then* have 
-    ///         a module added. Otherwise, we are simply not respecting the object-model and doing
-    ///         a bunch of redundant searching and if-checking.
-    ///
-    ///     So the premise goes something like this: project.add_module() => adds module to default
-    ///                                             project.add_target() => adds empty target 
-    ///                                             target.add_module() => adds a module to this
+    /// Adds a module to the default target of the project.
+    /// If no default target is found, it is created.
     pub fn add_module(&mut self, module_name: String) {
         if let Some(target) = self.find_default_target_mut() {
         // Default target exists -- simply add module to it 
