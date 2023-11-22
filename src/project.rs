@@ -46,14 +46,20 @@ impl Project {
 
     /// Adds a module to the default target of the project.
     /// If no default target is found, it is created.
-    pub fn add_module(&mut self, module_name: String) {
+    pub fn add_module(&mut self, module_name: String) -> Result<(), io::Error> {
+        // Fetch default target from project
         if let Some(target) = self.find_default_target_mut() {
         // Default target exists -- simply add module to it 
-            target.deps.push((module_name, DepKind::Module));
+            target.deps.push((module_name.clone(), DepKind::Module));
         } else {
         // Default module not yet created -- make it
-            self.targets.push(Target { deps: vec![(module_name, DepKind::Module)], ..Default::default() });
+            self.targets.push(Target { deps: vec![(module_name.clone(), DepKind::Module)], ..Default::default() });
         }
+
+        // Spawn (create) module directory
+        Project::spawn_module(module_name)?;
+
+        Ok(())
     }
 
     /// Adds a target to the project 
