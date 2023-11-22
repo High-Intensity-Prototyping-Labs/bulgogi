@@ -1,6 +1,7 @@
 // Project module
 use crate::target::Target;
 use crate::client;
+use crate::client::{InfoKind, HelpKind};
 
 use std::fs::File;
 use std::path::Path;
@@ -24,7 +25,13 @@ impl Project {
             client::help(client::HelpKind::ProjectFound);
         } else {
             // Create project file with nothing in it
-            
+            if let Ok(_) = File::create("project.yaml") {
+                // Project initialized
+                client::info(InfoKind::InitSuccess);
+            } else {
+                // Could not create project.yaml 
+                client::help(HelpKind::ProjectInitFailed);
+            }
         }
     }
 }

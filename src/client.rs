@@ -83,6 +83,7 @@ pub enum HelpKind {
     TargetNotFound,
     NoModuleDir,
     MissingSubdirs,
+    ProjectInitFailed,
 }
 
 pub fn help(msg: HelpKind) {
@@ -95,6 +96,7 @@ pub fn help(msg: HelpKind) {
         HelpKind::TargetNotFound => println!("Could not find specified or default target in project."),
         HelpKind::NoModuleDir => println!("Could not find the specified module directory. Try using the --create flag to automatically populate the module directories."),
         HelpKind::MissingSubdirs => println!("One or more of the module subdirs (/src, /inc, /src/inc) were not found."),
+        HelpKind::ProjectInitFailed => println!("Failed to initialize project -- could not create project.yaml"),
     }
 }
 
