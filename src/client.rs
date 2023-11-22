@@ -18,9 +18,9 @@ pub fn cli() -> Command {
         .subcommand(
             Command::new("add")
             .about("Adds a new module to the bulgogi project")
-            .arg(arg!(<MODULE> "Path to the module in question"))
+            .arg(arg!(<MODULE> "Module name / directory"))
             .arg(
-                arg!(<TARGET> "Which target to add the module to")
+                arg!(<TARGET> "Target for which the module is a dependency")
                 .default_value("default")
                 .required(false)
             )
