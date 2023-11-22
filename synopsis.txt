@@ -6,6 +6,8 @@
 # Initializes a new bulgogi project in the current dir
 bulgogi init
 
+# Empty projects do not contain anything.
+
 # Adds a module to the bulgogi project
 bulgogi module add module1
 bulgogi module add --create telemetry
