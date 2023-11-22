@@ -12,10 +12,6 @@ pub fn cli() -> Command {
             .about("Initializes bulgogi project directory")
     )
     .subcommand(
-        Command::new("spawn")
-            .about("Spawns project directory structure.")
-    )
-    .subcommand(
         Command::new("module")
         .about("Manage project modules")
         .arg_required_else_help(true)
