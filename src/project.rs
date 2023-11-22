@@ -1,5 +1,6 @@
 // Project module
 use crate::target::Target;
+use crate::dependency::{Dependency, DepKind};
 use crate::client;
 use crate::client::{InfoKind, HelpKind};
 
@@ -33,5 +34,10 @@ impl Project {
                 client::help(HelpKind::ProjectInitFailed);
             }
         }
+    }
+
+    /// Adds a module to the project 
+    pub fn add_module(&mut self, module: &Dependency) {
+
     }
 }

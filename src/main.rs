@@ -1,6 +1,7 @@
 // Root module
 mod project;
 mod target;
+mod dependency;
 mod client;
 
 use crate::project::Project;

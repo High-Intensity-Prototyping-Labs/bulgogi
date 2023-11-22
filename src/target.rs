@@ -1,11 +1,8 @@
 // Target module
+
+use crate::dependency::Dependency;
+
 pub struct Target {
     name: String,
-    deps: Vec<(String,DepKind)>,
+    deps: Vec<Dependency>,
 }
-
-pub enum DepKind {
-    Target,
-    Module,
-}
-
