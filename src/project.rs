@@ -5,16 +5,18 @@ use crate::dependency::{Dependency, DepKind};
 use crate::client;
 use crate::client::{InfoKind, HelpKind};
 
+use std::io;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
 
-use std::io;
+use serde_yaml::{Value, Mapping, Sequence};
 
 const PROJECT_YAML: &str = "project.yaml";
 const SRC_DIR: &str = "src";
 const INC_DIR: &str = "inc";
 
+#[derive(Debug)]
 pub struct Project {
     targets: Vec<Target>,
 }
@@ -97,6 +99,11 @@ impl Project {
         return self.find_target_mut(&Target::default().name);
     }
 
+    /// Loads project from disk 
+    pub fn load() -> Result<Self, io::Error> {
+        
+    }
+
     /// Saves the project to disk 
     pub fn save(&self) -> () {
         if let Ok(f) = File::options().write(true).open(PROJECT_YAML) {
@@ -121,5 +128,59 @@ impl Project {
         }
 
         Ok(())
+    }
+}
+
+impl From<Mapping> for Project {
+    fn from(mapping: Mapping) -> Self {
+        // Create blank project 
+        let mut project = Project::new();
+
+        // Parse mapping into targets, add to project
+        for (key, value) in mapping {
+            // Only consider String keys and Sequence values
+            if let (Value::String(target), Value::Sequence(sequence)) = (key, value) {
+                // Create a target with empty deps based on key string
+                let mut new_target = Target::from(target);
+
+                // For each entry in the sequence
+                for entry in sequence {
+                    // Only consider strings in the sequence
+                    if let Value::String(module) = entry {
+                        // If it's a string, it's a module
+                        new_target.deps.push((module, DepKind::Module));
+                    }
+                }
+                project.targets.push(new_target);
+            }
+        }
+
+        // Infer which dependencies are actually targets
+        for target in &mut project.targets {
+            for dep in &mut target.deps {
+                if let Some(_) = project.find_target(&dep.0) {
+                // Target with matching name found -- therefore target
+                    dep.1 = DepKind::Target;
+                }
+            }
+        }
+        project
+    }
+}
+
+impl From<Project> for Mapping {
+    fn from(project: Project) -> Self {
+        let mut mapping = Mapping::new();
+
+        for target in project.targets {
+            let mut sequence = Sequence::new();
+
+            for dep in target.deps {
+                sequence.push(Value::String(dep.0));
+            }
+
+            mapping.insert(Value::String(target.name), Value::Sequence(sequence));
+        }
+        mapping
     }
 }
