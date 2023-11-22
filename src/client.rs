@@ -65,7 +65,6 @@ pub enum InfoKind {
 }
 
 pub fn info(msg: InfoKind) {
-    print!("[i] ");
     match msg {
         InfoKind::InitSuccess => println!("Successfully initialized project."),
         InfoKind::SpawnSuccess => println!("Successfully spawned project directories."),
@@ -87,7 +86,6 @@ pub enum HelpKind {
 }
 
 pub fn help(msg: HelpKind) {
-    print!("[?] ");
     match msg {
         HelpKind::CyclicDependency => println!("A cyclic dependency in your project.yaml file was detected. Consider fixing this and trying again."),
         HelpKind::ProjectFound => println!("Found project.yaml -- no need to initialize."),
