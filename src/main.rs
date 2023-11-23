@@ -4,11 +4,14 @@ mod target;
 mod dependency;
 mod client;
 
+use crate::client::HelpKind;
 use crate::project::Project;
 use crate::target::TARGET_DEFAULT;
 use crate::dependency::MODULE_DEFAULT;
 
-fn main() {
+use std::io;
+
+fn main() -> Result<(), io::Error> {
     let matches = client::cli().get_matches();
 
     match matches.subcommand() {
@@ -20,14 +23,28 @@ fn main() {
             match cmd.subcommand() {
                 Some(("add", sub)) => {
                     // Placehold add command arguments
-                    let module = sub.get_one::<String>("MODULE").unwrap_or(&String::from(MODULE_DEFAULT));
-                    let target = sub.get_one::<String>("TARGET").unwrap_or(&String::from(TARGET_DEFAULT));
+                    let module = sub.get_one::<String>("MODULE").expect("required").to_owned();
+                    let target = sub.get_one::<String>("TARGET").expect("required").to_owned();
 
                     // Load project
-                    let mut project = Project::load().unwrap_or(Project::new());
+                    match Project::load() {
+                        Ok(mut project) => {
+                            // Add module to project
+                            project.add_module(target, module.clone());
 
-                    // Add module
-                    project.add_target(target);
+                            // Spawn module directory 
+                            Project::spawn_module(module)?;
+
+                            // Save project 
+                            project.save().expect("yaml");
+
+                        }
+                        Err(e) => {
+                            client::help(HelpKind::InitRequired);
+                            println!("{}", e);
+                        }
+                    }
+
 
                     // TODO:
                     // Come to terms with how the high-level interface is fighting with itself;
@@ -43,4 +60,5 @@ fn main() {
         }
         _ => unreachable!(),
     }
+    Ok(())
 }
