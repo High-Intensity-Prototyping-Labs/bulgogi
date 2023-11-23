@@ -1,0 +1,1 @@
+- Noticed that adding the same module multiple times results in duplicates in the config.
