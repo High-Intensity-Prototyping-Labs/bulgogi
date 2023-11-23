@@ -28,7 +28,7 @@ pub fn cli() -> Command {
         )
         .subcommand(
             Command::new("rm")
-            .about("Removed a module from the bulgogi project")
+            .about("Removes a module from the bulgogi project")
             .alias("remove")
             .arg(arg!(<PATH> "Path to the module in question"))
             .arg(arg!(--cached))
