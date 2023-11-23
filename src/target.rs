@@ -34,3 +34,13 @@ impl From<String> for Target {
         }
     }
 }
+
+/// Creates a new target with an included module dependency
+impl From<(String, String)> for Target {
+    fn from(value: (String, String)) -> Self {
+        Target {
+            name: value.0,
+            deps: vec![(value.1, DepKind::Module)],
+        }
+    }
+}
