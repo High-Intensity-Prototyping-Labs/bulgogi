@@ -4,7 +4,7 @@ mod target;
 mod dependency;
 mod client;
 
-use crate::client::HelpKind;
+use crate::client::{HelpKind, InfoKind};
 use crate::project::Project;
 use crate::target::TARGET_DEFAULT;
 use crate::dependency::MODULE_DEFAULT;
@@ -38,6 +38,8 @@ fn main() -> Result<(), io::Error> {
                             // Save project 
                             project.save().expect("yaml");
 
+                            // Notify success 
+                            client::info(InfoKind::AddModuleSuccess);
                         }
                         Err(e) => {
                             if e.kind() == io::ErrorKind::NotFound {
