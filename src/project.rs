@@ -172,9 +172,10 @@ impl From<Mapping> for Project {
         }
 
         // Infer which dependencies are actually targets
+        let project_ref = project.clone();
         for target in &mut project.targets {
             for dep in &mut target.deps {
-                if let Some(_) = project.find_target(&dep.0) {
+                if let Some(_) = project_ref.find_target(&dep.0) {
                 // Target with matching name found -- therefore target
                     dep.1 = DepKind::Target;
                 }
