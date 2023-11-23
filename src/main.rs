@@ -44,16 +44,6 @@ fn main() -> Result<(), io::Error> {
                             println!("{}", e);
                         }
                     }
-
-
-                    // TODO:
-                    // Come to terms with how the high-level interface is fighting with itself;
-                    // The project methods are a little too independent because a lot of the
-                    // default behaviour can be handled up here.
-                    //
-                    // Decide to either:
-                    //  1. Handle less defaults and assumptions in the Project interface 
-                    //  2. Do much less up here
                 }
                 _ => unreachable!(),
             }
