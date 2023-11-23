@@ -11,6 +11,47 @@ use crate::dependency::MODULE_DEFAULT;
 
 use std::io;
 
+/// Shorthand to get an argument from a cli match
+macro_rules! get_one {
+    ($x:expr, $y:ty, $z:expr) => {
+        $x.get_one::<$y>($z).expect("required").to_owned()
+    };
+}
+
+/// High-level cli func to add a module to the project in the PWD.
+fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
+    // Load project
+    match Project::load() {
+        Ok(mut project) => {
+            if project.has_module(&module) {
+            // Duplicate found, notify
+                client::info(InfoKind::DuplicateModule);
+            } else {
+            // No duplicates found, continue
+                // Add module to project
+                project.add_module(target, module.clone());
+
+                // Spawn module directory 
+                Project::spawn_module(module)?;
+
+                // Save project 
+                project.save().expect("yaml");
+
+                // Notify success 
+                client::info(InfoKind::AddModuleSuccess);
+            }
+        }
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                client::help(HelpKind::InitRequired);
+            } else {
+                println!("{}", e);
+            }
+        }
+    }
+    Ok(())
+}
+
 fn main() -> Result<(), io::Error> {
     let matches = client::cli().get_matches();
 
