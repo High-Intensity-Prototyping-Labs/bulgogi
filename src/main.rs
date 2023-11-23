@@ -29,17 +29,23 @@ fn main() -> Result<(), io::Error> {
                     // Load project
                     match Project::load() {
                         Ok(mut project) => {
-                            // Add module to project
-                            project.add_module(target, module.clone());
+                            if project.has_module(&module) {
+                            // Duplicate found, notify
+                                client::info(InfoKind::DuplicateModule);
+                            } else {
+                            // No duplicates found, continue
+                                // Add module to project
+                                project.add_module(target, module.clone());
 
-                            // Spawn module directory 
-                            Project::spawn_module(module)?;
+                                // Spawn module directory 
+                                Project::spawn_module(module)?;
 
-                            // Save project 
-                            project.save().expect("yaml");
+                                // Save project 
+                                project.save().expect("yaml");
 
-                            // Notify success 
-                            client::info(InfoKind::AddModuleSuccess);
+                                // Notify success 
+                                client::info(InfoKind::AddModuleSuccess);
+                            }
                         }
                         Err(e) => {
                             if e.kind() == io::ErrorKind::NotFound {
