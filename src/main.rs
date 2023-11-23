@@ -52,6 +52,11 @@ fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
     Ok(())
 }
 
+/// Removes a module from the project 
+fn cli_rm_module(target: String, module: String) {
+
+}
+
 fn main() -> Result<(), io::Error> {
     let matches = client::cli().get_matches();
 
@@ -67,6 +72,12 @@ fn main() -> Result<(), io::Error> {
                     let module = get_one!(sub, String, "MODULE");
                     let target = get_one!(sub, String, "TARGET");
                     cli_add_module(target, module)?;
+                }
+                Some(("rm", sub)) => {
+                    // Placehold add command arguments
+                    let module = get_one!(sub, String, "MODULE");
+                    let target = get_one!(sub, String, "TARGET");
+                    cli_rm_module(target, module);
                 }
                 _ => unreachable!(),
             }
