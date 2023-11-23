@@ -9,6 +9,7 @@ use std::io;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
+use std::process::Command;
 
 use serde_yaml::{Value, Mapping, Sequence};
 
@@ -140,6 +141,20 @@ impl Project {
         }
 
         Ok(())
+    }
+
+    /// Outputs a tree diagram using `tree` 
+    pub fn tree(&self) {
+        let mut cmd = Command::new("tree");
+        for target in &self.targets {
+            for dep in &target.deps {
+                if let (module, DepKind::Module) = dep {
+                    cmd.arg(module);
+                }
+            }
+        }
+        let tree = cmd.output().expect("tree command failed").stdout;
+        println!("{}", String::from_utf8(tree).expect("UTF-8 tree to string failed"));
     }
 }
 

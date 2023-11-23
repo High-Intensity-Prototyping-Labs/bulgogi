@@ -40,12 +40,30 @@ fn main() -> Result<(), io::Error> {
 
                         }
                         Err(e) => {
-                            client::help(HelpKind::InitRequired);
-                            println!("{}", e);
+                            if e.kind() == io::ErrorKind::NotFound {
+                                client::help(HelpKind::InitRequired);
+                            } else {
+                                println!("{}", e);
+                            }
                         }
                     }
                 }
                 _ => unreachable!(),
+            }
+        }
+        Some(("tree", _)) => {
+            // Load project 
+            match Project::load() {
+                Ok(project) => {
+                    project.tree();
+                }
+                Err(e) => {
+                    if e.kind() == io::ErrorKind::NotFound {
+                        client::help(HelpKind::InitRequired);
+                    } else {
+                        println!("{}", e);
+                    }
+                }
             }
         }
         _ => unreachable!(),
