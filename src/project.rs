@@ -123,10 +123,11 @@ impl Project {
     }
 
     /// Saves the project to disk 
-    pub fn save(&self) -> () {
+    pub fn save(&self) -> Result<(), serde_yaml::Error> {
         if let Ok(f) = File::options().write(true).create(true).open(PROJECT_YAML) {
-            serde_yaml::to_writer(f, &Mapping::from(self.clone()));
+            serde_yaml::to_writer(f, &Mapping::from(self.clone()))?;
         }
+        Ok(())
     }
 
     /// Spawns a module directory with required subdirs
