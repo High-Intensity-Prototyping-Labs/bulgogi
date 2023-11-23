@@ -64,38 +64,9 @@ fn main() -> Result<(), io::Error> {
             match cmd.subcommand() {
                 Some(("add", sub)) => {
                     // Placehold add command arguments
-                    let module = sub.get_one::<String>("MODULE").expect("required").to_owned();
-                    let target = sub.get_one::<String>("TARGET").expect("required").to_owned();
-
-                    // Load project
-                    match Project::load() {
-                        Ok(mut project) => {
-                            if project.has_module(&module) {
-                            // Duplicate found, notify
-                                client::info(InfoKind::DuplicateModule);
-                            } else {
-                            // No duplicates found, continue
-                                // Add module to project
-                                project.add_module(target, module.clone());
-
-                                // Spawn module directory 
-                                Project::spawn_module(module)?;
-
-                                // Save project 
-                                project.save().expect("yaml");
-
-                                // Notify success 
-                                client::info(InfoKind::AddModuleSuccess);
-                            }
-                        }
-                        Err(e) => {
-                            if e.kind() == io::ErrorKind::NotFound {
-                                client::help(HelpKind::InitRequired);
-                            } else {
-                                println!("{}", e);
-                            }
-                        }
-                    }
+                    let module = get_one!(sub, String, "MODULE");
+                    let target = get_one!(sub, String, "TARGET");
+                    cli_add_module(target, module)?;
                 }
                 _ => unreachable!(),
             }
