@@ -18,6 +18,10 @@ macro_rules! get_one {
     };
 }
 
+fn productive_code() {
+
+}
+
 /// High-level cli func to add a module to the project in the PWD.
 fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
     // Load project
