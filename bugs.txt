@@ -1,3 +1,0 @@
-- When a project.yaml file is defined as default: [], running the 'tree' command yields the argless tree command with everything in the directory pouring out.
-- Removing the last module of a target corrupts the project.yaml file
-- Removing a non-existent module always returns 'Successfully removed module'
