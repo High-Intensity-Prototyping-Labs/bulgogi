@@ -55,6 +55,7 @@ fn cli_rm_module(target: String, module: String) {
     // Load project
     if let Ok(mut project) = Project::load() {
         project.rm_module(target, module);
+        project.save().expect("yaml");
         client::info(InfoKind::ModuleRemoved);
     } else {
         client::help(HelpKind::ProjectLoadFailed);
