@@ -50,13 +50,29 @@ fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
     Ok(())
 }
 
+/// Displays a tree diagram of the project modules 
+fn cli_tree() {
+    // Load project 
+    match Project::load() {
+        Ok(project) => {
+            project.tree();
+        }
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                client::help(HelpKind::InitRequired);
+            } else {
+                println!("{}", e);
+            }
+        }
+    }
+}
+
 /// Removes a module from the project 
 fn cli_rm_module(target: String, module: String) {
     // Load project
     if let Ok(mut project) = Project::load() {
         project.rm_module(target, module);
         project.save().expect("yaml");
-        client::info(InfoKind::ModuleRemoved);
     } else {
         client::help(HelpKind::ProjectLoadFailed);
     }
@@ -88,19 +104,7 @@ fn main() -> Result<(), io::Error> {
             }
         }
         Some(("tree", _)) => {
-            // Load project 
-            match Project::load() {
-                Ok(project) => {
-                    project.tree();
-                }
-                Err(e) => {
-                    if e.kind() == io::ErrorKind::NotFound {
-                        client::help(HelpKind::InitRequired);
-                    } else {
-                        println!("{}", e);
-                    }
-                }
-            }
+            cli_tree();
         }
         _ => unreachable!(),
     }
