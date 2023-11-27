@@ -142,8 +142,11 @@ impl Project {
 
     /// Saves the project to disk 
     pub fn save(&self) -> Result<(), serde_yaml::Error> {
+        let filtered_targets: Vec<Target> = self.targets.clone().into_iter().filter(|t| !t.deps.is_empty()).collect();
+        let filtered_project = Project { targets: filtered_targets };
+
         if let Ok(f) = File::options().write(true).create(true).truncate(true).open(PROJECT_YAML) {
-            serde_yaml::to_writer(f, &Mapping::from(self.clone()))?;
+            serde_yaml::to_writer(f, &Mapping::from(filtered_project))?;
         }
         Ok(())
     }
