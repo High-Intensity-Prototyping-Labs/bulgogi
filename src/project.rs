@@ -142,10 +142,8 @@ impl Project {
 
     /// Saves the project to disk 
     pub fn save(&self) -> Result<(), serde_yaml::Error> {
-        if let Ok(f) = File::options().write(true).create(true).open(PROJECT_YAML) {
-            serde_yaml::to_writer(f, &Mapping::from(self.clone()))?;
         if let Ok(f) = File::options().write(true).create(true).truncate(true).open(PROJECT_YAML) {
-            serde_yaml::to_writer(f, &Mapping::from(filtered_project))?;
+            serde_yaml::to_writer(f, &Mapping::from(self.clone()))?;
         }
         Ok(())
     }
