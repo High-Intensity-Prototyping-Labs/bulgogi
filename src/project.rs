@@ -135,7 +135,7 @@ impl Project {
     /// Removes a module from the project
     pub fn rm_module(&mut self, target_name: String, module_name: String) {
         if let Some(target) = self.find_target_mut(&target_name) {
-            let new_deps: Vec<Dependency> = target.deps.clone().into_iter().filter(|d| d.0 == module_name && d.1 == DepKind::Module).collect();
+            let new_deps: Vec<Dependency> = target.deps.clone().into_iter().filter(|d| d.0 != module_name && d.1 == DepKind::Module).collect();
             target.deps = new_deps;
         }
     }
