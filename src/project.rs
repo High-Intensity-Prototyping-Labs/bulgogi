@@ -135,7 +135,18 @@ impl Project {
     /// Removes a module from the project
     pub fn rm_module(&mut self, target_name: String, module_name: String) {
         if let Some(target) = self.find_target_mut(&target_name) {
-            let new_deps: Vec<Dependency> = target.deps.clone().into_iter().filter(|d| d.0 != module_name && d.1 == DepKind::Module).collect();
+            let mut found = false;
+            let new_deps: Vec<Dependency> = target.deps.clone().into_iter().filter(|d| {
+                d.0 != module_name && d.1 == DepKind::Module
+            }).collect();
+        
+            // TODO: Complete this part where if no modules were removed the user gets a 
+            // message saying that the module could not be found. This is to present false
+            // positives when deleting modules (typo or otherwise).
+            //
+            // Default behaviour should stay to keep a successful remove operation as silent
+
+
             target.deps = new_deps;
         }
     }
