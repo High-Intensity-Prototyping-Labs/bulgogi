@@ -30,7 +30,12 @@ pub fn cli() -> Command {
             Command::new("rm")
             .about("Removes a module from the bulgogi project")
             .alias("remove")
-            .arg(arg!(<PATH> "Path to the module in question"))
+            .arg(arg!(<MODULE> "Module name / directory"))
+            .arg(
+                arg!(<TARGET> "Target associated to the module")
+                .default_value("default")
+                .required(false)
+            )
             .arg(arg!(--cached))
         )
     )
@@ -54,6 +59,7 @@ pub enum InfoKind {
     AddModuleSuccess,
     NoChange,
     DuplicateModule,
+    ModuleRemoved,
 }
 
 pub fn info(msg: InfoKind) {
@@ -63,6 +69,7 @@ pub fn info(msg: InfoKind) {
         InfoKind::AddModuleSuccess => println!("Successfully added module to project."),
         InfoKind::NoChange => println!("No changes were made to the project state (project.yaml)"),
         InfoKind::DuplicateModule => println!("Duplicate module detected."),
+        InfoKind::ModuleRemoved => println!("Successfully removed module."),
     }
 }
 

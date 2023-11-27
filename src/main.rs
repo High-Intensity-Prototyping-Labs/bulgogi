@@ -6,8 +6,6 @@ mod client;
 
 use crate::client::{HelpKind, InfoKind};
 use crate::project::Project;
-use crate::target::TARGET_DEFAULT;
-use crate::dependency::MODULE_DEFAULT;
 
 use std::io;
 
@@ -54,7 +52,13 @@ fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
 
 /// Removes a module from the project 
 fn cli_rm_module(target: String, module: String) {
-
+    // Load project
+    if let Ok(mut project) = Project::load() {
+        project.rm_module(target, module);
+        client::info(InfoKind::ModuleRemoved);
+    } else {
+        client::help(HelpKind::ProjectLoadFailed);
+    }
 }
 
 fn main() -> Result<(), io::Error> {

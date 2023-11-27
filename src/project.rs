@@ -134,22 +134,10 @@ impl Project {
 
     /// Removes a module from the project
     pub fn rm_module(&mut self, target_name: String, module_name: String) {
-        for target in &mut self.targets {
-            if target.name == target_name {
-                for dep in &mut target.deps {
-                    if let (module, DepKind::Module) = dep {
-                        if module == &module_name {
-                            
-                        }
-                    }
-                }
-            }
+        if let Some(target) = self.find_target_mut(&target_name) {
+            let new_deps: Vec<Dependency> = target.deps.clone().into_iter().filter(|d| d.0 == module_name && d.1 == DepKind::Module).collect();
+            target.deps = new_deps;
         }
-
-        // TODO: Complete the rm_module function so that it uses the index 
-        //          of the desired module to remove.
-        //
-        //      Create a find_index method for modules, targets and modules within targets?
     }
 
     /// Saves the project to disk 
