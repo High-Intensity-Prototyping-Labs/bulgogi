@@ -19,7 +19,7 @@ const INC_DIR: &str = "inc";
 
 #[derive(Debug, Clone)]
 pub struct Project {
-    targets: Vec<Target>,
+    pub targets: Vec<Target>,
 }
 
 impl Project {

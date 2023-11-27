@@ -55,7 +55,10 @@ fn cli_tree() {
     // Load project 
     match Project::load() {
         Ok(project) => {
-            project.tree();
+            // Make sure project has at least 1 target
+            if !project.targets.is_empty() {
+                project.tree();
+            }
         }
         Err(e) => {
             if e.kind() == io::ErrorKind::NotFound {
