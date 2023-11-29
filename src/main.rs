@@ -16,6 +16,13 @@ macro_rules! get_one {
     };
 }
 
+/// Shorthand to get true/false state of flag from cli match
+macro_rules! get_flag {
+    ($x:expr, $y:expr) => {
+        $x.get_flag($y)
+    }
+}
+
 /// High-level cli func to add a module to the project in the PWD.
 fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
     // Load project
@@ -68,10 +75,10 @@ fn cli_tree() {
 }
 
 /// Removes a module from the project 
-fn cli_rm_module(target: String, module: String) {
+fn cli_rm_module(target: String, module: String, cached: bool) {
     // Load project
     if let Ok(mut project) = Project::load() {
-        project.rm_module(target, module);
+        project.rm_module(target, module, cached);
         project.save().expect("yaml");
     } else {
         client::help(HelpKind::ProjectLoadFailed);
@@ -98,7 +105,8 @@ fn main() -> Result<(), io::Error> {
                     // Placehold add command arguments
                     let module = get_one!(sub, String, "MODULE");
                     let target = get_one!(sub, String, "TARGET");
-                    cli_rm_module(target, module);
+                    let cached = get_flag!(sub, "cached");
+                    cli_rm_module(target, module, cached);
                 }
                 _ => unreachable!(),
             }

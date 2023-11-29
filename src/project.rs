@@ -100,9 +100,16 @@ impl Project {
     }
 
     /// Removes a module from the project
-    pub fn rm_module(&mut self, target_name: String, module_name: String) {
+    pub fn rm_module(&mut self, target_name: String, module_name: String, cached: bool) {
         if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
+        // Matching target entry found
+            // Override existing dependency list with one that has the undesired one removed
             target.deps = target.clone().deps.into_iter().filter(|d| matches!(d, (name, DepKind::Module) if name != &module_name)).collect();
+
+            if !cached {
+                // Delete the module directory 
+                Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
+            }
         }
     }
 
