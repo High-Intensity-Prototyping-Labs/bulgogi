@@ -38,8 +38,7 @@ impl Project {
         } else {
             // Create project file with nothing in it
             if let Ok(_) = File::create(PROJECT_YAML) {
-                // Project initialized
-                client::info(InfoKind::InitSuccess);
+                // Do nothing
             } else {
                 // Could not create project.yaml 
                 client::help(HelpKind::ProjectInitFailed);
