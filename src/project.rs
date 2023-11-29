@@ -62,36 +62,6 @@ impl Project {
         self.targets.push(Target::from(target_name));
     }
 
-    /// Returns a ref to a target which matches the criteria
-    pub fn find_target(&self, name: &String) -> Option<&Target> {
-        for target in &self.targets {
-            if &target.name == name {
-                return Some(target);
-            }
-        }
-        None
-    }
-
-    /// Returns a mut ref to a target with `name`
-    pub fn find_target_mut(&mut self, name: &String) -> Option<&mut Target> {
-        for target in &mut self.targets {
-            if &target.name == name {
-                return Some(target);
-            }
-        }
-        None
-    }
-
-    /// Returns a ref to the default target in the project 
-    pub fn find_default_target(&self) -> Option<&Target> {
-        return self.find_target(&Target::default().name);
-    }
-
-    /// Returns a mut ref to the default target in the project 
-    pub fn find_default_target_mut(&mut self) -> Option<&mut Target> {
-        return self.find_target_mut(&Target::default().name);
-    }
-
     /// Checks whether project has module 
     pub fn has_module(&self, module_name: &String) -> bool {
         for target in &self.targets {
