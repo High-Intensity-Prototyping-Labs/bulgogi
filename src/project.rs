@@ -200,6 +200,7 @@ impl From<Mapping> for Project {
         let mut project = Project::new();
 
         // Parse mapping into targets, add to project
+        let ref_mapping = mapping.clone();
         for (key, value) in mapping {
             // Only consider String keys and Sequence values
             if let (Value::String(target), Value::Sequence(sequence)) = (key, value) {
@@ -209,23 +210,17 @@ impl From<Mapping> for Project {
                 // For each entry in the sequence
                 for entry in sequence {
                     // Only consider strings in the sequence
-                    if let Value::String(module) = entry {
-                        // If it's a string, it's a module
-                        new_target.deps.push((module, DepKind::Module));
+                    if let Value::String(dep_string) = entry {
+                        if ref_mapping.keys().any(|k| matches!(k, Value::String(t) if t == &dep_string)) {
+                        // A matching dependency name has been found in the list of targets (keys)
+                            new_target.deps.push((dep_string, DepKind::Target));
+                        } else {
+                        // No matching dependency names in the target list
+                            new_target.deps.push((dep_string, DepKind::Module));
+                        }
                     }
                 }
                 project.targets.push(new_target);
-            }
-        }
-
-        // Infer which dependencies are actually targets
-        let project_ref = project.clone();
-        for target in &mut project.targets {
-            for dep in &mut target.deps {
-                if let Some(_) = project_ref.find_target(&dep.0) {
-                // Target with matching name found -- therefore target
-                    dep.1 = DepKind::Target;
-                }
             }
         }
         project
