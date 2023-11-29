@@ -34,9 +34,6 @@ fn cli_add_module(target: String, module: String) -> Result<(), io::Error> {
 
                 // Save project 
                 project.save().expect("yaml");
-
-                // Notify success 
-                client::info(InfoKind::AddModuleSuccess);
             }
         }
         Err(e) => {
