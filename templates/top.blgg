@@ -185,14 +185,9 @@ endfunction(add_library lib)
 endif(NOT COMMAND _add_library)
 
 # dependencies come first
-#add_subdirectory(JTOK)
-add_subdirectory(libloriserr)
-add_subdirectory(api/libipc)
-add_subdirectory(api/client_api)
-add_subdirectory(payload)
-add_subdirectory(modules)
-add_subdirectory(libdock)
-add_subdirectory(adcs/Source)
+{{#each module}}
+add_subdirectory({{this}})
+{{/each}}
 
 # executable targets after, and link against necessary dependencies
 add_subdirectory(ipcd)
