@@ -51,6 +51,10 @@ pub fn cli() -> Command {
         Command::new("clean")
         .about("Cleans the local project build files and cache")
     )
+    .subcommand(
+        Command::new("template")
+        .about("Tests the templating functionality")
+    )
 }
 
 pub enum InfoKind {

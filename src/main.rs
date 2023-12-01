@@ -3,6 +3,7 @@ mod project;
 mod target;
 mod dependency;
 mod client;
+mod template;
 
 use crate::client::{HelpKind, InfoKind};
 use crate::project::Project;
@@ -85,6 +86,11 @@ fn cli_rm_module(target: String, module: String, cached: bool) {
     }
 }
 
+/// Loads a template from the templates dir 
+fn cli_template() {
+    template::load().expect("error");
+}
+
 fn main() -> Result<(), io::Error> {
     let matches = client::cli().get_matches();
 
@@ -113,6 +119,9 @@ fn main() -> Result<(), io::Error> {
         }
         Some(("tree", _)) => {
             cli_tree();
+        }
+        Some(("template", _)) => {
+            cli_template();
         }
         _ => unreachable!(),
     }
