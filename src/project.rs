@@ -177,7 +177,14 @@ impl From<Mapping> for Project {
                             new_target.deps.push((dep_string, DepKind::Target));
                         } else {
                         // No matching dependency names in the target list
-                            new_target.deps.push((dep_string, DepKind::Module));
+                            if dep_string.contains("*") {
+                            // The project configuration indicates the module contains a main()
+                            // routine
+                                new_target.deps.push((dep_string.chars().filter(|c| c != &'*').collect(), DepKind::ModuleExe));
+                            } else {
+                            // This module contains no main() routine
+                                new_target.deps.push((dep_string, DepKind::Module));
+                            }
                         }
                     }
                 }
@@ -196,7 +203,10 @@ impl From<Project> for Mapping {
             let mut sequence = Sequence::new();
 
             for dep in target.deps {
-                sequence.push(Value::String(dep.0));
+                match dep.1 {
+                    DepKind::ModuleExe => sequence.push(Value::String(format!("{}*", dep.0))),
+                    _ => sequence.push(Value::String(dep.0)),
+                }
             }
 
             mapping.insert(Value::String(target.name), Value::Sequence(sequence));
