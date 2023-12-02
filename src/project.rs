@@ -48,10 +48,6 @@ impl Project {
 
     /// Adds a module to the default target of the project.
     /// If no default target is found, it is created.
-    /// TODO: Actually, the change from DepKind::Module to DepKind::ModuleExe as a default
-    /// behaviour should only happen when trying to build -- at that point it would be obvious that
-    /// there are no targets to build. That is, when a noob setup is detected, insert nice
-    /// defaults.
     pub fn add_module(&mut self, target_name: String, module_name: String) {
         if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
         // Matching target found in project
