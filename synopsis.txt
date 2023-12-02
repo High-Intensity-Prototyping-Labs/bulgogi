@@ -92,36 +92,16 @@ project/
 
 /* Repeat the same for module 2 */
 
-# Module vs Library vs Executable
-# -------------------------------
-# A module is a non-library non-executable (non-target) folder of 
-# source code and headers. They are uncommon but sometimes needed.
+# All modules are treated as libraries
+# -----------------------------------
+# Unless indicated by a * in the project config, all modules are treated like potential libraries.
+# 
+# This is helpful because it supports the existing CMake architecture that is being inherited and
+# allows more than one target to link against the module.
 #
-# A library is a target which is listed as a dependency of another
-# target. It depends on one or more modules and optionally targets.
-#
-# An executable is a target which is not a dependency of any other
-# target. It can depend on one or more modules and optionally targets.
-
-# Single-dependency targets 
-# -------------------------
-# Single-module executables:
-# - The executable and the module are indistinguishable.
-# - In the filesystem, the module directory lives.
-# - In the build system, the executble sources the module.
-#
-# Single-library executables:
-# - This variant is not possible due to the lack of a main routine.
-# * Instead, adding a module with a main routine will make this work.
-#
-# Single-module libraries: 
-# - The library and the module are indistinguishable.
-# - In the filesystem, the module directory lives.
-# - In the build system, a library sources the module.
-#
-# Single-library libraries:
-# - This variant is meaningless as the additional library is redundant.
-# * Instead, try adding more modules or libraries to make this work.
+# Additionally, when flagged as containing a main() routine with a *, executable targets can ensure
+# the presence of a dedicated main() module. For simplicity, they can also be standalone executables
+# in smaller/simpler projects.
 
 ################## Cyclic Dependencies 
 # A cyclic dependency check has been implemented for every conversion
