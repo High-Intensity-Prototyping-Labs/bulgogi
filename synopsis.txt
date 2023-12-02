@@ -92,6 +92,21 @@ project/
 
 /* Repeat the same for module 2 */
 
+# CMake Targets
+default:	# default.out			# What the user wants
+	module1*	# default.out		# What bulgogi tells CMake
+	module2		# libmodule2.a		# || || || || || || || ||
+
+target1:	# libtarget1.a
+	module3		# libmodule3.a
+	module4		# libmodule4.a
+
+target2:	# target2.out
+	module3		# libmodule3.a
+	module4*	# target2.out
+	target1		# libtarget1.a (implies library)
+
+
 # All modules are treated as libraries
 # -----------------------------------
 # Unless indicated by a * in the project config, all modules are treated like potential libraries.
@@ -101,7 +116,29 @@ project/
 #
 # Additionally, when flagged as containing a main() routine with a *, executable targets can ensure
 # the presence of a dedicated main() module. For simplicity, they can also be standalone executables
-# in smaller/simpler projects.
+# in smaller/simpler projects
+
+# Bulgogi targets are abstract groupings
+# --------------------------------------
+# As an orchestrator, bulgogi constructs and concepts are designed to faciliate
+# build system management and the user development process.
+#
+# The high-level distinction between a target and a module is merely an abstraction
+# which serves to distinguish products (executables) from intermediaries (libraries).
+#
+# This is not a conventional or 'good' way of thinking of binaries and libraries. But
+# that isn't the point. Within a self-contained project, this is how things conceptually
+# flow.
+
+# Targets without an executable component
+# ---------------------------------------
+# A new thought: targets which do not have an executable component specified (module*)
+# will be considered target libraries.
+#
+# This way, there are 3 kinds of CMake targets that bulgogi can generate:
+# - Executable target (links against libraries + has executable component),
+# - Library target (composed of modules but no executable component),
+# - Library modules (smallest compilation unit recognized by bulgogi).
 
 ################## Cyclic Dependencies 
 # A cyclic dependency check has been implemented for every conversion
