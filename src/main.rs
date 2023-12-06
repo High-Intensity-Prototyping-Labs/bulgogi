@@ -4,6 +4,7 @@ mod target;
 mod dependency;
 mod client;
 mod template;
+mod cmake;
 
 use crate::client::{HelpKind, InfoKind};
 use crate::project::Project;
