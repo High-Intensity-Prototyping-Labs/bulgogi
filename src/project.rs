@@ -111,6 +111,7 @@ impl Project {
 
             if !cached {
                 // Delete the module directory 
+                // TODO: Remove this ugly shell command with a proper FS file remove call.
                 Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
             }
         }
