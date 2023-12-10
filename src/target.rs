@@ -13,7 +13,7 @@ pub struct Target {
 impl Target {
     /// Adds a module to this target 
     pub fn add(&mut self, module: String) {
-        self.deps.push((module, DepKind::Module));
+        self.deps.push(Dependency::from((module, DepKind::Module)));
     }
 }
 
@@ -40,7 +40,7 @@ impl From<(String, String)> for Target {
     fn from(value: (String, String)) -> Self {
         Target {
             name: value.0,
-            deps: vec![(value.1, DepKind::Module)],
+            deps: vec![Dependency::from((value.1, DepKind::Module))],
         }
     }
 }

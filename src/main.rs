@@ -4,9 +4,11 @@ mod target;
 mod dependency;
 mod client;
 mod template;
+mod cmake;
 
 use crate::client::{HelpKind, InfoKind};
 use crate::project::Project;
+use crate::cmake::{CMakeProject, CMakeList};
 
 use std::io;
 
@@ -87,8 +89,17 @@ fn cli_rm_module(target: String, module: String, cached: bool) {
 }
 
 /// Loads a template from the templates dir 
-fn cli_template() {
+fn cli_template() -> Result<(), io::Error> {
     template::load().expect("error");
+
+    println!("::TESTING::");
+
+    let project = Project::load()?;
+    for target in project.targets {
+        let _ = CMakeList::from(target);
+    }
+
+    Ok(())
 }
 
 fn main() -> Result<(), io::Error> {

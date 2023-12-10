@@ -1,0 +1,7 @@
+default:
+- module1*
+- module3
+- target1
+target1:
+- module2
+- module4

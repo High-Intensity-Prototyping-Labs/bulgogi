@@ -1,7 +1,7 @@
 // Project module
 use crate::target::Target;
 use crate::target::TARGET_DEFAULT;
-use crate::dependency::{Dependency, DepKind};
+use crate::dependency::{Dependency, DepKind, DepFlag};
 use crate::client;
 use crate::client::{InfoKind, HelpKind};
 
@@ -51,7 +51,7 @@ impl Project {
     pub fn add_module(&mut self, target_name: String, module_name: String) {
         if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
         // Matching target found in project
-            target.deps.push((module_name, DepKind::Module));
+            target.deps.push(Dependency::from((module_name, DepKind::Module)));
         } else {
         // No matching targets found -- create it and add module
             self.targets.push(Target::from((target_name, module_name)));
@@ -67,7 +67,7 @@ impl Project {
     pub fn has_module(&self, module_name: &String) -> bool {
         for target in &self.targets {
             for dep in &target.deps {
-                if let (m, DepKind::Module) = dep {
+                if let Dependency { name: m, kind: DepKind::Module, .. } = dep {
                     if m == module_name {
                         return true;
                     }
@@ -105,10 +105,13 @@ impl Project {
         if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
         // Matching target entry found
             // Override existing dependency list with one that has the undesired one removed
-            target.deps = target.clone().deps.into_iter().filter(|d| matches!(d, (name, DepKind::Module) if name != &module_name)).collect();
+            target.deps = target.clone().deps.into_iter().filter(|d| {
+                matches!(d, Dependency { name, kind: DepKind::Module, .. } if name != &module_name)
+            }).collect();
 
             if !cached {
                 // Delete the module directory 
+                // TODO: Remove this ugly shell command with a proper FS file remove call.
                 Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
             }
         }
@@ -147,7 +150,7 @@ impl Project {
         let mut cmd = Command::new("tree");
         for target in &self.targets {
             for dep in &target.deps {
-                if let (module, DepKind::Module) = dep {
+                if let Dependency { name: module, kind: DepKind::Module, .. } = dep {
                     cmd.arg(module);
                 }
             }
@@ -176,16 +179,16 @@ impl From<Mapping> for Project {
                     if let Value::String(dep_string) = entry {
                         if ref_mapping.keys().any(|k| matches!(k, Value::String(t) if t == &dep_string)) {
                         // A matching dependency name has been found in the list of targets (keys)
-                            new_target.deps.push((dep_string, DepKind::Target));
+                            new_target.deps.push(Dependency::from((dep_string, DepKind::Target)));
                         } else {
                         // No matching dependency names in the target list
                             if dep_string.contains("*") {
                             // The project configuration indicates the module contains a main()
                             // routine
-                                new_target.deps.push((dep_string.chars().filter(|c| c != &'*').collect(), DepKind::ModuleExe));
+                                new_target.deps.push(Dependency::from((dep_string, DepKind::Module, DepFlag::Executable)));
                             } else {
                             // This module contains no main() routine
-                                new_target.deps.push((dep_string, DepKind::Module));
+                                new_target.deps.push(Dependency::from((dep_string, DepKind::Module)));
                             }
                         }
                     }
@@ -205,9 +208,9 @@ impl From<Project> for Mapping {
             let mut sequence = Sequence::new();
 
             for dep in target.deps {
-                match dep.1 {
-                    DepKind::ModuleExe => sequence.push(Value::String(format!("{}*", dep.0))),
-                    _ => sequence.push(Value::String(dep.0)),
+                match dep.flag {
+                    DepFlag::Executable => sequence.push(Value::String(format!("{}*", dep.name))),
+                    _ => sequence.push(Value::String(dep.name)),
                 }
             }
 
