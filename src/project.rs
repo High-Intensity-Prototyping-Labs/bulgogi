@@ -162,7 +162,7 @@ impl Project {
 
     /// Returns an iterator over all the module-type dependencies of the project
     pub fn modules(self) -> impl Iterator<Item=Dependency> {
-        self.targets.into_iter().flat_map(|t| t.deps.into_iter())
+        self.targets.into_iter().flat_map(|t| t.deps.into_iter().filter(|d| matches!(d.kind, DepKind::Module)))
     }
 }
 
