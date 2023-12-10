@@ -103,9 +103,19 @@ target1:	# libtarget1.a
 
 target2:	# target2.out
 	module3		# libmodule3.a
-	module4*	# target2.out
+	module5*	# target2.out
 	target1		# libtarget1.a (implies library)
 
+# Exceptions
+default:	# default.out
+	target1*	# Shared object?
+	module2
+
+target1:	# target1.out
+	module1*	# target1.out
+
+# Bottom line: targets marked as executable dependencies are treated as
+# normal target-libraries
 
 # All modules are treated as libraries
 # -----------------------------------
