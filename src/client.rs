@@ -153,7 +153,10 @@ pub fn tree() {
         Ok(project) => {
             // Make sure project has at least 1 target
             if !project.targets.is_empty() {
-                project.tree();
+                let mut cmd = Command::new("tree");
+                for module in project.modules() {
+                    cmd.arg(module.name);
+                }
             }
         }
         Err(e) => {
@@ -165,6 +168,20 @@ pub fn tree() {
         }
     }
 }
+
+/// Outputs a tree diagram using `tree` 
+// pub fn tree(&self) {
+//     let mut cmd = Command::new("tree");
+//     for target in &self.targets {
+//         for dep in &target.deps {
+//             if let Dependency { name: module, kind: DepKind::Module, .. } = dep {
+//                 cmd.arg(module);
+//             }
+//         }
+//     }
+//     let tree = cmd.output().expect("tree command failed").stdout;
+//     println!("{}", String::from_utf8(tree).expect("UTF-8 tree to string failed"));
+// }
 
 /// Removes a module from the project 
 pub fn rm_module(target: String, module: String, cached: bool) {
@@ -186,6 +203,13 @@ pub fn template() -> Result<(), io::Error> {
     let project = Project::load()?;
     for target in project.targets {
         let _ = CMakeList::from(target);
+    }
+
+    if let Ok(project) = Project::load() {
+        println!("!!Printing modules!!");
+        for module in project.modules() {
+            println!("{:#?}", module);
+        }
     }
 
     Ok(())

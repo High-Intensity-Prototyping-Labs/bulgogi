@@ -146,20 +146,6 @@ impl Project {
         Ok(())
     }
 
-    /// Outputs a tree diagram using `tree` 
-    pub fn tree(&self) {
-        let mut cmd = Command::new("tree");
-        for target in &self.targets {
-            for dep in &target.deps {
-                if let Dependency { name: module, kind: DepKind::Module, .. } = dep {
-                    cmd.arg(module);
-                }
-            }
-        }
-        let tree = cmd.output().expect("tree command failed").stdout;
-        println!("{}", String::from_utf8(tree).expect("UTF-8 tree to string failed"));
-    }
-
     /// Returns an iterator over all the module-type dependencies of the project
     pub fn modules(self) -> impl Iterator<Item=Dependency> {
         self.targets.into_iter().flat_map(|t| t.deps.into_iter().filter(|d| matches!(d.kind, DepKind::Module)))
