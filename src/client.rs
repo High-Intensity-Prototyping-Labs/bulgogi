@@ -1,7 +1,8 @@
 // Module dedicated to the cli.
 use clap::{arg, Command};
-use crate::{CMakeList, Project};
 use crate::template;
+use crate::cmake::CMakeList;
+use crate::project::Project;
 use std::io;
 
 /// Shorthand to get an argument from a cli match
@@ -50,7 +51,7 @@ pub fn next_command() -> Result<(), io::Error> {
             tree();
         }
         Some(("template", _)) => {
-            template();
+            template()?;
         }
         _ => unreachable!(),
     }
