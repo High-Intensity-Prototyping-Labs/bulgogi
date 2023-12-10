@@ -10,6 +10,7 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::process::Command;
+use std::vec::IntoIter;
 
 use serde_yaml::{Value, Mapping, Sequence};
 
@@ -157,6 +158,11 @@ impl Project {
         }
         let tree = cmd.output().expect("tree command failed").stdout;
         println!("{}", String::from_utf8(tree).expect("UTF-8 tree to string failed"));
+    }
+
+    /// Returns an iterator over all the module-type dependencies of the project
+    pub fn modules(self) -> impl Iterator<Item=Dependency> {
+        self.targets.into_iter().flat_map(|t| t.deps.into_iter())
     }
 }
 
