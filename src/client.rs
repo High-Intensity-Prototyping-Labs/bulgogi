@@ -1,5 +1,62 @@
 // Module dedicated to the cli.
 use clap::{arg, Command};
+use crate::{CMakeList, Project};
+use crate::template;
+use std::io;
+
+/// Shorthand to get an argument from a cli match
+macro_rules! get_one {
+    ($x:expr, $y:ty, $z:expr) => {
+        $x.get_one::<$y>($z).expect("required").to_owned()
+    };
+}
+
+/// Shorthand to get true/false state of flag from cli match
+macro_rules! get_flag {
+    ($x:expr, $y:expr) => {
+        $x.get_flag($y)
+    }
+}
+
+
+/// Handles the next CLI command and its arguments.
+pub fn next_command() -> Result<(), io::Error> {
+    let matches = cli().get_matches();
+
+    match matches.subcommand() {
+        Some(("init", _)) => {
+            // Initialize project in the PWD
+            Project::init();
+        }
+        Some(("module", cmd)) => {
+            match cmd.subcommand() {
+                Some(("add", sub)) => {
+                    // Placehold add command arguments
+                    let module = get_one!(sub, String, "MODULE");
+                    let target = get_one!(sub, String, "TARGET");
+                    add_module(target, module)?;
+                }
+                Some(("rm", sub)) => {
+                    // Placehold add command arguments
+                    let module = get_one!(sub, String, "MODULE");
+                    let target = get_one!(sub, String, "TARGET");
+                    let cached = get_flag!(sub, "cached");
+                    rm_module(target, module, cached);
+                }
+                _ => unreachable!(),
+            }
+        }
+        Some(("tree", _)) => {
+            tree();
+        }
+        Some(("template", _)) => {
+            template();
+        }
+        _ => unreachable!(),
+    }
+
+    Ok(())
+}
 
 pub fn cli() -> Command {
     Command::new("bulgogi")
@@ -55,6 +112,82 @@ pub fn cli() -> Command {
         Command::new("template")
         .about("Tests the templating functionality")
     )
+}
+
+/// High-level cli func to add a module to the project in the PWD.
+pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
+    // Load project
+    match Project::load() {
+        Ok(mut project) => {
+            if project.has_module(&module) {
+            // Duplicate found, notify
+                info(InfoKind::DuplicateModule);
+            } else {
+            // No duplicates found, continue
+                // Add module to project
+                project.add_module(target, module.clone());
+
+                // Spawn module directory 
+                Project::spawn_module(module)?;
+
+                // Save project 
+                project.save().expect("yaml");
+            }
+        }
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                help(HelpKind::InitRequired);
+            } else {
+                println!("{}", e);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Displays a tree diagram of the project modules 
+pub fn tree() {
+    // Load project 
+    match Project::load() {
+        Ok(project) => {
+            // Make sure project has at least 1 target
+            if !project.targets.is_empty() {
+                project.tree();
+            }
+        }
+        Err(e) => {
+            if e.kind() == io::ErrorKind::NotFound {
+                help(HelpKind::InitRequired);
+            } else {
+                println!("{}", e);
+            }
+        }
+    }
+}
+
+/// Removes a module from the project 
+pub fn rm_module(target: String, module: String, cached: bool) {
+    // Load project
+    if let Ok(mut project) = Project::load() {
+        project.rm_module(target, module, cached);
+        project.save().expect("yaml");
+    } else {
+        help(HelpKind::ProjectLoadFailed);
+    }
+}
+
+/// Loads a template from the templates dir 
+pub fn template() -> Result<(), io::Error> {
+    template::load().expect("error");
+
+    println!("::TESTING::");
+
+    let project = Project::load()?;
+    for target in project.targets {
+        let _ = CMakeList::from(target);
+    }
+
+    Ok(())
 }
 
 pub enum InfoKind {
