@@ -182,7 +182,7 @@ impl From<Mapping> for Project {
                             if dep_string.contains("*") {
                             // The project configuration indicates the module contains a main()
                             // routine
-                                new_target.deps.push(Dependency::from((dep_string, DepKind::Module, DepFlag::Executable)));
+                                new_target.deps.push(Dependency::from((dep_string.replace("*", ""), DepKind::Module, DepFlag::Executable)));
                             } else {
                             // This module contains no main() routine
                                 new_target.deps.push(Dependency::from((dep_string, DepKind::Module)));
