@@ -150,6 +150,11 @@ impl Project {
     pub fn modules(self) -> impl Iterator<Item=Dependency> {
         self.targets.into_iter().flat_map(|t| t.deps.into_iter().filter(|d| matches!(d.kind, DepKind::Module)))
     }
+
+    /// Returns whether the project has no targets (empty)
+    pub fn empty(&self) -> bool {
+        self.targets.is_empty()
+    }
 }
 
 impl From<Mapping> for Project {
