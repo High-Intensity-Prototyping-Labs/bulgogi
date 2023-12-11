@@ -4,6 +4,7 @@ use crate::template;
 use crate::cmake::CMakeList;
 use crate::project::Project;
 use std::io;
+use std::process;
 
 /// Shorthand to get an argument from a cli match
 macro_rules! get_one {
@@ -151,12 +152,22 @@ pub fn tree() {
     // Load project 
     match Project::load() {
         Ok(project) => {
-            // Make sure project has at least 1 target
-            if !project.targets.is_empty() {
-                let mut cmd = Command::new("tree");
-                for module in project.modules() {
-                    cmd.arg(module.name);
+            // Declare tree command process
+            let mut cmd = process::Command::new("tree");
+
+            // Add each module-type dependency (directories) to tree command args
+            cmd.args(project.clone().modules().map(|m| m.name));
+
+            // Match result of running command
+            match cmd.output() {
+                Ok(c) => {
+                    match String::from_utf8(c.stdout) {
+                        Ok(_) if project.empty() => println!(""),
+                        Ok(tree) => println!("{}", tree),
+                        Err(e) => println!("Failed to parse tree command output ({})", e),
+                    }
                 }
+                Err(e) => println!("Failed to run tree command ({})", e)
             }
         }
         Err(e) => {
@@ -168,20 +179,6 @@ pub fn tree() {
         }
     }
 }
-
-/// Outputs a tree diagram using `tree` 
-// pub fn tree(&self) {
-//     let mut cmd = Command::new("tree");
-//     for target in &self.targets {
-//         for dep in &target.deps {
-//             if let Dependency { name: module, kind: DepKind::Module, .. } = dep {
-//                 cmd.arg(module);
-//             }
-//         }
-//     }
-//     let tree = cmd.output().expect("tree command failed").stdout;
-//     println!("{}", String::from_utf8(tree).expect("UTF-8 tree to string failed"));
-// }
 
 /// Removes a module from the project 
 pub fn rm_module(target: String, module: String, cached: bool) {
