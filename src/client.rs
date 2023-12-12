@@ -123,7 +123,7 @@ pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
     // Load project
     match Project::load() {
         Ok(mut project) => {
-            if project.has_module(&module) {
+            if project.clone().modules().any(|m| m.name == module) {
             // Duplicate found, notify
                 info(InfoKind::DuplicateModule);
             } else {

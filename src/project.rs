@@ -46,20 +46,6 @@ impl Project {
         }
     }
 
-    /// Checks whether project has module 
-    pub fn has_module(&self, module_name: &String) -> bool {
-        for target in &self.targets {
-            for dep in &target.deps {
-                if let Dependency { name: m, kind: DepKind::Module, .. } = dep {
-                    if m == module_name {
-                        return true;
-                    }
-                }
-            }
-        }
-        false
-    }
-
     /// Loads project from disk 
     pub fn load() -> Result<Self, io::Error> {
         match File::open(PROJECT_YAML) {
