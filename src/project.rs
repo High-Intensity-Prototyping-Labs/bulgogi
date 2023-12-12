@@ -46,11 +46,6 @@ impl Project {
         }
     }
 
-    /// Adds a target to the project 
-    pub fn add_target(&mut self, target_name: String) {
-        self.targets.push(Target::from(target_name));
-    }
-
     /// Checks whether project has module 
     pub fn has_module(&self, module_name: &String) -> bool {
         for target in &self.targets {
