@@ -5,3 +5,4 @@
 - The executable indicator (*) appears in the module name internally.
 - There is possibly a problem with the lack of FS checks when loading a project
 	-> (e.g.: a bunch of modules are listed in the project.yaml which do not exist in the FS.)
+- Trying to add the same module as dependencies to 2 different targets results in a duplicate detected error.
