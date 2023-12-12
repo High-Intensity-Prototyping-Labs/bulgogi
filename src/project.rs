@@ -146,14 +146,24 @@ impl Project {
         Ok(())
     }
 
+    /// Returns whether the project has no targets (empty)
+    pub fn empty(&self) -> bool {
+        self.targets.is_empty()
+    }
+
     /// Returns an iterator over all the module-type dependencies of the project
     pub fn modules(self) -> impl Iterator<Item=Dependency> {
         self.targets.into_iter().flat_map(|t| t.deps.into_iter().filter(|d| matches!(d.kind, DepKind::Module)))
     }
 
-    /// Returns whether the project has no targets (empty)
-    pub fn empty(&self) -> bool {
-        self.targets.is_empty()
+    /// Returns an iterator over all project targets 
+    pub fn targets(self) -> impl Iterator<Item=Target> {
+        self.targets.into_iter()
+    }
+
+    /// Returns a mutable iterator over all project targets
+    pub fn targets_mut(&mut self) -> std::slice::IterMut<'_, Target> {
+        self.targets.iter_mut()
     }
 }
 
