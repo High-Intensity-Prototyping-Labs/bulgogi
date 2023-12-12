@@ -10,7 +10,6 @@ use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::process::Command;
-use std::vec::IntoIter;
 
 use serde_yaml::{Value, Mapping, Sequence};
 
@@ -44,18 +43,6 @@ impl Project {
                 // Could not create project.yaml 
                 client::help(HelpKind::ProjectInitFailed);
             }
-        }
-    }
-
-    /// Adds a module to the default target of the project.
-    /// If no default target is found, it is created.
-    pub fn add_module(&mut self, target_name: String, module_name: String) {
-        if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
-        // Matching target found in project
-            target.deps.push(Dependency::from((module_name, DepKind::Module)));
-        } else {
-        // No matching targets found -- create it and add module
-            self.targets.push(Target::from((target_name, module_name)));
         }
     }
 

@@ -1,10 +1,12 @@
 // Module dedicated to the cli.
-use clap::{arg, Command};
-use crate::template;
-use crate::cmake::CMakeList;
-use crate::project::Project;
 use std::io;
 use std::process;
+use clap::{arg, Command};
+use crate::template;
+use crate::target::Target;
+use crate::project::Project;
+use crate::cmake::CMakeList;
+use crate::dependency::{Dependency, DepKind};
 
 /// Shorthand to get an argument from a cli match
 macro_rules! get_one {
@@ -126,8 +128,14 @@ pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
                 info(InfoKind::DuplicateModule);
             } else {
             // No duplicates found, continue
-                // Add module to project
-                project.add_module(target, module.clone());
+                // Find matching target 
+                if let Some(target) = project.targets_mut().find(|t| t.name == target) {
+                    // Match found, add module 
+                    target.deps.push(Dependency::from((module.clone(), DepKind::Module)));
+                } else {
+                    // No matching target found, create it 
+                    project.targets.push(Target::from((target, module.clone())));
+                }
 
                 // Spawn module directory 
                 Project::spawn_module(module)?;
