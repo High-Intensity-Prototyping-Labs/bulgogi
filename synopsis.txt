@@ -120,6 +120,21 @@ target1:	# target1.out
 
 /** Long-form droney bits **/
 
+# I just remembered: executables are special 
+# ------------------------------------------
+# The whole need for "proxy" modules for targets stems from the special need for executable targets 
+# to have the main() sources added directly to them.
+#
+# If a mechanism exists for executables to be created this way in the CMake translation, why wouldn't 
+# libraries do this as well? Now I remember the line of thinking I was going on and why it's been so 
+# damn hard to break from it.
+#
+# Still, for now, I think it would be best to let executables think they're special (and so treat them
+# that way) and then continue with the direct interpretation for the libraries and the rest.
+#
+# So in other words: executables have proxy modules (which is what the * helps with anyway) and everything
+# else is a library.
+
 # New way of thinking: Bulgogi is a CMake orchestrator
 # ----------------------------------------------------
 # Rather than try and be clever by designating some module directories to be 'proxy' libraries 
