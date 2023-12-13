@@ -64,7 +64,7 @@ bulgogi add source5.c module2 # Adds source to specific module
 
 # project.yaml
 default:		# Target 
-	module1		# Dependency 1
+	module1*	# Dependency 1 (contains main)
 	module2		# Dependency 2
 
 target1:		# Target
@@ -73,7 +73,8 @@ target1:		# Target
 
 target2:		# Target
 	module3		# Dependency 1
-	target1		# Dependency 2 (implies target1 is a lib)
+	module5*	# Dependency 2 (contains main)
+	target1		# Dependency 3 (implies target1 is a lib/shared lib)
 
 **NOTE: A dependency can be a target OR a module. Targets used as dependencies imply lib.
 
@@ -116,6 +117,27 @@ target1:	# target1.out
 
 # Bottom line: targets marked as executable dependencies are treated as
 # normal target-libraries
+
+/** Long-form droney bits **/
+
+# New way of thinking: Bulgogi is a CMake orchestrator
+# ----------------------------------------------------
+# Rather than try and be clever by designating some module directories to be 'proxy' libraries 
+# and executables, passing modules directly as libraries to CMake (even in cases when the library
+# target and the module are indistinguishable) and leaving it to be CMake's problem (or the user's 
+# desire), a level of simplicity and fine-grained control is simultaneously unlocked.
+#
+# I am seeing this as a bit of an A/B test, especially considering that I have flip-flopped between
+# wanting to have proxy target modules and not. 
+#
+# On the positive end, proxy modules are a more natural/stylistic interpretation of the desired project
+# layout. If a human were adapting the bulgogi project.yaml file into a CMake project, it would be 
+# surprising to me if they would choose to create a library which only links to another lone library.
+#
+# On the flipside, if the bulgogi configuration _implies_ that a lone module is part of a lone library,
+# why not accept this as the user's wish? This would be a much more direct interpretation of the desired
+# project layout. This could be a very easy to produce a library file which I can send to my buddy just 
+# on the side. 
 
 # All modules are treated as libraries
 # -----------------------------------
