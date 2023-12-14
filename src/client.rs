@@ -5,7 +5,6 @@ use clap::{arg, Command};
 use crate::template;
 use crate::target::Target;
 use crate::project::Project;
-use crate::cmake::CMakeList;
 use crate::dependency::{Dependency, DepKind};
 
 /// Shorthand to get an argument from a cli match
@@ -207,7 +206,7 @@ pub fn template() -> Result<(), io::Error> {
 
     let project = Project::load()?;
     for target in project.targets {
-        let _ = CMakeList::from(target);
+
     }
 
     if let Ok(project) = Project::load() {
