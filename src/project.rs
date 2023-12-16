@@ -44,12 +44,20 @@ impl From<Mapping> for Project {
     fn from(map: Mapping) -> Self {
         let mut project = Project::new();
 
-        let targets = map.clone().into_keys().into_iter().filter_map(|k| {
+        let targets = map.keys().filter_map(|k| {
             match k {
-                Value::String(s) => Some((s, Target::Library)),
+                Value::String(s) => Some(s.clone()),
                 _ => None,
             }
-        }).collect::<HashMap<TargetID, Target>>();
+        }).collect::<Vec<TargetID>>();
+
+        // Collect values first as flat map then filter map against matches found in target list
+        let modules = map.values()
+            .filter_map(|v| match v { Value::Sequence(l) => Some(l), _ => None })
+            .flat_map(|l| l.iter())
+            .filter_map(|
+            
+        });
 
         // TODO: Find out in what order to load the mapping into the project.
         //       Maybe loading the deps first can allow the rest to be derived from there?
