@@ -38,7 +38,7 @@ impl From<Project> for CMakeProject {
 
 impl From<(Target, Dependency)> for CMakeTarget {
     fn from(value: (Target, Dependency)) -> Self {
-        
+        CMakeTarget::LibModule(String::from("wow"))
     }
 }
 
@@ -48,7 +48,7 @@ impl From<Target> for CMakeList {
         let mut list = CMakeList::new();
 
         for dep in target.deps.iter() {
-            list.insert(dep.name, 
+
         }
 
         CMakeList::new()
