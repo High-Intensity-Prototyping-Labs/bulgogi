@@ -63,11 +63,10 @@ impl From<Mapping> for Project {
 
         // Collect values first as flat map then filter map against matches found in target list
         let modules = map.values()
-            .filter_map(|v| match v { Value::Sequence(seq) => Some(seq), _ => None })
-            .flat_map(|seq| seq.iter().filter_map(|v| match v { Value::String(s) => Some(s.clone()), _ => None }))
-            .filter(|s| !targets.iter().any(|t| t == s))
-            .map(|s| match s.contains("*") { true => (s, Module::Executable), false => (s, Module::Normal) })
-            .collect::<HashMap<ModuleID, Module>>();
+            .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
+            .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
+            .collect::<Vec<ModuleID>>()
+            .dedup();
 
         // Get dependencies
         let deps = map.iter()
