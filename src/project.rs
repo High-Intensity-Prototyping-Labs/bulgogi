@@ -2,15 +2,7 @@
 use crate::target::Target;
 use crate::dependency::{Dependency, DepKind, DepFlag};
 
-use std::io;
-use std::fs;
-use std::fs::File;
-use std::path::Path;
-
 use serde_yaml::{Value, Mapping, Sequence};
-
-const SRC_DIR: &str = "src";
-const INC_DIR: &str = "inc";
 
 #[derive(Debug, Clone)]
 pub struct Project {
@@ -22,23 +14,6 @@ impl Project {
         Project {
             targets: Vec::new(),
         }
-    }
-
-    /// Spawns a module directory with required subdirs
-    pub fn spawn_module(module_name: String) -> Result<(), io::Error> {
-        let path = Path::new(&module_name);
-        let src = path.join(SRC_DIR);
-        let inc = path.join(INC_DIR);
-        let pinc = src.join(SRC_DIR);
-
-        if !path.exists() {
-        // Module dir missing -- create 
-            fs::create_dir_all(src)?;
-            fs::create_dir_all(inc)?;
-            fs::create_dir_all(pinc)?;
-        }
-
-        Ok(())
     }
 
     /// Returns whether the project has no targets (empty)

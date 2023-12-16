@@ -9,11 +9,18 @@ use std::process;
 use std::fs::File;
 use std::path::Path;
 
+use std::fs;
 use clap::{arg, Command};
 use serde_yaml::Mapping;
 
 /// Relative path to the project config file
 const PROJECT_YAML: &str = "project.yaml";
+
+/// Top-level module source directory
+const SRC_DIR: &str = "src";
+
+/// Top-level module include directory
+const INC_DIR: &str = "inc";
 
 /// Shorthand to get an argument from a cli match
 macro_rules! get_one {
@@ -162,10 +169,10 @@ pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
                 }
 
                 // Spawn module directory 
-                Project::spawn_module(module)?;
+                spawn_module(module)?;
 
                 // Save project 
-                project.save().expect("yaml");
+                save(&project).expect("yaml");
             }
         }
         Err(e) => {
@@ -199,6 +206,23 @@ pub fn rm_module(target_name: String, module_name: String, cached: bool) {
     } else {
         help(HelpKind::ProjectLoadFailed);
     }
+}
+
+/// Spawns a module directory with required subdirs
+pub fn spawn_module(module_name: String) -> Result<(), io::Error> {
+    let path = Path::new(&module_name);
+    let src = path.join(SRC_DIR);
+    let inc = path.join(INC_DIR);
+    let pinc = src.join(SRC_DIR);
+
+    if !path.exists() {
+    // Module dir missing -- create 
+        fs::create_dir_all(src)?;
+        fs::create_dir_all(inc)?;
+        fs::create_dir_all(pinc)?;
+    }
+
+    Ok(())
 }
 
 
