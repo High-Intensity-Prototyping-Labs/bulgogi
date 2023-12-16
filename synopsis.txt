@@ -120,6 +120,20 @@ target1:	# target1.out
 
 /** Long-form droney bits **/
 
+# The HashMap Update: 0.5.0
+# -------------------------
+# This time we've realized that HashMaps are our friends. 
+#
+# The Project struct will now be a hasmap which can be crawled like a graph.
+#
+# Every target has a target ID, which is in fact its name. The key will be a String.
+#
+# Targets have lists of Dependencies, of which some may be modules (with module IDs) and others 
+# may be targets (with Target IDs corresponding to an existing target in the HashMap).
+#
+# This way, without fighting the underlying data structures, the desired representation and functionality 
+# may be implemented. This will also greatly ease conversion from the bulgogi Project to a CMakeProject.
+
 # I just remembered: executables are special 
 # ------------------------------------------
 # The whole need for "proxy" modules for targets stems from the special need for executable targets 
