@@ -195,7 +195,7 @@ pub fn rm_module(target_name: String, module_name: String, cached: bool) {
                 process::Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
             }
         }
-        project.save();
+        save(&project);
     } else {
         help(HelpKind::ProjectLoadFailed);
     }
@@ -223,6 +223,17 @@ pub fn load() -> Result<Project, io::Error> {
             Err(e)
         }
     }
+}
+
+/// Saves the project to disk 
+pub fn save(project: &Project) -> Result<(), serde_yaml::Error> {
+    let filtered_targets: Vec<Target> = project.targets.clone().into_iter().filter(|t| !t.deps.is_empty()).collect();
+    let filtered_project = Project { targets: filtered_targets };
+
+    if let Ok(f) = File::options().write(true).create(true).truncate(true).open(PROJECT_YAML) {
+        serde_yaml::to_writer(f, &Mapping::from(filtered_project))?;
+    }
+    Ok(())
 }
 
 

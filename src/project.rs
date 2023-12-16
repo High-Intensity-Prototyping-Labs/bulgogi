@@ -1,15 +1,11 @@
 // Project module
 use crate::target::Target;
-use crate::target::TARGET_DEFAULT;
 use crate::dependency::{Dependency, DepKind, DepFlag};
-use crate::client;
-use crate::client::{InfoKind, HelpKind};
 
 use std::io;
 use std::fs;
 use std::fs::File;
 use std::path::Path;
-use std::process::Command;
 
 use serde_yaml::{Value, Mapping, Sequence};
 
@@ -26,17 +22,6 @@ impl Project {
         Project {
             targets: Vec::new(),
         }
-    }
-
-    /// Saves the project to disk 
-    pub fn save(&self) -> Result<(), serde_yaml::Error> {
-        let filtered_targets: Vec<Target> = self.targets.clone().into_iter().filter(|t| !t.deps.is_empty()).collect();
-        let filtered_project = Project { targets: filtered_targets };
-
-        if let Ok(f) = File::options().write(true).create(true).truncate(true).open(PROJECT_YAML) {
-            serde_yaml::to_writer(f, &Mapping::from(filtered_project))?;
-        }
-        Ok(())
     }
 
     /// Spawns a module directory with required subdirs
