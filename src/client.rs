@@ -1,11 +1,18 @@
 // Module dedicated to the cli.
-use std::io;
-use std::process;
-use clap::{arg, Command};
 use crate::template;
 use crate::target::Target;
 use crate::project::Project;
 use crate::dependency::{Dependency, DepKind};
+
+use std::io;
+use std::process;
+use std::fs::File;
+use std::path::Path;
+
+use clap::{arg, Command};
+
+/// Relative path to the project config file
+const PROJECT_YAML: &str = "project.yaml";
 
 /// Shorthand to get an argument from a cli match
 macro_rules! get_one {
@@ -122,18 +129,17 @@ pub fn init() {
     // Check if project.yaml exists 
     if Path::new(PROJECT_YAML).exists() {
         // Advise that project exists
-        client::help(client::HelpKind::ProjectFound);
+        help(HelpKind::ProjectFound);
     } else {
         // Create project file with nothing in it
         if let Ok(_) = File::create(PROJECT_YAML) {
             // Do nothing
         } else {
             // Could not create project.yaml 
-            client::help(HelpKind::ProjectInitFailed);
+            help(HelpKind::ProjectInitFailed);
         }
     }
 }
-
 
 /// High-level cli func to add a module to the project in the PWD.
 pub fn add_module(target: String, module: String) -> Result<(), io::Error> {

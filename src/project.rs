@@ -13,7 +13,6 @@ use std::process::Command;
 
 use serde_yaml::{Value, Mapping, Sequence};
 
-const PROJECT_YAML: &str = "project.yaml";
 const SRC_DIR: &str = "src";
 const INC_DIR: &str = "inc";
 
