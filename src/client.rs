@@ -117,6 +117,24 @@ pub fn cli() -> Command {
     )
 }
 
+/// Initializes the project configuration file in the current directory.
+pub fn init() {
+    // Check if project.yaml exists 
+    if Path::new(PROJECT_YAML).exists() {
+        // Advise that project exists
+        client::help(client::HelpKind::ProjectFound);
+    } else {
+        // Create project file with nothing in it
+        if let Ok(_) = File::create(PROJECT_YAML) {
+            // Do nothing
+        } else {
+            // Could not create project.yaml 
+            client::help(HelpKind::ProjectInitFailed);
+        }
+    }
+}
+
+
 /// High-level cli func to add a module to the project in the PWD.
 pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
     // Load project

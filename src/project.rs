@@ -25,24 +25,7 @@ pub struct Project {
 impl Project {
     pub fn new() -> Self {
         Project {
-            targets: vec![],
-        }
-    }
-
-    /// Initializes a bulgogi project in the PWD of the shell.
-    pub fn init() {
-        // Check if project.yaml exists 
-        if Path::new(PROJECT_YAML).exists() {
-            // Advise that project exists
-            client::help(client::HelpKind::ProjectFound);
-        } else {
-            // Create project file with nothing in it
-            if let Ok(_) = File::create(PROJECT_YAML) {
-                // Do nothing
-            } else {
-                // Could not create project.yaml 
-                client::help(HelpKind::ProjectInitFailed);
-            }
+            targets: Vec::new(),
         }
     }
 
