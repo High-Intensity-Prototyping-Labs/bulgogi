@@ -10,7 +10,7 @@ pub struct CMakeProject {
     pub targets: Vec<CMakeList>,
 }
 
-pub type CMakeList = HashMap<&str, CMakeTarget>;
+pub type CMakeList = HashMap<String, CMakeTarget>;
 
 pub enum CMakeTarget {
     LibModule(String),
