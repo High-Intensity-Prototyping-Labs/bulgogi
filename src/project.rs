@@ -4,6 +4,15 @@ use std::collections::HashMap;
 
 use serde_yaml::{Mapping, Value};
 
+macro_rules! filter_match {
+    ($what:expr, $pat:pat, $ret:expr) => {
+        match $what {
+            $pat => $ret,
+            _ => None,
+        }
+    }
+}
+
 pub type TargetID = String;
 pub type ModuleID = String;
 pub type ProjectLayout = HashMap<TargetID, Vec<String>>;
