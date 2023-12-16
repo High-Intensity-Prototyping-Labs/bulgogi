@@ -1,7 +1,7 @@
 // Root module
 mod project;
-mod target;
-mod dependency;
+//mod target;
+//mod dependency;
 mod client;
 mod template;
 mod cmake;
