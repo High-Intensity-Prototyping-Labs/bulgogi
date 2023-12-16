@@ -133,6 +133,9 @@ target1:	# target1.out
 #
 # This way, without fighting the underlying data structures, the desired representation and functionality 
 # may be implemented. This will also greatly ease conversion from the bulgogi Project to a CMakeProject.
+#
+# Dependencies must also be defined. The must, at the very least, define a source directory or another 
+# target.
 
 # I just remembered: executables are special 
 # ------------------------------------------
