@@ -57,12 +57,9 @@ impl From<Mapping> for Project {
         let mut project = Project::new();
 
         // Get list of targets
-        let targets = map.keys().filter_map(|k| {
-            match k {
-                Value::String(s) => Some(s.clone()),
-                _ => None,
-            }
-        }).collect::<Vec<TargetID>>();
+        let targets = map.keys()
+            .filter_map(|k| filter_match!(k, Value::String(s), Some(s.clone())))
+            .collect::<Vec<TargetID>>();
 
         // Collect values first as flat map then filter map against matches found in target list
         let modules = map.values()
