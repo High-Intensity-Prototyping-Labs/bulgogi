@@ -65,6 +65,7 @@ impl From<Mapping> for Project {
         let mut modules = map.values()
             .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
             .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
+            .filter(|s| !targets.iter().any(|t| t == s))
             .collect::<Vec<ModuleID>>();
         modules.dedup();
 
