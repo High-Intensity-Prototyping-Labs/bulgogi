@@ -8,16 +8,19 @@ pub type TargetID = String;
 pub type ModuleID = String;
 pub type ProjectLayout = HashMap<TargetID, Vec<String>>;
 
+#[derive(Debug)]
 pub enum Target{
     Executable,
     Library,
 }
 
+#[derive(Debug)]
 pub enum Module {
     Normal,
     Executable,
 }
 
+#[derive(Debug)]
 pub enum Dependency {
     Module(ModuleID),
     Target(TargetID),
@@ -59,9 +62,18 @@ impl From<Mapping> for Project {
             .filter(|s| !targets.iter().any(|t| t == s))
             .map(|s| match s.contains("*") { true => (s, Module::Executable), false => (s, Module::Normal) })
             .collect::<HashMap<ModuleID, Module>>();
-            
-        // TODO: Find out in what order to load the mapping into the project.
-        //       Maybe loading the deps first can allow the rest to be derived from there?
+
+        // Get dependencies
+        let deps = map.iter()
+            .filter_map(|(k, v)| match (k, v) { (Value::String(target_id), Value::Sequence(seq)) => Some((target_id.clone(), seq)), _ => None })
+            .map(|(target_id, seq)| (target_id, seq.iter().filter_map(|v| match v { Value::String(dep_str) => Some(dep_str.clone()), _ => None }).collect::<Vec<String>>()))
+            .map(|(target_id, dep_list)| (target_id, dep_list.iter().map(|d| match targets.iter().any(|t| t == d) { true => Dependency::Target(d.clone()), false => Dependency::Module(d.clone()) }).collect::<Vec<Dependency>>() ))
+            .collect::<HashMap<TargetID, Vec<Dependency>>>();
+
+        dbg!(map);
+        dbg!(targets);
+        dbg!(modules);
+        dbg!(deps);
 
         project
     }
