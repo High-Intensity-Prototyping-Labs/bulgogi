@@ -118,6 +118,39 @@ target1:	# target1.out
 # Bottom line: targets marked as executable dependencies are treated as
 # normal target-libraries
 
+# HashMaps
+targets:
+        default: 
+                kind: Executable 
+        target1:
+                kind: Library 
+        target2:
+                kind: Executable 
+
+modules:
+        module1:
+                kind: Executable
+        module2:
+                kind: Normal
+        module3:
+                kind: Normal 
+        module4:
+                kind: Normal
+        module5:
+                kind: Executable
+
+deps:
+        default:
+                Module(module1)
+                Module(module2)
+        target1:
+                Module(module3)
+                Module(module4)
+        target2:
+                Module(module3)
+                Module(module5)
+                Target(target1)
+
 /** Long-form droney bits **/
 
 # The HashMap Update: 0.5.0
