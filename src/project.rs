@@ -26,7 +26,7 @@ pub enum Dependency {
 pub struct Project {
     pub targets: HashMap<TargetID, Target>,
     pub modules: HashMap<ModuleID, Module>,
-    pub deps: HashMap<TargetID, Dependency>,
+    pub deps: HashMap<TargetID, Vec<Dependency>>,
 
 }
 
