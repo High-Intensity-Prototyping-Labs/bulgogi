@@ -28,46 +28,6 @@ impl Project {
         }
     }
 
-    /// Loads project from disk 
-    pub fn load() -> Result<Self, io::Error> {
-        match File::open(PROJECT_YAML) {
-            Ok(f) => {
-            // Project file exists -- load it
-                let yaml = serde_yaml::from_reader::<File, Mapping>(f).or_else(|_| {
-                    client::help(HelpKind::YamlParsingError);
-                    Err(Mapping::new())
-                });
-
-                let mapping = yaml.unwrap(); // panic here if YAML failed to parse
-                let project = Project::from(mapping);
-
-                Ok(project)
-            }
-            Err(e) => {
-            // Project not found or initialized -- notify 
-                client::help(HelpKind::ProjectLoadFailed);
-                Err(e)
-            }
-        }
-    }
-
-    /// Removes a module from the project
-    pub fn rm_module(&mut self, target_name: String, module_name: String, cached: bool) {
-        if let Some(target) = self.targets.iter_mut().find(|t| t.name == target_name) {
-        // Matching target entry found
-            // Override existing dependency list with one that has the undesired one removed
-            target.deps = target.clone().deps.into_iter().filter(|d| {
-                matches!(d, Dependency { name, kind: DepKind::Module, .. } if name != &module_name)
-            }).collect();
-
-            if !cached {
-                // Delete the module directory 
-                // TODO: Remove this ugly shell command with a proper FS file remove call.
-                Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
-            }
-        }
-    }
-
     /// Saves the project to disk 
     pub fn save(&self) -> Result<(), serde_yaml::Error> {
         let filtered_targets: Vec<Target> = self.targets.clone().into_iter().filter(|t| !t.deps.is_empty()).collect();

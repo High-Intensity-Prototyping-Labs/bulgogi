@@ -10,6 +10,7 @@ use std::fs::File;
 use std::path::Path;
 
 use clap::{arg, Command};
+use serde_yaml::Mapping;
 
 /// Relative path to the project config file
 const PROJECT_YAML: &str = "project.yaml";
@@ -36,7 +37,7 @@ pub fn next_command() -> Result<(), io::Error> {
     match matches.subcommand() {
         Some(("init", _)) => {
             // Initialize project in the PWD
-            Project::init();
+            init();
         }
         Some(("module", cmd)) => {
             match cmd.subcommand() {
@@ -144,7 +145,7 @@ pub fn init() {
 /// High-level cli func to add a module to the project in the PWD.
 pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
     // Load project
-    match Project::load() {
+    match load() {
         Ok(mut project) => {
             if project.clone().modules().any(|m| m.name == module) {
             // Duplicate found, notify
@@ -178,10 +179,57 @@ pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
     Ok(())
 }
 
+/// High-level func which removes a module from the project
+pub fn rm_module(target_name: String, module_name: String, cached: bool) {
+    if let Ok(mut project) = load() {
+        if let Some(target) = project.targets.iter_mut().find(|t| t.name == target_name) {
+        // Matching target entry found
+            // Override existing dependency list with one that has the undesired one removed
+            target.deps = target.clone().deps.into_iter().filter(|d| {
+                matches!(d, Dependency { name, kind: DepKind::Module, .. } if name != &module_name)
+            }).collect();
+
+            if !cached {
+                // Delete the module directory 
+                // TODO: Remove this ugly shell command with a proper FS file remove call.
+                process::Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
+            }
+        }
+        project.save();
+    } else {
+        help(HelpKind::ProjectLoadFailed);
+    }
+}
+
+
+/// Loads project from the current working directory
+pub fn load() -> Result<Project, io::Error> {
+    match File::open(PROJECT_YAML) {
+        Ok(f) => {
+        // Project file exists -- load it
+            let yaml = serde_yaml::from_reader::<File, Mapping>(f).or_else(|_| {
+                help(HelpKind::YamlParsingError);
+                Err(Mapping::new())
+            });
+
+            let mapping = yaml.unwrap(); // panic here if YAML failed to parse
+            let project = Project::from(mapping);
+
+            Ok(project)
+        }
+        Err(e) => {
+        // Project not found or initialized -- notify 
+            help(HelpKind::ProjectLoadFailed);
+            Err(e)
+        }
+    }
+}
+
+
 /// Displays a tree diagram of the project modules 
 pub fn tree() {
     // Load project 
-    match Project::load() {
+    match load() {
         Ok(project) => {
             // Declare tree command process
             let mut cmd = process::Command::new("tree");
@@ -211,29 +259,18 @@ pub fn tree() {
     }
 }
 
-/// Removes a module from the project 
-pub fn rm_module(target: String, module: String, cached: bool) {
-    // Load project
-    if let Ok(mut project) = Project::load() {
-        project.rm_module(target, module, cached);
-        project.save().expect("yaml");
-    } else {
-        help(HelpKind::ProjectLoadFailed);
-    }
-}
-
 /// Loads a template from the templates dir 
 pub fn template() -> Result<(), io::Error> {
     template::load().expect("error");
 
     println!("::TESTING::");
 
-    let project = Project::load()?;
+    let project = load()?;
     for target in project.targets {
 
     }
 
-    if let Ok(project) = Project::load() {
+    if let Ok(project) = load() {
         println!("!!Printing modules!!");
         for module in project.modules() {
             println!("{:#?}", module);
