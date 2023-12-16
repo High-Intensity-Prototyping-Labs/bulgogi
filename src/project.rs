@@ -71,9 +71,17 @@ impl From<Mapping> for Project {
 
         // Get dependencies
         let deps = map.iter()
-            .filter_map(|(k, v)| match (k, v) { (Value::String(target_id), Value::Sequence(seq)) => Some((target_id.clone(), seq)), _ => None })
-            .map(|(target_id, seq)| (target_id, seq.iter().filter_map(|v| match v { Value::String(dep_str) => Some(dep_str.clone()), _ => None }).collect::<Vec<String>>()))
-            .map(|(target_id, dep_list)| (target_id, dep_list.iter().map(|d| match targets.iter().any(|t| t == d) { true => Dependency::Target(d.clone()), false => Dependency::Module(d.clone()) }).collect::<Vec<Dependency>>() ))
+            .filter_map(|(k, v)| filter_match!((k, v), (Value::String(target_id), Value::Sequence(seq)), Some((target_id.clone(), seq))))
+            .map(|(target_id, seq)| (target_id, seq.iter().filter_map(|entry| filter_match!(entry, Value::String(dep_str), Some(dep_str.clone())))))
+            .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|d| {
+                if targets.iter().any(|t| t == &d) { 
+                    Dependency::Target(d) 
+                } else if modules.iter().any(|m| m == &d) { 
+                    Dependency::Module(d) 
+                } else {
+                    panic!("Could not find dependency {} in targets or modules list. This should not be possible given that all entries in the project.yaml are added to one or the other", d);
+                }
+            }).collect::<Vec<Dependency>>()))
             .collect::<HashMap<TargetID, Vec<Dependency>>>();
 
         dbg!(map);
