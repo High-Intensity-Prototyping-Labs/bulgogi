@@ -44,12 +44,15 @@ impl From<Mapping> for Project {
     fn from(map: Mapping) -> Self {
         let mut project = Project::new();
 
-        let targets = map.into_keys().into_iter().filter_map(|k| {
+        let targets = map.clone().into_keys().into_iter().filter_map(|k| {
             match k {
                 Value::String(s) => Some((s, Target::Library)),
                 _ => None,
             }
         }).collect::<HashMap<TargetID, Target>>();
+
+        // TODO: Find out in what order to load the mapping into the project.
+        //       Maybe loading the deps first can allow the rest to be derived from there?
 
         project
     }
