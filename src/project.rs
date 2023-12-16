@@ -1,32 +1,56 @@
 // Project module 
 
-use std::collections::hash_map;
 use std::collections::HashMap;
 
-type TargetID = String;
-type ModuleDir = String;
+use serde_yaml::{Mapping, Value};
 
-enum Dependency {
-    Module(ModuleDir),
+pub type TargetID = String;
+pub type ModuleID = String;
+pub type ProjectLayout = HashMap<TargetID, Vec<String>>;
+
+pub enum Target{
+    Executable,
+    Library,
+}
+
+pub enum Module {
+    Normal,
+    Executable,
+}
+
+pub enum Dependency {
+    Module(ModuleID),
     Target(TargetID),
 }
 
-struct Project {
-    layout: HashMap<TargetID, Vec<Dependency>>,
+pub struct Project {
+    pub targets: HashMap<TargetID, Target>,
+    pub modules: HashMap<ModuleID, Module>,
+    pub deps: HashMap<TargetID, Dependency>,
+
 }
 
 impl Project {
     pub fn new() -> Self {
         Project {
-            layout: HashMap::new(),
+            targets: HashMap::new(),
+            modules: HashMap::new(),
+            deps: HashMap::new(),
         }
     }
+}
 
-    pub fn targets(&self) -> hash_map::Iter<'_, String, Vec<Dependency>> {
-        self.layout.iter()
-    }
+impl From<Mapping> for Project {
+    fn from(map: Mapping) -> Self {
+        let mut project = Project::new();
 
-    pub fn modules(&self) -> impl Iterator<Item=&Dependency> {
-        self.layout.values().flat_map(|l| l.into_iter().filter(|d| matches!(d, Dependency::Module(_))))
+        let targets = map.into_keys().into_iter().filter_map(|k| {
+            match k {
+                Value::String(s) => Some((s, Target::Library)),
+                _ => None,
+            }
+        }).collect::<HashMap<TargetID, Target>>();
+
+        project
     }
 }
