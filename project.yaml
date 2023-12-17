@@ -2,6 +2,7 @@ default:
 - module1*
 - module3
 - target1
+- module3
 target1:
 - module1
 - module2
