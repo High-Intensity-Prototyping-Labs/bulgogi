@@ -49,7 +49,7 @@ pub fn next_command() -> Result<(), io::Error> {
                     // Placehold add command arguments
                     let module = get_one!(sub, String, "MODULE");
                     let target = get_one!(sub, String, "TARGET");
-                    add_module(target, module)?;
+                    add_module(module, target)?;
                 }
                 Some(("rm", sub)) => {
                     // Placehold add command arguments
@@ -172,17 +172,17 @@ pub fn add_module(module: impl Into<String>, target: impl Into<String>) -> Resul
     if let Some(target_deps) = project.deps.get_mut(&target) {
         // Check for duplicate module-dependency for target
         if target_deps.contains(&Dependency::Module(module.clone())) {
+            // Module already listed as target dependency
             info(InfoKind::DuplicateModule);
         } else {
+            // Add module as target dependency and save project
             target_deps.push(Dependency::Module(module));
+            save(project)?;
         }
     } else {
         // Target not found in project dep tree
         help(HelpKind::TargetNotFound);
     }
-
-    // Save project
-    
 
     Ok(())
 }
@@ -233,10 +233,18 @@ pub fn load() -> Result<Project, io::Error> {
 }
 
 /// Saves the project to disk 
-pub fn save(project: &Project) -> Result<(), serde_yaml::Error> {
+pub fn save(project: Project) -> Result<(), io::Error> {
+    let file = File::options()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(PROJECT_YAML)?;
+
+    let map = Mapping::from(project);
+    serde_yaml::to_writer(file, &map).expect("serde_yaml failed to write Project to project.yaml");
+
     Ok(())
 }
-
 
 /// Displays a tree diagram of the project modules 
 pub fn tree() {
