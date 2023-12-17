@@ -15,10 +15,8 @@ use serde_yaml::Mapping;
 
 /// Relative path to the project config file
 const PROJECT_YAML: &str = "project.yaml";
-
 /// Top-level module source directory
 const SRC_DIR: &str = "src";
-
 /// Top-level module include directory
 const INC_DIR: &str = "inc";
 
@@ -35,7 +33,6 @@ macro_rules! get_flag {
         $x.get_flag($y)
     }
 }
-
 
 /// Handles the next CLI command and its arguments.
 pub fn next_command() -> Result<(), io::Error> {
@@ -151,61 +148,12 @@ pub fn init() {
 
 /// High-level cli func to add a module to the project in the PWD.
 pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
-    // Load project
-    match load() {
-        Ok(mut project) => {
-            if project.clone().modules().any(|m| m.name == module) {
-            // Duplicate found, notify
-                info(InfoKind::DuplicateModule);
-            } else {
-            // No duplicates found, continue
-                // Find matching target 
-                if let Some(target) = project.targets_mut().find(|t| t.name == target) {
-                    // Match found, add module 
-                    target.deps.push(Dependency::from((module.clone(), DepKind::Module)));
-                } else {
-                    // No matching target found, create it 
-                    project.targets.push(Target::from((target, module.clone())));
-                }
-
-                // Spawn module directory 
-                spawn_module(module)?;
-
-                // Save project 
-                save(&project).expect("yaml");
-            }
-        }
-        Err(e) => {
-            if e.kind() == io::ErrorKind::NotFound {
-                help(HelpKind::InitRequired);
-            } else {
-                println!("{}", e);
-            }
-        }
-    }
     Ok(())
 }
 
 /// High-level func which removes a module from the project
 pub fn rm_module(target_name: String, module_name: String, cached: bool) {
-    if let Ok(mut project) = load() {
-        if let Some(target) = project.targets.iter_mut().find(|t| t.name == target_name) {
-        // Matching target entry found
-            // Override existing dependency list with one that has the undesired one removed
-            target.deps = target.clone().deps.into_iter().filter(|d| {
-                matches!(d, Dependency { name, kind: DepKind::Module, .. } if name != &module_name)
-            }).collect();
-
-            if !cached {
-                // Delete the module directory 
-                // TODO: Remove this ugly shell command with a proper FS file remove call.
-                process::Command::new("rm").arg("-r").arg(module_name).output().expect("failed to execute `rm` command to remove module.");
-            }
-        }
-        save(&project);
-    } else {
-        help(HelpKind::ProjectLoadFailed);
-    }
+    Ok(())
 }
 
 /// Spawns a module directory with required subdirs
@@ -251,12 +199,6 @@ pub fn load() -> Result<Project, io::Error> {
 
 /// Saves the project to disk 
 pub fn save(project: &Project) -> Result<(), serde_yaml::Error> {
-    let filtered_targets: Vec<Target> = project.targets.clone().into_iter().filter(|t| !t.deps.is_empty()).collect();
-    let filtered_project = Project { targets: filtered_targets };
-
-    if let Ok(f) = File::options().write(true).create(true).truncate(true).open(PROJECT_YAML) {
-        serde_yaml::to_writer(f, &Mapping::from(filtered_project))?;
-    }
     Ok(())
 }
 
@@ -270,13 +212,13 @@ pub fn tree() {
             let mut cmd = process::Command::new("tree");
 
             // Add each module-type dependency (directories) to tree command args
-            cmd.args(project.clone().modules().map(|m| m.name));
+            cmd.args(project.clone().modules.keys());
 
             // Match result of running command
             match cmd.output() {
                 Ok(c) => {
                     match String::from_utf8(c.stdout) {
-                        Ok(_) if project.empty() => println!(""),
+                        Ok(_) if project.modules.is_empty() => println!(""),
                         Ok(tree) => println!("{}", tree),
                         Err(e) => println!("Failed to parse tree command output ({})", e),
                     }
@@ -307,7 +249,7 @@ pub fn template() -> Result<(), io::Error> {
 
     if let Ok(project) = load() {
         println!("!!Printing modules!!");
-        for module in project.modules() {
+        for module in project.modules.keys() {
             println!("{:#?}", module);
         }
     }
