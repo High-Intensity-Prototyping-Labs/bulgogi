@@ -55,10 +55,8 @@ impl Project {
 
 impl From<Mapping> for Project {
     fn from(map: Mapping) -> Self {
-        let mut project = Project::new();
-
-        // Get list of targets
-        let targets = map.keys()
+        // Get list of target_list
+        let target_list = map.keys()
             .filter_map(|k| filter_match!(k, Value::String(s), Some(s.clone())))
             .collect::<Vec<TargetID>>();
 
@@ -69,7 +67,7 @@ impl From<Mapping> for Project {
         let modules = map.values()
             .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
             .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
-            .filter(|s| !targets.iter().any(|t| t == s))
+            .filter(|s| !target_list.iter().any(|t| t == s))
             .dedup_by(|s1, s2| s1.replace("*", "") == s2.replace("*", ""))
             .map(|s| (s.clone(), s.contains("*").then_some(Module::Executable).unwrap_or(Module::Normal)))
             .map(|(s, m)| (s.replace("*", ""), m))
@@ -81,30 +79,28 @@ impl From<Mapping> for Project {
             .map(|(target_id, seq)| (target_id, seq.iter().filter_map(|entry| filter_match!(entry, Value::String(dep_str), Some(dep_str.clone())))))
             .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|s| s.replace("*", ""))))
             .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|d| {
-                if targets.iter().any(|t| t == &d) { 
+                if target_list.iter().any(|t| t == &d) { 
                     Dependency::Target(d) 
                 } else if modules.keys().any(|m| m == &d) { 
                     Dependency::Module(d) 
                 } else {
-                    panic!("Could not find dependency {} in targets or modules list. This should not be possible given that all entries in the project.yaml are added to one or the other", d);
+                    panic!("Could not find dependency {} in target or modules list. This should not be possible given that all entries in the project.yaml are added to one or the other", d);
                 }
             }).collect::<Vec<Dependency>>()))
             .collect::<HashMap<TargetID, Vec<Dependency>>>();
 
         // HashMap the Targets 
-        // 1. For each target, check module-dependencies
-        // 2. If an executable component found in module-dependencies, Target::Executable
-        // 3. Otherwise, Target::Library
-        // let target_map = deps.iter()
-        //     .map(|(target_id, target_deps)| (target_id, target_deps.iter().filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m.clone())))))
-        //     .map(|(target_id, module_deps)| (target_id, module_deps.filter_map(|module_id| modules.get(module_id))))
-        //     .;
+        let targets = deps.iter()
+            .map(|(t, d)| (t, d.iter().filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m.clone())))))
+            .map(|(t, m)| (t, m.filter_map(|m| filter_match!(modules.get(&m), Some(module), Some(module)))))
+            .map(|(t, modules)| (t.clone(), modules.into_iter().any(|m| matches!(m, Module::Executable)).then_some(Target::Executable).unwrap_or(Target::Library)))
+            .collect::<HashMap<TargetID, Target>>();
 
-        dbg!(map);
-        dbg!(targets);
-        dbg!(modules);
-        dbg!(deps);
-
-        project
+        // Return the initialized project
+        Project {
+            targets,
+            modules,
+            deps,
+        }
     }
 }

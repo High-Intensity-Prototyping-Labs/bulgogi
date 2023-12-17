@@ -1,7 +1,10 @@
-default:
-- module1*
-- module3
-- target1
-target1:
-- module2
-- module4
+default:		# Target 
+- module1*	# Dependency 1 (contains main)
+- module2		# Dependency 2
+target1:		# Target
+- module3		# Dependency 1
+- module4		# Dependency 2
+target2:		# Target
+- module3		# Dependency 1
+- module5*	# Dependency 2 (contains main)
+- target1		# Dependency 3 (implies target1 is a lib/shared lib)
