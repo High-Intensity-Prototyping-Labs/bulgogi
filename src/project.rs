@@ -88,6 +88,15 @@ impl From<Mapping> for Project {
             }).collect::<Vec<Dependency>>()))
             .collect::<HashMap<TargetID, Vec<Dependency>>>();
 
+        // HashMap the Targets 
+        // 1. For each target, check module-dependencies
+        // 2. If an executable component found in module-dependencies, Target::Executable
+        // 3. Otherwise, Target::Library
+        // let target_map = deps.iter()
+        //     .map(|(target_id, target_deps)| (target_id, target_deps.iter().filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m.clone())))))
+        //     .map(|(target_id, module_deps)| (target_id, module_deps.filter_map(|module_id| modules.get(module_id))))
+        //     .;
+
         dbg!(map);
         dbg!(targets);
         dbg!(modules);
