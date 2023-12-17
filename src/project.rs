@@ -16,9 +16,8 @@ macro_rules! filter_match {
 
 pub type TargetID = String;
 pub type ModuleID = String;
-pub type ProjectLayout = HashMap<TargetID, Vec<String>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Target{
     Executable,
     Library,
@@ -30,12 +29,13 @@ pub enum Module {
     Executable,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Dependency {
     Module(ModuleID),
     Target(TargetID),
 }
 
+#[derive(Debug, Clone)]
 pub struct Project {
     pub targets: HashMap<TargetID, Target>,
     pub modules: HashMap<ModuleID, Module>,
