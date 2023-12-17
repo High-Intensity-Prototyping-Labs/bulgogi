@@ -3,7 +3,7 @@ mod project;
 //mod target;
 //mod dependency;
 mod client;
-//mod template;
+mod template;
 //mod cmake;
 
 use std::io;
