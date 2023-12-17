@@ -67,6 +67,7 @@ impl From<Mapping> for Project {
             .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
             .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
             .filter(|s| !targets.iter().any(|t| t == s))
+            .batching(|it| filter_match!(it.next(), Some(s), Some(s)))
             .dedup_by(|s1, s2| s1.replace("*", "") == s2.replace("*", ""))
             .map(|s| (s.clone(), s.contains("*").then_some(Module::Executable).unwrap_or(Module::Normal)))
             .map(|(s, m)| (s.replace("*", ""), m))
