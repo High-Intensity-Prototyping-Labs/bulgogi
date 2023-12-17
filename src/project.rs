@@ -104,3 +104,18 @@ impl From<Mapping> for Project {
         }
     }
 }
+
+impl From<Project> for Mapping {
+    fn from(project: Project) -> Self {
+        project.deps.iter()
+            .map(|(target_id, dep_list)| (target_id, dep_list.iter().map(|d| {
+                match d {
+                    Dependency::Module(m) => m,
+                    Dependency::Target(t) => t,
+                }
+            })))
+            .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|d| Value::String(d.to_string())).collect::<Vec<Value>>()))
+            .map(|(target_id, value_seq)| (Value::String(target_id.clone()), Value::Sequence(value_seq)))
+            .collect::<Mapping>()
+    }
+}
