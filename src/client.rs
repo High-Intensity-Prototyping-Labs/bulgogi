@@ -153,7 +153,6 @@ pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
 
 /// High-level func which removes a module from the project
 pub fn rm_module(target_name: String, module_name: String, cached: bool) {
-    Ok(())
 }
 
 /// Spawns a module directory with required subdirs
