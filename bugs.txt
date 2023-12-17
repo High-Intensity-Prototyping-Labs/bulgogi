@@ -1,8 +1,3 @@
-- When CMakeTargets are created From<Target>, they cannot prevent duplicate modules
-	from being declared within the CMakeProject. This either needs to be a formal 
-	feature or have the approach work top-to-bottom with direct conversion from 
-	bulgogi Project to CMakeProject as originally intended.
-- The executable indicator (*) appears in the module name internally.
-- There is possibly a problem with the lack of FS checks when loading a project
-	-> (e.g.: a bunch of modules are listed in the project.yaml which do not exist in the FS.)
-- Trying to add the same module as dependencies to 2 different targets results in a duplicate detected error.
+- Having at least 2 conflicting entries of a module's executable status anywhere
+in the project config can lead to undefined determination of whether the module 
+is executable or not. 
