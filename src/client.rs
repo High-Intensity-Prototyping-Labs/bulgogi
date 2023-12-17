@@ -1,7 +1,7 @@
 // Module dedicated to the cli.
 use crate::template;
 // use crate::target::Target;
-use crate::project::Project;
+use crate::project::{Project, Module, Dependency};
 // use crate::dependency::{Dependency, DepKind};
 
 use std::io;
@@ -147,7 +147,43 @@ pub fn init() {
 }
 
 /// High-level cli func to add a module to the project in the PWD.
-pub fn add_module(target: String, module: String) -> Result<(), io::Error> {
+pub fn add_module(module: impl Into<String>, target: impl Into<String>) -> Result<(), io::Error> {
+    // Collect args
+    let module = module.into();
+    let target = target.into();
+
+    // Load Project
+    let mut project = load()?;
+    
+    // Add module to modules map if missing
+    if project.modules.contains_key(&module) == false {
+        // Create clean copy of module ID for internal representation
+        let module_clean = module.replace("*", "");
+
+        // Account for executable indicator
+        if module.contains("*") {
+            project.modules.insert(module_clean, Module::Executable);
+        } else {
+            project.modules.insert(module_clean, Module::Normal);
+        }
+    }
+
+    // Add module as dependency to target
+    if let Some(target_deps) = project.deps.get_mut(&target) {
+        // Check for duplicate module-dependency for target
+        if target_deps.contains(&Dependency::Module(module.clone())) {
+            info(InfoKind::DuplicateModule);
+        } else {
+            target_deps.push(Dependency::Module(module));
+        }
+    } else {
+        // Target not found in project dep tree
+        help(HelpKind::TargetNotFound);
+    }
+
+    // Save project
+    
+
     Ok(())
 }
 

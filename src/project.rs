@@ -1,8 +1,8 @@
 // Project module 
 
-use itertools::Itertools;
 use std::collections::HashMap;
 
+use itertools::Itertools;
 use serde_yaml::{Mapping, Value};
 
 macro_rules! filter_match {
@@ -29,7 +29,7 @@ pub enum Module {
     Executable,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Dependency {
     Module(ModuleID),
     Target(TargetID),
