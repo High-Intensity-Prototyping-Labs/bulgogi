@@ -1,5 +1,6 @@
 // Project module 
 
+use itertools::Itertools;
 use std::collections::HashMap;
 
 use serde_yaml::{Mapping, Value};
@@ -62,13 +63,14 @@ impl From<Mapping> for Project {
             .collect::<Vec<TargetID>>();
 
         // Collect values first as flat map then filter map against matches found in target list
-        let mut modules = map.values()
+        let modules = map.values()
             .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
             .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
             .filter(|s| !targets.iter().any(|t| t == s))
-            .map(|s| s.replace("*", ""))
-            .collect::<Vec<ModuleID>>();
-        modules.dedup();
+            .dedup_by(|s1, s2| s1.replace("*", "") == s2.replace("*", ""))
+            .map(|s| (s.clone(), s.contains("*").then_some(Module::Executable).unwrap_or(Module::Normal)))
+            .map(|(s, m)| (s.replace("*", ""), m))
+            .collect::<HashMap<ModuleID, Module>>();
 
         // Get dependencies
         let deps = map.iter()
@@ -78,7 +80,7 @@ impl From<Mapping> for Project {
             .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|d| {
                 if targets.iter().any(|t| t == &d) { 
                     Dependency::Target(d) 
-                } else if modules.iter().any(|m| m == &d) { 
+                } else if modules.keys().any(|m| m == &d) { 
                     Dependency::Module(d) 
                 } else {
                     panic!("Could not find dependency {} in targets or modules list. This should not be possible given that all entries in the project.yaml are added to one or the other", d);
