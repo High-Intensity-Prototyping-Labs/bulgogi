@@ -162,10 +162,13 @@ pub fn add_module(module: impl Into<String>, target: impl Into<String>) -> Resul
 
         // Account for executable indicator
         if module.contains("*") {
-            project.modules.insert(module_clean, Module::Executable);
+            project.modules.insert(module_clean.clone(), Module::Executable);
         } else {
-            project.modules.insert(module_clean, Module::Normal);
+            project.modules.insert(module_clean.clone(), Module::Normal);
         }
+
+        // Spawn module directory
+        spawn_module(module_clean)?;
     }
 
     // Add module as dependency to target
@@ -192,7 +195,9 @@ pub fn rm_module(target_name: String, module_name: String, cached: bool) {
 }
 
 /// Spawns a module directory with required subdirs
-pub fn spawn_module(module_name: String) -> Result<(), io::Error> {
+pub fn spawn_module(module_name: impl Into<String>) -> Result<(), io::Error> {
+    let module_name = module_name.into();
+
     let path = Path::new(&module_name);
     let src = path.join(SRC_DIR);
     let inc = path.join(INC_DIR);
@@ -207,7 +212,6 @@ pub fn spawn_module(module_name: String) -> Result<(), io::Error> {
 
     Ok(())
 }
-
 
 /// Loads project from the current working directory
 pub fn load() -> Result<Project, io::Error> {
