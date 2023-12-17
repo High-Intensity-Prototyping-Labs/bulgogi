@@ -66,6 +66,7 @@ impl From<Mapping> for Project {
             .filter_map(|v| filter_match!(v, Value::Sequence(seq), Some(seq)))
             .flat_map(|seq| seq.iter().filter_map(|entry| filter_match!(entry, Value::String(s), Some(s.clone()))))
             .filter(|s| !targets.iter().any(|t| t == s))
+            .map(|s| s.replace("*", ""))
             .collect::<Vec<ModuleID>>();
         modules.dedup();
 
@@ -73,6 +74,7 @@ impl From<Mapping> for Project {
         let deps = map.iter()
             .filter_map(|(k, v)| filter_match!((k, v), (Value::String(target_id), Value::Sequence(seq)), Some((target_id.clone(), seq))))
             .map(|(target_id, seq)| (target_id, seq.iter().filter_map(|entry| filter_match!(entry, Value::String(dep_str), Some(dep_str.clone())))))
+            .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|s| s.replace("*", ""))))
             .map(|(target_id, dep_strs)| (target_id, dep_strs.map(|d| {
                 if targets.iter().any(|t| t == &d) { 
                     Dependency::Target(d) 
