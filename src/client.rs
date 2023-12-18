@@ -5,12 +5,13 @@ use crate::project::{Project, Module, Dependency};
 // use crate::dependency::{Dependency, DepKind};
 use crate::filter_match;
 
+use std::fs;
 use std::io;
+use std::io::Write;
 use std::process;
 use std::fs::File;
 use std::path::Path;
 
-use std::fs;
 use clap::{arg, Command};
 use serde_yaml::Mapping;
 
@@ -57,7 +58,8 @@ pub fn next_command() -> Result<(), io::Error> {
                     let module = get_one!(sub, String, "MODULE");
                     let target = get_one!(sub, String, "TARGET");
                     let cached = get_flag!(sub, "cached");
-                    rm_module(target, module, cached);
+                    let forced = get_flag!(sub, "forced");
+                    rm_module(module, target, cached, forced)?;
                 }
                 _ => unreachable!(),
             }
@@ -110,6 +112,7 @@ pub fn cli() -> Command {
                 .required(false)
             )
             .arg(arg!(--cached))
+            .arg(arg!(--forced).short('f'))
         )
     )
     .subcommand(
@@ -192,7 +195,7 @@ pub fn add_module(module: impl Into<String>, target: impl Into<String>) -> Resul
 }
 
 /// High-level func which removes a module from the project
-pub fn rm_module(module: impl Into<String>, target: impl Into<String>, cached: bool) -> Result<(), io::Error> {
+pub fn rm_module(module: impl Into<String>, target: impl Into<String>, cached: bool, forced: bool) -> Result<(), io::Error> {
     // Shadow args 
     let module = module.into();
     let target = target.into();
@@ -200,24 +203,25 @@ pub fn rm_module(module: impl Into<String>, target: impl Into<String>, cached: b
     // Load project 
     let mut project = load()?;
 
-    // 1. See if the module is removable from the desired target 
-    // 2. If so and a cached remove is desired, check if other targets depend on this module 
-    // 3. If they don't, go ahead with removing it from the filesystem.
-    // *. A remove cached forced option may be required if other targets depend on it
+    // Remove module-dependency from target in project deps
     if let Some(dep_list) = project.deps.get_mut(&target) {
-        let mut removed = false;
-        dep_list.retain(|d| {
-            match d {
-                Dependency::Module(m) if m != &module => {
-                    removed = true;
-                    false
-                }
-                _ => true,
-            }
-        });
+        if let Some(i) = dep_list.iter().position(|d| d == &module) {
+            dep_list.remove(i);
+        }
+    }
 
-        if removed {
-            
+    // Remove module from project if no other targets depend on it
+    // Note: passing the forced flag will ignore other targets depending on module
+    if !project.any_depends(&module) || forced {
+        // Remove module from project modules
+        project.modules.remove(&module);
+
+        // Remove module directory if cache flag passed
+        if cached {
+            if prompt(PromptKind::YesNo, Prompt::DeleteCachedModule, Answer::Yes) == Answer::Yes 
+            || forced {
+                fs::remove_dir_all(module)?;
+            }
         }
     }
 
