@@ -1,8 +1,5 @@
 // Root module
-#[macro_export]
 mod project;
-//mod target;
-//mod dependency;
 mod client;
 mod template;
 mod cmake;

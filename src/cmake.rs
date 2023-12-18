@@ -2,8 +2,6 @@
 use crate::filter_match;
 use crate::project::{Project, TargetID, Target, Dependency};
 
-use std::collections::HashMap;
-
 pub type LibraryName = String;
 pub type ExecutableName = String;
 

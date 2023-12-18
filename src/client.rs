@@ -1,10 +1,8 @@
 // Module dedicated to the cli.
 use crate::template;
-// use crate::target::Target;
-use crate::project::{Project, Module, Dependency};
-// use crate::dependency::{Dependency, DepKind};
 use crate::filter_match;
 use crate::cmake::CMakeProject;
+use crate::project::{Project, Module, Dependency};
 
 use std::fs;
 use std::io;
