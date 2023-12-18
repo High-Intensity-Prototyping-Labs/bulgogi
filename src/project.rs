@@ -43,6 +43,12 @@ impl Project {
             deps: HashMap::new(),
         }
     }
+
+    /// Returns `true` if any targets in the project list `module` as one of its dependencies.
+    /// Otherwise `false` implies that no targets depend on this module.
+    pub fn any_depends(&self, module: &ModuleID) -> bool {
+        self.deps.values().flatten().any(|d| d == module)
+    }
 }
 
 impl From<Mapping> for Project {
@@ -117,6 +123,15 @@ impl From<Dependency> for String {
         match dep {
             Dependency::Module(m) => m,
             Dependency::Target(t) => t,
+        }
+    }
+}
+
+impl PartialEq<String> for Dependency {
+    fn eq(&self, other: &String) -> bool {
+        match self {
+            Dependency::Module(m) => m == other,
+            Dependency::Target(t) => t == other,
         }
     }
 }
