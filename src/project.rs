@@ -111,3 +111,12 @@ impl From<Project> for Mapping {
             .collect::<Mapping>()
     }
 }
+
+impl From<Dependency> for String {
+    fn from(dep: Dependency) -> Self {
+        match dep {
+            Dependency::Module(m) => m,
+            Dependency::Target(t) => t,
+        }
+    }
+}
