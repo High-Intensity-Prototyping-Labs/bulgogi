@@ -386,6 +386,7 @@ pub enum Prompt {
     AutoInit,
     AutoAddTarget,
     AutoAddSubdirs,
+    DeleteCachedModule,
 }
 
 pub fn get_prompt(prompt: Prompt) -> String {
@@ -393,5 +394,53 @@ pub fn get_prompt(prompt: Prompt) -> String {
         Prompt::AutoInit => String::from("Automatically initialize project in current directory?"),
         Prompt::AutoAddTarget => String::from("Automatically add the default target to the project?"),
         Prompt::AutoAddSubdirs => String::from("Automatically create missing subdirs for the module?"),
+        Prompt::DeleteCachedModule => String::from("Permanently delete cached module files in filesystem? (Cannot be undone!)"),
+    }
+}
+
+pub enum PromptKind {
+    YesNo,
+}
+
+#[derive(PartialEq)]
+pub enum Answer {
+    Yes,
+    No,
+    Neither,
+}
+
+/// Prompts the user for an answer.
+///
+/// # Arguments 
+///
+/// * `kind` - Indicates the prompt type (supports y/n).
+/// * `prompt` - The prompt to show the user.
+/// * `default` - Specifies default answer if user hits enter.
+///
+/// # Returns 
+///
+/// A string containing the user's answer. Blank (trimmed) otherwise.
+pub fn prompt(kind: PromptKind, prompt: Prompt, default: Answer) -> Answer {
+    let mut answer = String::new();
+    print!("[u] ");
+    match kind {
+        PromptKind::YesNo => {
+            print!("{}", get_prompt(prompt));
+            match default {
+                Answer::Yes => print!(" (Y/n): "),
+                Answer::No => print!(" (y/N): "),
+                Answer::Neither => print!(" (y/n): "),
+            }
+        }
+    }
+    io::stdout().flush().expect("stdio");
+    io::stdin().read_line(&mut answer).expect("stdio");
+
+    if answer.trim().is_empty() {
+        default
+    } else if answer.trim() == "Y" || answer.trim() == "y" {
+        Answer::Yes
+    } else {
+        Answer::No
     }
 }
