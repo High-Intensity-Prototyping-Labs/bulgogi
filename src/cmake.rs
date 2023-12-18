@@ -7,15 +7,18 @@ use std::collections::HashMap;
 pub type LibraryName = String;
 pub type ExecutableName = String;
 
+#[derive(Debug)]
 pub struct CMakeProject {
     pub submodules: Vec<CMakeList>,
 }
 
+#[derive(Debug)]
 pub struct CMakeList {
     pub target: CMakeTarget,
     pub links: Vec<LibraryName>,
 }
 
+#[derive(Debug)]
 pub enum CMakeTarget {
     Library(LibraryName),
     Executable(ExecutableName),

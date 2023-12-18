@@ -4,6 +4,7 @@ use crate::template;
 use crate::project::{Project, Module, Dependency};
 // use crate::dependency::{Dependency, DepKind};
 use crate::filter_match;
+use crate::cmake::CMakeProject;
 
 use std::fs;
 use std::io;
@@ -324,16 +325,10 @@ pub fn template() -> Result<(), io::Error> {
     println!("::TESTING::");
 
     let project = load()?;
-    for target in project.targets {
+    let cmake = CMakeProject::from(project.clone());
 
-    }
-
-    if let Ok(project) = load() {
-        println!("!!Printing modules!!");
-        for module in project.modules.keys() {
-            println!("{:#?}", module);
-        }
-    }
+    dbg!(project);
+    dbg!(cmake);
 
     Ok(())
 }
