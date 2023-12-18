@@ -1,18 +1,10 @@
 // Project module 
+use crate::filter_match;
 
 use std::collections::HashMap;
 
 use itertools::Itertools;
 use serde_yaml::{Mapping, Value};
-
-macro_rules! filter_match {
-    ($what:expr, $pat:pat, $ret:expr) => {
-        match $what {
-            $pat => $ret,
-            _ => None,
-        }
-    }
-}
 
 pub type TargetID = String;
 pub type ModuleID = String;

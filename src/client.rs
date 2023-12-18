@@ -3,6 +3,7 @@ use crate::template;
 // use crate::target::Target;
 use crate::project::{Project, Module, Dependency};
 // use crate::dependency::{Dependency, DepKind};
+use crate::filter_match;
 
 use std::io;
 use std::process;
@@ -191,7 +192,36 @@ pub fn add_module(module: impl Into<String>, target: impl Into<String>) -> Resul
 }
 
 /// High-level func which removes a module from the project
-pub fn rm_module(target_name: String, module_name: String, cached: bool) {
+pub fn rm_module(module: impl Into<String>, target: impl Into<String>, cached: bool) -> Result<(), io::Error> {
+    // Shadow args 
+    let module = module.into();
+    let target = target.into();
+
+    // Load project 
+    let mut project = load()?;
+
+    // 1. See if the module is removable from the desired target 
+    // 2. If so and a cached remove is desired, check if other targets depend on this module 
+    // 3. If they don't, go ahead with removing it from the filesystem.
+    // *. A remove cached forced option may be required if other targets depend on it
+    if let Some(dep_list) = project.deps.get_mut(&target) {
+        let mut removed = false;
+        dep_list.retain(|d| {
+            match d {
+                Dependency::Module(m) if m != &module => {
+                    removed = true;
+                    false
+                }
+                _ => true,
+            }
+        });
+
+        if removed {
+            
+        }
+    }
+
+    Ok(())
 }
 
 /// Spawns a module directory with required subdirs
