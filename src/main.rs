@@ -5,7 +5,7 @@ mod project;
 //mod dependency;
 mod client;
 mod template;
-//mod cmake;
+mod cmake;
 
 use std::io;
 
