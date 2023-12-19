@@ -135,3 +135,15 @@ impl PartialEq<String> for Dependency {
         }
     }
 }
+
+pub trait ProjectChild {
+    fn module_ids(&self) -> Vec<ModuleID>;
+}
+
+impl ProjectChild for Vec<Dependency> {
+    fn module_ids(&self) -> Vec<ModuleID> {
+        self.iter()
+            .filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m.clone())))
+            .collect()
+    }
+}
