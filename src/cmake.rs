@@ -35,9 +35,10 @@ impl CMakeProject {
 
 impl From<Project> for CMakeProject {
     fn from(project: Project) -> Self {
-        let submodules = project.deps.iter()
-            .filter_map(|(target_id, dep_list)| filter_match!(dep_list.module_ids().first(), Some(module_id), Some((target_id, module_id))))
-            .;
+        let proxy_libs = project.deps.iter()
+            .map(|(target_id, dep_list)| (target_id, dep_list.module_ids()))
+            .filter_map(|(target_id, mod_list)| filter_match!(mod_list.first(), Some(m), Some((target_id.clone(), m.clone()))))
+            .collect::<HashMap<TargetID, SubmoduleDir>>();
 
         //CMakeProject {
         //    submodules,
