@@ -153,6 +153,26 @@ deps:
 
 /** Long-form droney bits **/
 
+# Gotta give up on proxy libraries 
+# --------------------------------
+# After many flip flops, I have realized that it will not be practical
+# to use proxy submodules for Bulgogi/CMake libraries.
+#
+# The main reason for this being that, unlike executable proxies (which are
+# required), proxy libraries are not indicated in the project config.
+#
+# Although it would not be impossible to implement a 'dibs' system on such 
+# proxy lib submodules, this can allow for situations in which 2 'twin' target
+# libraries are defined with the same module-dependencies. The orchestrator would
+# need to account for these situations, which would be annoying and require more 
+# back and forth with the user.
+#
+# The simplest solution here is to compile modules as standalone libraries and then 
+# add each of the target-libraries to the CMake build as meta-libraries which simply 
+# link globs of libmodules together.
+#
+# Executables then proxy themselves based on the (*) indicator.
+
 # The HashMap Update: 0.5.0
 # -------------------------
 # This time we've realized that HashMaps are our friends. 
