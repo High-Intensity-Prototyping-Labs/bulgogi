@@ -171,7 +171,8 @@ deps:
 # add each of the target-libraries to the CMake build as meta-libraries which simply 
 # link globs of libmodules together.
 #
-# Executables then proxy themselves based on the (*) indicator.
+# Executables then proxy themselves based on the (*) indicator. Library targets are 
+# declared in the highest-level CMakelist.txt after all of the submodules are included.
 
 # The HashMap Update: 0.5.0
 # -------------------------
