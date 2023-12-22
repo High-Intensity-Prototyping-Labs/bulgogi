@@ -8,16 +8,19 @@ use itertools::Itertools;
 
 pub type Submodule = String;
 
+#[derive(Debug)]
 pub struct CMakeProject {
     pub submodules: Vec<Submodule>,
     pub lists: HashMap<Submodule, CMakeList>,
 }
 
+#[derive(Debug)]
 pub struct CMakeList {
     pub target: CMakeTarget,
     pub links: Vec<CMakeTarget>,
 }
 
+#[derive(Debug)]
 pub enum CMakeTarget {
     Library(String),
     Executable(String),
