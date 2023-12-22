@@ -48,13 +48,16 @@ impl From<Project> for CMakeProject {
                     target: CMakeTarget::from((entry.0.clone(), entry.1.clone())),
                     links: dep_list.iter().map(|d| CMakeTarget::from(d.clone())).collect(),
                 }
-            }).collect::<Vec<CMakeList>>()
-            .extend(submodules.iter().map(|s| {
+            }).chain(submodules.iter().map(|s| {
                 CMakeList {
                     target: CMakeTarget::from(s.clone()),
                     links: Vec::new(),
                 }
-            }).collect::<Vec<CMakeList>>());
+            })).collect::<Vec<CMakeList>>();
+
+
+        dbg!(submodules);
+        dbg!(cmake_lists);
 
         // let lists = cmake_lists.into_iter()
         //     .map(|l| )
