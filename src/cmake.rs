@@ -4,6 +4,8 @@ use crate::project::{Project, TargetID, Target, Dependency, Module, ModuleID, Pr
 
 use std::collections::HashMap;
 
+use itertools::Itertools;
+
 pub type Submodule = String;
 
 pub struct CMakeProject {
@@ -33,7 +35,7 @@ impl CMakeProject {
 impl From<Project> for CMakeProject {
     fn from(project: Project) -> Self {
         // Collect list of submodules
-        let submodules = project.modules.keys().collect::<Vec<Submodule>>();
+        let submodules = project.modules.keys().cloned().collect::<Vec<Submodule>>();
         
         // Glob lists before sorting by submodule
         let cmake_lists = project.deps.iter()
@@ -53,6 +55,8 @@ impl From<Project> for CMakeProject {
 
         // let lists = cmake_lists.into_iter()
         //     .map(|l| )
+
+        CMakeProject::new()
     }
 }
 
