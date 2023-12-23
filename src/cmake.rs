@@ -14,13 +14,13 @@ pub struct CMakeProject {
     pub lists: HashMap<Submodule, CMakeList>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CMakeList {
     pub target: CMakeTarget,
     pub links: Vec<CMakeTarget>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CMakeTarget {
     Library(String),
     Executable(String),
@@ -55,12 +55,15 @@ impl From<Project> for CMakeProject {
                 }
             })).collect::<Vec<CMakeList>>();
 
+        // Sort lists by submdule 
+        let lists = submodules.iter()
+            .filter_map(|s| match cmake_lists.iter().find(|&l| l.target == s) {
+                Some(lib) => Some((s.clone(), lib.clone())),
+                None => None,
+            })
+            .collect::<HashMap<Submodule, CMakeList>>();
 
-        dbg!(submodules);
-        dbg!(cmake_lists);
-
-        // let lists = cmake_lists.into_iter()
-        //     .map(|l| )
+        dbg!(lists);
 
         CMakeProject::new()
     }
@@ -90,5 +93,23 @@ impl From<Dependency> for CMakeTarget {
 impl From<Submodule> for CMakeTarget {
     fn from(submodule: Submodule) -> Self {
         CMakeTarget::Library(submodule)
+    }
+}
+
+impl PartialEq<String> for CMakeTarget {
+    fn eq(&self, other: &String) -> bool {
+        match self {
+            CMakeTarget::Library(l) => l == other,
+            CMakeTarget::Executable(x) => x == other,
+        }
+    }
+}
+
+impl PartialEq<&String> for CMakeTarget {
+    fn eq(&self, other: &&String) -> bool {
+        match self {
+            CMakeTarget::Library(l) => &l == other,
+            CMakeTarget::Executable(x) => &x == other,
+        }
     }
 }
