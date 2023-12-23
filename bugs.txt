@@ -1,3 +1,5 @@
 - Having at least 2 conflicting entries of a module's executable status anywhere
 in the project config can lead to undefined determination of whether the module 
 is executable or not. 
+
+- Seems like the nested private inc directory in src/ is actually just called src/, which is not right (should be src/inc).
