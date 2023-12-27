@@ -46,67 +46,20 @@ impl From<Project> for CMakeProject {
     fn from(project: Project) -> Self {
         let submodules = project.modules.keys().cloned().collect_vec();
 
-        let executables = project.modules.iter()
-            .filter_map(|(mid, m)| filter_match!(m, Module::Executable, Some(mid)));
-
-        // Closure which returns `Some()` Project.targets entries if it contains an 
-        // executable component module or `None` otherwise.
-        let executable = |entry: (&TargetID, &Vec<Dependency>)| {
-            match entry.1.iter().find(|d| executables.clone().any(|m| d == &m)) {
-                Some(_) => Some(entry),
-                None => None,
-            }
-        };
-
-        let proxies = project.deps.iter()
-            .filter_map(executable)
+        let exe_modules = project.deps.iter()
+            .filter_map(|(tid, dep_list)| filter_match!(project.targets.get(tid), Some(t), Some((t, dep_list))))
+            .filter_map(|(t, dep_list)| filter_match!(t, Target::Executable, Some(dep_list)))
+            .flat_map(|dep_list| dep_list.iter())
+            .filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m)))
+            .filter_map(|m| filter_match!(project.modules.get(m), Some(Module::Executable), Some(m.clone())))
             .collect_vec();
 
         dbg!(submodules);
+        dbg!(exe_modules);
 
         CMakeProject::new()
     }
 }
-
-// impl From<Project> for CMakeProject {
-//     fn from(project: Project) -> Self {
-//         // Collect list of submodules
-//         let submodules = project.modules.keys().cloned().collect::<Vec<Submodule>>();
-//         
-//         // Glob lists before sorting by submodule
-//         let cmake_lists = project.deps.iter()
-//             .filter_map(|(target_id, dep_list)| filter_match!(project.targets.get_key_value(target_id), Some(entry), Some((entry, dep_list))))
-//             .map(|(entry, dep_list)| {
-//                 CMakeList {
-//                     target: CMakeTarget::from((entry.0.clone(), entry.1.clone())),
-//                     links: dep_list.iter().map(|d| CMakeTarget::from(d.clone())).collect(),
-//                 }
-//             }).collect::<Vec<CMakeList>>();
-// 
-//         let cmake_dependencies = cmake_lists.iter()
-//             .flat_map(|l| l.links.iter())
-//             .filter_map(|link| filter_match!(link, CMakeTarget::Library(lib), Some(lib.clone())))
-//             .map(|lib| CMakeList {
-//                 target: CMakeTarget::from(lib),
-//                 links: Vec::new(),
-//             }).collect::<Vec<CMakeList>>();
-//         
-//         // Sort lists by submdule 
-//         let lists = submodules.iter()
-//             .filter_map(|s| match cmake_lists.iter().find(|&l| l.target == s) {
-//                 Some(lib) => Some((s.clone(), lib.clone())),
-//                 None => None,
-//             })
-//             .collect::<HashMap<Submodule, CMakeList>>();
-// 
-//         dbg!(submodules.clone());
-//         dbg!(cmake_lists.clone());
-//         dbg!(cmake_dependencies.clone());
-//         dbg!(lists);
-// 
-//         CMakeProject::new()
-//     }
-// }
 
 // TODO: Prepend CMakeTarget internal representation of target names with "lib" when appropriate.
 impl From<(TargetID, Target)> for CMakeTarget {
