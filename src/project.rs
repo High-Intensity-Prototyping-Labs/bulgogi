@@ -49,6 +49,16 @@ impl Project {
     pub fn any_depends(&self, module: &ModuleID) -> bool {
         self.deps.values().flatten().any(|d| d == module)
     }
+
+    /// Returns an iterator over the project's executable TargetIDs
+    pub fn executable_targets(&self) -> impl Iterator<Item=TargetID> + '_ {
+        self.targets.iter().filter_map(|t| filter_match!(t.1, Target::Executable, Some(t.0.clone())))
+    }
+
+    /// Returns an iterator over the project targets
+    pub fn targets(&self) -> impl Iterator<Item=(&TargetID, &Target)> {
+        self.targets.iter()
+    }
 }
 
 impl From<Mapping> for Project {
