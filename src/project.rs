@@ -59,7 +59,47 @@ impl Project {
     pub fn targets(&self) -> impl Iterator<Item=(&TargetID, &Target)> {
         self.targets.iter()
     }
+
+    // /// Returns a custom iterator over the project modules 
+    // pub fn modules(&self) ->  {
+
+    // }
 }
+
+/// Executable iterator struct
+pub struct Executable<I> {
+    iter: I,
+}
+
+/// Implement the Executable iterator
+impl<I> Iterator for Executable<I> where I: Iterator
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
+    }
+}
+
+/// Implement the Executable struct
+impl<I> Executable<I> {
+    pub fn new(iter: I) -> Executable<I> {
+        Executable { iter }
+    }
+}
+
+/// Extension trait for the Executable iterator 
+pub trait ExecutableIter: Sized {
+    fn executable(self) -> Executable<Self> where Self: Sized;
+}
+
+/// Implement Executable extension trait for Iterator
+impl<I> ExecutableIter for I where I: Iterator + Sized {
+    fn executable(self) -> Executable<Self> where Self: Sized {
+
+    }
+}
+
 
 impl From<Mapping> for Project {
     fn from(map: Mapping) -> Self {
