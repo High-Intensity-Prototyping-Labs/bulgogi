@@ -1,6 +1,6 @@
 // CMake Module
 use crate::filter_match;
-use crate::project::{Project, TargetID, Target, Dependency, Module, ModuleID, ProjectChild};
+use crate::project::{Project, TargetID, Target, Dependency, Module, ModuleID, ProjectChild, ExecutableIter};
 
 use std::collections::HashMap;
 
@@ -23,15 +23,6 @@ pub enum CMakeTarget {
     Executable(String),
 }
 
-impl CMakeTarget {
-    pub fn is_exe(&self) -> bool {
-        match self {
-            CMakeTarget::Executable(_) => true,
-            CMakeTarget::Library(_) => false,
-        }
-    }
-}
-
 impl CMakeProject {
     pub fn new() -> Self {
         CMakeProject {
@@ -46,13 +37,18 @@ impl From<Project> for CMakeProject {
     fn from(project: Project) -> Self {
         let submodules = project.modules.keys().cloned().collect_vec();
 
-        let exe_modules = project.deps.iter()
-            .filter_map(|(tid, dep_list)| filter_match!(project.targets.get(tid), Some(t), Some((t, dep_list))))
-            .filter_map(|(t, dep_list)| filter_match!(t, Target::Executable, Some(dep_list)))
-            .flat_map(|dep_list| dep_list.iter())
-            .filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m)))
-            .filter_map(|m| filter_match!(project.modules.get(m), Some(Module::Executable), Some(m.clone())))
+        let executables = submodules.iter()
+            .filter_map(|mstr| filter_match!(project.modules.get(mstr), Some(m), Some(m)))
+            .executable(|m| matches!(m, Module::Executable))
             .collect_vec();
+
+        // let exe_modules = project.deps.iter()
+        //     .filter_map(|(tid, dep_list)| filter_match!(project.targets.get(tid), Some(t), Some((t, dep_list))))
+        //     .filter_map(|(t, dep_list)| filter_match!(t, Target::Executable, Some(dep_list)))
+        //     .flat_map(|dep_list| dep_list.iter())
+        //     .filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m)))
+        //     .filter_map(|m| filter_match!(project.modules.get(m), Some(Module::Executable), Some(m.clone())))
+        //     .collect_vec();
 
         dbg!(submodules);
         dbg!(exe_modules);
