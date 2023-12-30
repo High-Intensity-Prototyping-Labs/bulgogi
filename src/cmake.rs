@@ -51,7 +51,7 @@ impl From<Project> for CMakeProject {
         //     .collect_vec();
 
         dbg!(submodules);
-        dbg!(exe_modules);
+        dbg!(executables);
 
         CMakeProject::new()
     }
