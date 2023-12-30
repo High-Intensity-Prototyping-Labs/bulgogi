@@ -67,36 +67,47 @@ impl Project {
 }
 
 /// Executable iterator struct
-pub struct Executable<I> {
+pub struct Executable<I, F> {
     iter: I,
+    f: F,
 }
 
 /// Implement the Executable iterator
-impl<I> Iterator for Executable<I> where I: Iterator
+impl<I, F> Iterator for Executable<I, F> 
+    where 
+    I: Iterator,
+    F: Fn(&I::Item) -> bool,
 {
     type Item = I::Item;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next()
+        match self.iter.next() {
+            Some(e) if (self.f)(&e) => Some(e),
+            _ => None,
+        }
     }
 }
 
 /// Implement the Executable struct
-impl<I> Executable<I> {
-    pub fn new(iter: I) -> Executable<I> {
-        Executable { iter }
+impl<I, F> Executable<I, F> {
+    pub fn new(iter: I, f: F) -> Executable<I, F> {
+        Executable { iter, f }
     }
 }
 
 /// Extension trait for the Executable iterator 
-pub trait ExecutableIter: Sized {
-    fn executable(self) -> Executable<Self> where Self: Sized;
+pub trait ExecutableIter<F>: Sized {
+    fn executable(self, f: F) -> Executable<Self, F> where Self: Sized;
 }
 
 /// Implement Executable extension trait for Iterator
-impl<I> ExecutableIter for I where I: Iterator + Sized {
-    fn executable(self) -> Executable<Self> where Self: Sized {
-
+impl<I, F> ExecutableIter<F> for I 
+    where 
+    I: Iterator + Sized,
+    F: Fn(&I::Item) -> bool,
+{
+    fn executable(self, f: F) -> Executable<Self, F> where Self: Sized {
+        Executable { iter: self, f }
     }
 }
 
