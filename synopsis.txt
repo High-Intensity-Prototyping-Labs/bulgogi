@@ -8,6 +8,8 @@ bulgogi init
 
 # Empty projects do not contain anything.
 
+# Alias: Bulgogi CLI tool should be aliased to `bul`.
+
 # Adds a module to the bulgogi project
 bulgogi module add module1
 bulgogi module add --create telemetry
