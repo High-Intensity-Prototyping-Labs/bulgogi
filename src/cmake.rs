@@ -7,15 +7,18 @@ use std::collections::HashMap;
 use itertools::Itertools;
 
 pub type Submodule = String;
-pub type CMakeList = Vec<CMakeTarget>;
 
 #[derive(Debug)]
 pub struct CMakeProject {
     pub submodules: Vec<Submodule>,
     pub lists: HashMap<Submodule, CMakeList>,
-    pub targets: HashMap<Submodule, CMakeTarget>,
 }
 
+#[derive(Debug)]
+pub struct CMakeList {
+    pub target: CMakeTarget,
+    pub links: Vec<CMakeTarget>,
+}
 
 #[derive(Debug, Clone)]
 pub enum CMakeTarget {
@@ -28,7 +31,6 @@ impl CMakeProject {
         CMakeProject {
             submodules: Vec::new(),
             lists: HashMap::new(),
-            targets: HashMap::new(),
         }
     }
 }
@@ -38,20 +40,20 @@ impl From<Project> for CMakeProject {
         let submodules = project.modules.keys().cloned().collect_vec();
 
         let executables = submodules.iter()
-            .filter_map(|mstr| filter_match!(project.modules.get(mstr), Some(m), Some(m)))
-            .executable(|m| matches!(m, Module::Executable))
+            .filter_map(|sm| filter_match!(project.modules.get(sm), Some(Module::Executable), Some(sm)))
             .collect_vec();
 
-        // let exe_modules = project.deps.iter()
-        //     .filter_map(|(tid, dep_list)| filter_match!(project.targets.get(tid), Some(t), Some((t, dep_list))))
-        //     .filter_map(|(t, dep_list)| filter_match!(t, Target::Executable, Some(dep_list)))
-        //     .flat_map(|dep_list| dep_list.iter())
-        //     .filter_map(|d| filter_match!(d, Dependency::Module(m), Some(m)))
-        //     .filter_map(|m| filter_match!(project.modules.get(m), Some(Module::Executable), Some(m.clone())))
-        //     .collect_vec();
+        let libmodules = submodules.iter()
+            .filter(|sm| !executables.iter().any(|e| sm == e))
+            .collect_vec();
 
-        dbg!(submodules);
-        dbg!(executables);
+        let libtargets = project.targets.iter()
+            .filter_map(|(tid, t)| filter_match!(t, Target::Library, Some(tid)))
+            .collect_vec();
+
+        let lists = executables.iter()
+            .filter_map(|e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
+
 
         CMakeProject::new()
     }
