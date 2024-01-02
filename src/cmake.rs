@@ -39,21 +39,51 @@ impl From<Project> for CMakeProject {
     fn from(project: Project) -> Self {
         let submodules = project.modules.keys().cloned().collect_vec();
 
-        let executables = submodules.iter()
+        // Names of executable modules
+        let exemodules = submodules.iter()
             .filter_map(|sm| filter_match!(project.modules.get(sm), Some(Module::Executable), Some(sm)))
             .collect_vec();
 
+        // Names of library modules
         let libmodules = submodules.iter()
-            .filter(|sm| !executables.iter().any(|e| sm == e))
+            .filter(|sm| !exemodules.iter().any(|e| sm == e))
             .collect_vec();
 
+        // Names of library targets
         let libtargets = project.targets.iter()
             .filter_map(|(tid, t)| filter_match!(t, Target::Library, Some(tid)))
             .collect_vec();
 
-        let lists = executables.iter()
-            .filter_map(|e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
+        // Names of executable targets
+        let exetargets = project.targets.iter()
+            .filter_map(|(tid, t)| filter_match!(t, Target::Executable, Some(tid)))
+            .collect_vec();
 
+        // Collection of executable modules, library modules and library targets into CMakeLists.
+        let lists = exetargets.iter()
+            .filter_map(|&e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
+            .map(|(e, dep_list)| { 
+                CMakeList {
+                    target: CMakeTarget::Executable(e.to_string()),
+                    links: dep_list.iter()
+                            .filter(|d| !exemodules.iter()
+                            .any(|e| d == e))
+                            .cloned()
+                            .map_into()
+                            .collect_vec(),
+                }
+            })
+            .collect_vec();
+
+        dbg!(exemodules.clone());
+        dbg!(libmodules);
+        dbg!(exetargets.clone());
+        dbg!(lists);
+
+        // let lists = executables.iter()
+        //    .filter_map(|e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
+
+        todo!("Finish collecting the static lists of targets into CMakeLists.");
 
         CMakeProject::new()
     }
