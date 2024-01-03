@@ -36,3 +36,10 @@ void client::cli(CLI::App& app) {
         module_add->add_option("TARGET", "Parent target (depends on module)");
         module_add->add_flag("--create", "Create new module if not found in FS.");
 }
+
+void client::add_module(void) {
+        Project project;
+
+        project.targets["default"] = Target::Executable;
+        project.modules["module1"] = Module::Executable;
+}
