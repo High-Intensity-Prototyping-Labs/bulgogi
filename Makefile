@@ -1,10 +1,10 @@
 CC=clang++
-BIN=bulgogi
+BIN=bul
 SRC=$(wildcard *.cc)
 FLAGS=-std=c++20 -Wall
 
 all:
-	$(CC) -o bulgogi $(FLAGS) $(SRC)
+	$(CC) -o $(BIN) $(FLAGS) $(SRC)
 
 analyze:
 	$(CC) --analyze -Xclang -analyzer-output=html -o analyzer -std=c++20 $(SRC)
