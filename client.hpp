@@ -11,8 +11,6 @@
 // Standard C++ Libraries
 #include <string>
 
-using std::string;
-
 namespace client {
         void cli(CLI::App&);
 }

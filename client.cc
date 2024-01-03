@@ -11,11 +11,8 @@
  * @param app Reference to the initialized CLI11 App in `main()`
  */
 void client::cli(CLI::App& app) {
-        // blah blah blah 
+        // App settings
         app.require_subcommand();
-
-        string filename = "default";
-        app.add_option("-f,--file", filename, "A help string");
 
         // Subcommands
         auto module = app.add_subcommand("module", "Manage project modules")
