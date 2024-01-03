@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-InDev v1.0.0
+InDev v0.6.0
 
 ## Overview
 Bulgogi is a C/C++ build-system orchestrator for CubeSats.

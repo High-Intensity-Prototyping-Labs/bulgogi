@@ -1,1 +1,0 @@
-- Abstract the src/inc/private inc module directory structure as a customizable struct.
