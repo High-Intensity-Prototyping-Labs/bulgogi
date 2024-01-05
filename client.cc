@@ -40,6 +40,10 @@ void client::cli(CLI::App& app) {
 void client::add_module(void) {
         Project project;
 
+        Dependency dep;
+        dep.type = Dependency::Target;
+        dep.id = "default";
+
         project.targets["default"] = Target::Executable;
         project.modules["module1"] = Module::Executable;
 }

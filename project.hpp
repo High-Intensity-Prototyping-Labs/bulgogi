@@ -12,16 +12,16 @@
 #include <unordered_map>
 
 using String = std::string;
-using TargetID = std::string;
-using ModuleID = std::string;
-using Dependency = std::variant<TargetID, ModuleID>;
-
-template<class T>
-using Vector = std::vector<T>;
-
 using std::unordered_map;
 
 namespace project {
+        // Type Aliases
+        template<class T>
+        using Vector = std::vector<T>;
+
+        using TargetID = std::string;
+        using ModuleID = std::string;
+
         // Enums
         enum class Target {
                 Executable,
@@ -31,6 +31,14 @@ namespace project {
         enum class Module {
                 Normal,
                 Executable,
+        };
+
+        struct Dependency {
+                enum { Target, Module } type;
+                union id {
+                        TargetID target_id;
+                        ModuleID module_id;
+                };
         };
 
         class Project {

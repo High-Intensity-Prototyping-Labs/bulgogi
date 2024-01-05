@@ -15,6 +15,10 @@
 using project::Project;
 using project::Target;
 using project::Module;
+using project::ModuleID;
+using project::TargetID;
+using project::Vector;
+using project::Dependency;
 
 namespace client {
         void cli(CLI::App&);
