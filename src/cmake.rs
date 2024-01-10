@@ -66,8 +66,7 @@ impl From<Project> for CMakeProject {
                 CMakeList {
                     target: CMakeTarget::Executable(e.to_string()),
                     links: dep_list.iter()
-                            .filter(|d| !exemodules.iter()
-                            .any(|e| d == e))
+                            .filter(|d| !exemodules.iter().any(|e| d == e))
                             .cloned()
                             .map_into()
                             .collect_vec(),
