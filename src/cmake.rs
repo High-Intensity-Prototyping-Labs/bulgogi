@@ -64,7 +64,7 @@ impl From<Project> for CMakeProject {
         // Group exemodules and exetargets together (proxies)
         let exegroups = exetargets.iter()
             .filter_map(|&et| filter_match!(project.deps.get(et), Some(et_deps), Some((et, et_deps))))
-            .filter_map(|(&et, et_deps)| {
+            .filter_map(|(et, et_deps)| {
                 match et_deps.iter().find(|&d| exemodules.iter().any(|&em| d == em)) {
                     Some(et_dep_exe) => Some((et, et_dep_exe)),
                     _ => None,
