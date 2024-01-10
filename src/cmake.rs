@@ -59,8 +59,8 @@ impl From<Project> for CMakeProject {
             .filter_map(|(tid, t)| filter_match!(t, Target::Executable, Some(tid)))
             .collect_vec();
 
-        // Collection of executable modules, library modules and library targets into CMakeLists.
-        let lists = exetargets.iter()
+        // Collection of executable modules
+        let exelists = exetargets.iter()
             .filter_map(|&e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
             .map(|(e, dep_list)| { 
                 CMakeList {
@@ -74,10 +74,36 @@ impl From<Project> for CMakeProject {
             })
             .collect_vec();
 
+        // Collection of modules compiled as libraries
+        let libmodulelists = libmodules.iter()
+            .map(|lm| {
+                CMakeList {
+                    target: CMakeTarget::Library(lm.to_string()),
+                    links: Vec::new(),
+                }
+            })
+            .collect_vec();
+
+        // Shorthand for library targets with dependencies (go in top-level CMakeList for now)
+        let toplist = libtargets.iter()
+            .filter_map(|&lt| filter_match!(project.deps.get(lt), Some(dep_list), Some((lt, dep_list))))
+            .map(|(lt, dep_list)| {
+                CMakeList {
+                    target: CMakeTarget::Library(lt.to_string()),
+                    links: dep_list.iter()
+                            .cloned()
+                            .map_into()
+                            .collect_vec(),
+                }
+            })
+            .collect_vec();
+
         dbg!(exemodules.clone());
         dbg!(libmodules);
         dbg!(exetargets.clone());
-        dbg!(lists);
+        dbg!(exelists);
+        dbg!(libmodulelists);
+        dbg!(toplist);
 
         // let lists = executables.iter()
         //    .filter_map(|e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
