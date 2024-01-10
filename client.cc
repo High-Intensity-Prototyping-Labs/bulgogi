@@ -37,13 +37,11 @@ void client::cli(CLI::App& app) {
         module_add->add_flag("--create", "Create new module if not found in FS.");
 }
 
-void client::add_module(void) {
-        Project project;
+Project client::load(void) {
+        // Load yaml file 
+        // Convert to project class 
+        return Project();
+}
 
-        Dependency dep;
-        dep.type = Dependency::Target;
-        dep.id = "default";
-
-        project.targets["default"] = Target::Executable;
-        project.modules["module1"] = Module::Executable;
+void client::add_module(string& module, string& target) {
 }
