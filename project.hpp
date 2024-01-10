@@ -11,16 +11,14 @@
 #include <variant>
 #include <unordered_map>
 
-using String = std::string;
+using std::string;
+using std::vector;
 using std::unordered_map;
 
 namespace project {
         // Type Aliases
-        template<class T>
-        using Vector = std::vector<T>;
-
-        using TargetID = std::string;
-        using ModuleID = std::string;
+        using target_id = std::string;
+        using module_id = std::string;
 
         // Enums
         enum class Target {
@@ -35,17 +33,14 @@ namespace project {
 
         struct Dependency {
                 enum { Target, Module } type;
-                union id {
-                        TargetID target_id;
-                        ModuleID module_id;
-                };
+                string dep_id;
         };
 
         class Project {
         public:
-                unordered_map<TargetID, Target> targets;
-                unordered_map<ModuleID, Module> modules;
-                unordered_map<TargetID, Vector<Dependency>> deps;
+                unordered_map<target_id, Target> targets;
+                unordered_map<module_id, Module> modules;
+                unordered_map<target_id, vector<Dependency>> deps;
         };
 }
 
