@@ -197,6 +197,15 @@ impl PartialEq<String> for Dependency {
     }
 }
 
+impl ToString for Dependency {
+    fn to_string(&self) -> String {
+        match self {
+            Dependency::Module(m) => m.clone(),
+            Dependency::Target(t) => t.clone(),
+        }
+    }
+}
+
 pub trait ProjectChild {
     fn module_ids(&self) -> Vec<ModuleID>;
 }

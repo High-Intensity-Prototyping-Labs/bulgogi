@@ -7,6 +7,8 @@ use std::collections::HashMap;
 use itertools::Itertools;
 
 pub type Submodule = String;
+pub type LibName = String;
+pub type ExeName = String;
 
 #[derive(Debug)]
 pub struct CMakeProject {
@@ -22,8 +24,8 @@ pub struct CMakeList {
 
 #[derive(Debug, Clone)]
 pub enum CMakeTarget {
-    Library(String),
-    Executable(String),
+    Library(LibName),
+    Executable(Submodule, ExeName),
 }
 
 impl CMakeProject {
@@ -59,12 +61,24 @@ impl From<Project> for CMakeProject {
             .filter_map(|(tid, t)| filter_match!(t, Target::Executable, Some(tid)))
             .collect_vec();
 
+        // Group exemodules and exetargets together (proxies)
+        let exegroups = exetargets.iter()
+            .filter_map(|&et| filter_match!(project.deps.get(et), Some(et_deps), Some((et, et_deps))))
+            .filter_map(|(&et, et_deps)| {
+                match et_deps.iter().find(|&d| exemodules.iter().any(|&em| d == em)) {
+                    Some(et_dep_exe) => Some((et, et_dep_exe)),
+                    _ => None,
+                }
+            })
+            .map(|(et, et_dep_exe)| (et.to_string(), et_dep_exe.to_string()))
+            .collect_vec();
+
         // Collection of executable modules
-        let exelists = exetargets.iter()
-            .filter_map(|&e| filter_match!(project.deps.get(e), Some(dep_list), Some((e, dep_list))))
-            .map(|(e, dep_list)| { 
+        let exelists = exegroups.iter()
+            .filter_map(|(tar, sub)| filter_match!(project.deps.get(tar), Some(dep_list), Some((tar, sub, dep_list))))
+            .map(|(tar, sub, dep_list)| { 
                 CMakeList {
-                    target: CMakeTarget::Executable(e.to_string()),
+                    target: CMakeTarget::Executable(sub.clone(), tar.clone()),
                     links: dep_list.iter()
                             .filter(|d| !exemodules.iter().any(|e| d == e))
                             .cloned()
@@ -98,10 +112,16 @@ impl From<Project> for CMakeProject {
             })
             .collect_vec();
 
+        // Associate lists to submodules
+        //let exesubmodules = exemodules.iter()
+        //    .map(|e| )
+
+        dbg!(submodules.clone());
         dbg!(exemodules.clone());
         dbg!(libmodules);
         dbg!(exetargets.clone());
         dbg!(exelists);
+        dbg!(exegroups);
         dbg!(libmodulelists);
         dbg!(toplist);
 
@@ -111,16 +131,6 @@ impl From<Project> for CMakeProject {
         todo!("Finish collecting the static lists of targets into CMakeLists.");
 
         CMakeProject::new()
-    }
-}
-
-// TODO: Prepend CMakeTarget internal representation of target names with "lib" when appropriate.
-impl From<(TargetID, Target)> for CMakeTarget {
-    fn from((target_id, target): (TargetID, Target)) -> Self {
-        match target {
-            Target::Library => CMakeTarget::Library(target_id),
-            Target::Executable => CMakeTarget::Executable(target_id),
-        }
     }
 }
 
@@ -145,7 +155,7 @@ impl PartialEq<String> for CMakeTarget {
     fn eq(&self, other: &String) -> bool {
         match self {
             CMakeTarget::Library(l) => l == other,
-            CMakeTarget::Executable(x) => x == other,
+            CMakeTarget::Executable(_, x) => x == other,
         }
     }
 }
@@ -154,7 +164,7 @@ impl PartialEq<&String> for CMakeTarget {
     fn eq(&self, other: &&String) -> bool {
         match self {
             CMakeTarget::Library(l) => &l == other,
-            CMakeTarget::Executable(x) => &x == other,
+            CMakeTarget::Executable(_, x) => &x == other,
         }
     }
 }
