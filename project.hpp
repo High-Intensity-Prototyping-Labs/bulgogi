@@ -33,7 +33,7 @@ namespace project {
 
         struct Dependency {
                 enum { Target, Module } type;
-                string dep_id;
+                string id;
         };
 
         class Project {
