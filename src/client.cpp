@@ -36,12 +36,3 @@ void client::cli(CLI::App& app) {
         module_add->add_option("TARGET", "Parent target (depends on module)");
         module_add->add_flag("--create", "Create new module if not found in FS.");
 }
-
-Project client::load(void) {
-        // Load yaml file 
-        // Convert to project class 
-        return Project();
-}
-
-void client::add_module(string& module, string& target) {
-}
