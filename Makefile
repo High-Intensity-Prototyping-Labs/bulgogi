@@ -1,12 +1,13 @@
-SRC_DIR := .
-OBJ_DIR := ../obj
-BIN_DIR := ..
+SRC_DIR := src
+INC_DIR := inc
+OBJ_DIR := obj
+BIN_DIR := .
 
 BIN := $(BIN_DIR)/bul
-SRC := $(wildcard *.cpp)
-OBJ := $(addprefix $(OBJ_DIR)/, $(patsubst %.cpp, %.o, $(SRC)))
+SRC := $(wildcard $(addsuffix *.cpp, $(SRC_DIR)/))
+OBJ := $(addprefix $(OBJ_DIR)/, $(patsubst $(addsuffix %.cpp, $(SRC_DIR)/), %.o, $(SRC)))
 
-CPPFLAGS=-I../inc
+CPPFLAGS=-I$(INC_DIR)
 CXXFLAGS=-std=c++20 -Wall -pedantic
 
 all: $(BIN)
