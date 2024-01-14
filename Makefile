@@ -1,16 +1,30 @@
-CC=clang++
-BIN=bul
-SRC=$(wildcard *.cc)
-FLAGS=-std=c++20 -Wall
+SRC_DIR := src 
+INC_DIR := inc
+BIN_DIR := .
 
-all:
-	$(CC) -o $(BIN) $(FLAGS) $(SRC)
+BIN := $(BIN_DIR)/bul
+SRC := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-analyze:
-	$(CC) --analyze -Xclang -analyzer-output=html -o analyzer -std=c++20 $(SRC)
-	open -a "Google Chrome Beta" analyzer/index.html
+CPPFLAGS=-Iinc
+CXXFLAGS=-std=c++20 -Wall
+
+all: $(BIN)
+	
+$(BIN): $(OBJ) | $(BIN_DIR)
+	echo $^
+	echo $@
+	echo $(OBJ)
+	echo $(SRC)
+	$(CXX) $^ -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(BIN_DIR) $(OBJ_DIR):
+	mkdir -p $@
 
 clean:
-	rm $(BIN)
+	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR) 
 
-.phony: all
+.PHONY: all clean
