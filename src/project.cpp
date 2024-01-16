@@ -16,6 +16,13 @@ Project Project::make() {
 
 Project Project::load() {
         // Load project.yaml
+        YAML::Node project = YAML::LoadFile(PROJECT_YAML);
+
+        if(project["default"]) {
+                cout << "Default target found containing : " << project["default"] << endl;
+        }
+
+        return Project::make();
 }
 
 Dependency Dependency::make(Dependency::Kind kind, string name) {
