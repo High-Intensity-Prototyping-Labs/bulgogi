@@ -12,7 +12,9 @@
 // Standard C++ Libraries
 #include <string>
 
+// Using Declarations
 using std::string;
+using project::Project;
 
 namespace client {
         void cli(CLI::App&);

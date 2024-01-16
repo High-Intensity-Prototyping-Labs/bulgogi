@@ -9,11 +9,13 @@ OBJ := $(addprefix $(OBJ_DIR)/, $(patsubst $(addsuffix %.cpp, $(SRC_DIR)/), %.o,
 
 CPPFLAGS=-I$(INC_DIR)
 CXXFLAGS=-std=c++20 -Wall -pedantic
+LDFLAGS := -Llib
+LDLIBS := -lyaml-cpp
 
 all: $(BIN)
 	
 $(BIN): $(OBJ) | $(BIN_DIR)
-	$(CXX) $^ -o $@
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
