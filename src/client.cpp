@@ -31,16 +31,9 @@ void client::cli(CLI::App& app) {
                 ->require_subcommand();
 
         // Module add subcommand config
-        string module_str;
         module_add->add_option("MODULE", "Name of module to add");
         module_add->add_option("TARGET", "Parent target (depends on module)");
         module_add->add_flag("--create", "Create new module if not found in FS.");
-        module_add->add_option_function<string>("MODULE", [&module_str](const string& arg) {
-                module_str = arg;
-                cout << "arg = " << arg << endl;
-        });
-
-        cout << "module_str = " << module_str << endl;
 }
 
 void client::add_module(string &module_name, string &target_name) {
