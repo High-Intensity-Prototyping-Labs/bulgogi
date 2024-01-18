@@ -27,9 +27,11 @@ Project Project::load() {
         }
 
         // This is kinda nonsense
-        auto pp = project.as<vector<std::tuple<string, vector<string>>>>();
+        auto pp = project.as<vector<string>>();
         for(auto it = pp.begin(); it < pp.end(); ++it) {
-                std::cout << std::get<string>(*it) << ": ";
+                for(auto it2 = (*it).begin(); it2 < (*it).end(); ++it2) {
+                        std::cout << *it2 << ": " << std::endl;
+                }
 
         }
 
