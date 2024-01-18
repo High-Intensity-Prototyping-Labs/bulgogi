@@ -33,6 +33,10 @@ Project Project::load() {
 
         }
 
+        // TODO:
+        // Figure out how to extract the target name and the dep list iteratively
+        // at the project level. Currently can only extract dep_lists.
+
         return Project::make();
 }
 
