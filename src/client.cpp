@@ -10,12 +10,7 @@
  *
  * @param app Reference to the initialized CLI11 App in `main()`
  */
-void client::cli(CLI::App& app) {
-        // Group argument placeholders
-        string MODULE;
-        string TARGET;
-        bool create;
-
+void client::cli(CLI::App& app, Args& args) {
         // App settings
         app.require_subcommand();
 
@@ -36,25 +31,25 @@ void client::cli(CLI::App& app) {
                 ->require_subcommand();
 
         // Module add subcommand config
-        module_add->add_option<string>("MODULE", MODULE, "Name of module to add");
-        module_add->add_option<string>("TARGET", TARGET, "Parent target (depends on module)");
-        module_add->add_flag<bool>("--create", create, "Create new module if not found in FS.");
+        module_add->add_option<string>("MODULE", args.MODULE, "Name of module to add");
+        module_add->add_option<string>("TARGET", args.TARGET, "Parent target (depends on module)");
+        module_add->add_flag<bool>("--create", args.create, "Create new module if not found in FS.");
 
         // Module add callback 
         module_add->callback([&](){
-                add_module(MODULE, TARGET, create);
+                add_module(args);
         });
 }
 
-void client::add_module(string MODULE, string TARGET, bool create) {
+void client::add_module(Args& args) {
         cout << "Adding a module..." << endl;
-        if(create) {
+        if(args.create) {
                 cout << "Going ahead with creating a new module in the FS" << endl;
         } else {
-                cout << "Opting to instead search the FS for the MODULE=" << MODULE << endl;
+                cout << "Opting to instead search the FS for the MODULE=" << args.MODULE << endl;
         }
-        cout << "The desired MODULE = " << MODULE << endl;
-        cout << "The desired TARGET = " << TARGET << endl;
+        cout << "The desired MODULE = " << args.MODULE << endl;
+        cout << "The desired TARGET = " << args.TARGET << endl;
 
         // Load project 
         // Project project = Project::load();
