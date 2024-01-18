@@ -13,6 +13,11 @@
 void client::cli(CLI::App& app, Args& args) {
         // App settings
         app.require_subcommand();
+        app.preparse_callback([](size_t argCount){
+                if (argCount == 0) {
+                   throw(CLI::CallForHelp());
+                }
+        });
 
         // Subcommands
         auto module = app.add_subcommand("module", "Manage project modules")
