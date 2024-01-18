@@ -12,6 +12,7 @@
 #include "yaml-cpp/yaml.h"
 
 // Standard C++ Libraries
+#include <tuple>
 #include <string>
 #include <vector>
 #include <variant>
@@ -19,8 +20,6 @@
 #include <unordered_map>
 
 // Using declarations
-using std::cout;
-using std::endl;
 using std::string;
 using std::vector;
 using std::unordered_map;

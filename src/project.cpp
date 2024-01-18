@@ -18,8 +18,19 @@ Project Project::load() {
         // Load project.yaml
         YAML::Node project = YAML::LoadFile(PROJECT_YAML);
 
+        // This works
         if(project["default"]) {
-                cout << "Default target found containing : " << project["default"] << endl;
+                auto dep_list = project["default"].as<vector<string>>();
+                for(auto it = dep_list.begin(); it < dep_list.end(); ++it) {
+                        std::cout << *it << std::endl;
+                }
+        }
+
+        // This is kinda nonsense
+        auto pp = project.as<vector<std::tuple<string, vector<string>>>>();
+        for(auto it = pp.begin(); it < pp.end(); ++it) {
+                std::cout << std::get<string>(*it) << ": ";
+
         }
 
         return Project::make();

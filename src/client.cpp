@@ -47,27 +47,27 @@ void client::cli(CLI::App& app, Args& args) {
 }
 
 void client::add_module(Args& args) {
-        cout << "Adding a module..." << endl;
+        std::cout << "Adding a module..." << std::endl;
         if(args.create) {
-                cout << "Going ahead with creating a new module in the FS" << endl;
+                std::cout << "Going ahead with creating a new module in the FS" << std::endl;
         } else {
-                cout << "Opting to instead search the FS for the MODULE=" << args.MODULE << endl;
+                std::cout << "Opting to instead search the FS for the MODULE=" << args.MODULE << std::endl;
         }
-        cout << "The desired MODULE = " << args.MODULE << endl;
-        cout << "The desired TARGET = " << args.TARGET << endl;
+        std::cout << "The desired MODULE = " << args.MODULE << std::endl;
+        std::cout << "The desired TARGET = " << args.TARGET << std::endl;
 
         // Load project 
-        // Project project = Project::load();
+        Project project = Project::load();
 }
 
 void client::rm_module(Args& args) {
-        cout << "Removing a module..." << endl;
+        std::cout << "Removing a module..." << std::endl;
         if(args.all) {
-                cout << "Removing ALL modules found" << endl;
+                std::cout << "Removing ALL modules found" << std::endl;
         } else {
-                cout << "Just removing module (" << args.MODULE << ") attached to target (" << args.TARGET << endl;
+                std::cout << "Just removing module (" << args.MODULE << ") attached to target (" << args.TARGET << std::endl;
         }
 
-        cout << "Module to remove: " << args.MODULE << endl;
-        cout << "Target attached: " << args.TARGET << endl;
+        std::cout << "Module to remove: " << args.MODULE << std::endl;
+        std::cout << "Target attached: " << args.TARGET << std::endl;
 }
