@@ -9,7 +9,7 @@ OBJ := $(addprefix $(OBJ_DIR)/, $(patsubst $(addsuffix %.cpp, $(SRC_DIR)/), %.o,
 
 CPPFLAGS=-I$(INC_DIR)
 CXXFLAGS=-std=c++20 -Wall -pedantic
-LDFLAGS := -Llib
+LDFLAGS := -Llib -fsanitize=address
 LDLIBS := -lyaml-cpp
 
 all: $(BIN)
