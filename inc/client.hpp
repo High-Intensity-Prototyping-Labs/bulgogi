@@ -17,8 +17,8 @@ using std::string;
 using project::Project;
 
 namespace client {
-        void cli(CLI::App&);
+        void cli(CLI::App& app);
 
         // Commands
-        void add_module(string& module_name, string& target_name);
+        void add_module(string MODULE, string TARGET, bool create);
 }

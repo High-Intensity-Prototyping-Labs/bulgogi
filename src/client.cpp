@@ -11,6 +11,11 @@
  * @param app Reference to the initialized CLI11 App in `main()`
  */
 void client::cli(CLI::App& app) {
+        // Group argument placeholders
+        string MODULE;
+        string TARGET;
+        bool create;
+
         // App settings
         app.require_subcommand();
 
@@ -31,12 +36,26 @@ void client::cli(CLI::App& app) {
                 ->require_subcommand();
 
         // Module add subcommand config
-        module_add->add_option("MODULE", "Name of module to add");
-        module_add->add_option("TARGET", "Parent target (depends on module)");
-        module_add->add_flag("--create", "Create new module if not found in FS.");
+        module_add->add_option<string>("MODULE", MODULE, "Name of module to add");
+        module_add->add_option<string>("TARGET", TARGET, "Parent target (depends on module)");
+        module_add->add_flag<bool>("--create", create, "Create new module if not found in FS.");
+
+        // Module add callback 
+        module_add->callback([&](){
+                add_module(MODULE, TARGET, create);
+        });
 }
 
-void client::add_module(string &module_name, string &target_name) {
+void client::add_module(string MODULE, string TARGET, bool create) {
+        cout << "Adding a module..." << endl;
+        if(create) {
+                cout << "Going ahead with creating a new module in the FS" << endl;
+        } else {
+                cout << "Opting to instead search the FS for the MODULE=" << MODULE << endl;
+        }
+        cout << "The desired MODULE = " << MODULE << endl;
+        cout << "The desired TARGET = " << TARGET << endl;
+
         // Load project 
-        Project project = Project::load();
+        // Project project = Project::load();
 }
