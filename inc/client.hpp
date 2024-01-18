@@ -22,6 +22,7 @@ namespace client {
                 string  MODULE;
                 string  TARGET;
                 bool    create;
+                bool    all;
         };
 
         // Configures the CLI11 app for CLI args.
@@ -29,4 +30,5 @@ namespace client {
 
         // Commands
         void add_module(Args& args);
+        void rm_module(Args& args);
 }

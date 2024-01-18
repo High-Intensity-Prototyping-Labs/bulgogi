@@ -31,19 +31,19 @@ void client::cli(CLI::App& app, Args& args) {
 
         // Module subcommands
         auto module_add = module->add_subcommand("add", "Adds a module to the project");
-
-        auto module_rm = module->add_subcommand("rm", "Removes a module from the project")
-                ->require_subcommand();
+        auto module_rm = module->add_subcommand("rm", "Removes a module from the project");
 
         // Module add subcommand config
-        module_add->add_option<string>("MODULE", args.MODULE, "Name of module to add");
-        module_add->add_option<string>("TARGET", args.TARGET, "Parent target (depends on module)");
-        module_add->add_flag<bool>("--create", args.create, "Create new module if not found in FS.");
+        module_add->add_option<string>("MODULE", args.MODULE, "Name of module to add")->required(true);
+        module_add->add_option<string>("TARGET", args.TARGET, "Parent target (depends on module)")->default_val("default");
+        module_add->add_flag<bool>("--create", args.create, "Create new module if not found in FS.")->default_val(false);
+        module_add->callback([&]() { add_module(args); });
 
-        // Module add callback 
-        module_add->callback([&](){
-                add_module(args);
-        });
+        // Module rm subcommand config 
+        module_rm->add_option<string>("MODULE", args.MODULE, "Name of the module to remove")->required(true);
+        module_rm->add_option<string>("TARGET", args.TARGET, "Target attached to the module")->default_val("default");
+        module_rm->add_flag<bool>("--all", args.all, "Remove all module attachments to targets")->default_val(false);
+        module_rm->callback([&]() { rm_module(args); });
 }
 
 void client::add_module(Args& args) {
@@ -58,4 +58,16 @@ void client::add_module(Args& args) {
 
         // Load project 
         // Project project = Project::load();
+}
+
+void client::rm_module(Args& args) {
+        cout << "Removing a module..." << endl;
+        if(args.all) {
+                cout << "Removing ALL modules found" << endl;
+        } else {
+                cout << "Just removing module (" << args.MODULE << ") attached to target (" << args.TARGET << endl;
+        }
+
+        cout << "Module to remove: " << args.MODULE << endl;
+        cout << "Target attached: " << args.TARGET << endl;
 }
