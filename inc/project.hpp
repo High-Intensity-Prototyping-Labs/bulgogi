@@ -40,8 +40,6 @@ namespace project {
                 static Project load(void);
 
                 static Project from(unordered_map<string, vector<string>>);
-
-                bool contains_module(string& m);
         };
         std::ostream& operator<<(std::ostream& out, Project& project);
 }
