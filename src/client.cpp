@@ -30,6 +30,8 @@ void client::cli(CLI::App& app, Args& args) {
         auto clean = app.add_subcommand("clean", "Cleans the project")
                 ->require_subcommand();
 
+        auto test = app.add_subcommand("test", "Runs a test feature");
+
         // Module subcommands
         auto module_add = module->add_subcommand("add", "Adds a module to the project");
         auto module_rm = module->add_subcommand("rm", "Removes a module from the project");
@@ -45,6 +47,9 @@ void client::cli(CLI::App& app, Args& args) {
         module_rm->add_option<string>("TARGET", args.TARGET, "Target attached to the module")->default_val("default");
         module_rm->add_flag<bool>("--all", args.all, "Remove all module attachments to targets")->default_val(false);
         module_rm->callback([&]() { rm_module(args); });
+
+        // Test command config
+        test->callback([&]() { client::test(); });
 }
 
 void client::err(Err e, std::optional<string> info) {
@@ -143,4 +148,12 @@ void client::rm_module(Args& args) {
 
         std::cout << "Module to remove: " << args.MODULE << std::endl;
         std::cout << "Target attached: " << args.TARGET << std::endl;
+}
+
+void client::test() {
+        // Load project 
+        auto project = Project::load();
+
+        // Convert to string 
+        std::cout << "My converted project: " << project.to<string>() << std::endl;
 }

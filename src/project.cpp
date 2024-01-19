@@ -69,7 +69,7 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
 
 template<>
 string Project::to<string>() {
-
+        return "GAFOOKY";
 }
 
 // Checks whether project contains module at all

@@ -44,6 +44,9 @@ namespace project {
                 static Project make(void);
                 static Project from(unordered_map<string, vector<string>>);
 
+                template<class T>
+                T to(void);
+
                 static Project load(void);
                 void save(void);
 

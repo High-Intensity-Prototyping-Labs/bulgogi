@@ -43,4 +43,5 @@ namespace client {
         // Commands
         void add_module(Args& args);
         void rm_module(Args& args);
+        void test(void);
 }
