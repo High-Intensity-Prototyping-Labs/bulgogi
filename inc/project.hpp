@@ -41,4 +41,5 @@ namespace project {
 
                 static Project from(unordered_map<string, vector<string>>);
         };
+        std::ostream& operator<<(std::ostream& out, Project& project);
 }

@@ -67,3 +67,24 @@ std::ostream& project::operator<<(std::ostream& out, Dependency& dep) {
 
         return out;
 }
+
+
+std::ostream& project::operator<<(std::ostream& out, Project& project) {
+        out << "Project {" << std::endl;
+        out << "\ttargets: {" << std::endl;
+        for(auto it = project.targets.begin(); it != project.targets.end(); it++) {
+                auto target = it->first;
+                auto dep_list = it->second;
+
+                out << "\t\t" << target << ": {" << std::endl;
+                for(auto it2 = dep_list.begin(); it2 != dep_list.end(); it2++) {
+                        auto dep = *it2;
+                        out << "\t\t\t" << dep << ", " << std::endl;
+                }
+                out << "\t\t}" << std::endl;
+        }
+        out << "\t}" << std::endl;
+        out << "}" << std::endl;
+
+        return out;
+}
