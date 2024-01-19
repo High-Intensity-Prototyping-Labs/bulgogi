@@ -17,29 +17,36 @@ Project Project::make() {
 Project Project::load() {
         // Load project.yaml
         YAML::Node project = YAML::LoadFile(PROJECT_YAML);
+        auto map = project.as<unordered_map<string, vector<string>>>();
+        return Project::from(map);
+}
 
-        // This works
-        if(project["default"]) {
-                auto dep_list = project["default"].as<vector<string>>();
-                for(auto it = dep_list.begin(); it < dep_list.end(); ++it) {
-                        std::cout << *it << std::endl;
+// Convert project.yaml map into project struct
+Project Project::from(unordered_map<string, vector<string>> targets) {
+        auto project = Project::make();
+
+        for(auto it = targets.begin(); it != targets.end(); it++) {
+                auto target = it->first;
+                auto dep_list = it->second;
+                auto deps = vector<Dependency>();
+
+                // Convert the list of dep strings into a vec of Dependency
+                for(auto it2 = dep_list.begin(); it2 < dep_list.end(); it2++) {
+                        auto dep = *it2;
+                        // If dep is found among the target names, its dependency type is target
+                        if(targets.count(dep)) {
+                                deps.push_back(Dependency::make(Dependency::Target, dep));
+                        // Otherwise, it is a module
+                        } else {
+                                deps.push_back(Dependency::make(Dependency::Module, dep));
+                        }
                 }
+
+                // Add the Target/Vec<Dependency> pair to the project targets
+                project.targets.insert({target, deps});
         }
 
-        // This is kinda nonsense
-        auto pp = project.as<vector<string>>();
-        for(auto it = pp.begin(); it < pp.end(); ++it) {
-                for(auto it2 = (*it).begin(); it2 < (*it).end(); ++it2) {
-                        std::cout << *it2 << ": " << std::endl;
-                }
-
-        }
-
-        // TODO:
-        // Figure out how to extract the target name and the dep list iteratively
-        // at the project level. Currently can only extract dep_lists.
-
-        return Project::make();
+        return project;
 }
 
 Dependency Dependency::make(Dependency::Kind kind, string name) {

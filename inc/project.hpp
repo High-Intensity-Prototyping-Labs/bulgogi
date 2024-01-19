@@ -37,5 +37,7 @@ namespace project {
 
                 static Project make(void);
                 static Project load(void);
+
+                static Project from(unordered_map<string, vector<string>>);
         };
 }
