@@ -46,7 +46,17 @@ void client::cli(CLI::App& app, Args& args) {
         module_rm->callback([&]() { rm_module(args); });
 }
 
+void client::err(Err e, std::optional<string> info) {
+        const auto VALUE_UNKNOWN = "(UNKNOWN)";
+        switch (e) {
+        case Err::TargetNotFound:
+                std::cout << "Target not found in project: " << info.value_or(VALUE_UNKNOWN) << std::endl;
+                break;
+        }
+}
+
 void client::add_module(Args& args) {
+        // DEBUG:
         std::cout << "Adding a module..." << std::endl;
         if(args.create) {
                 std::cout << "Going ahead with creating a new module in the FS" << std::endl;
@@ -59,8 +69,19 @@ void client::add_module(Args& args) {
         // Load project 
         Project project = Project::load();
 
-        // Debug
+        // DEBUG:
         std::cout << "Project loaded. Contains the following: " << std::endl;
+        std::cout << project << std::endl;
+
+        // Add module to project 
+        if(project.targets.count(args.TARGET)) {
+                project.targets[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
+        } else {
+                client::err(Err::TargetNotFound, args.TARGET);
+        }
+
+        // DEBUG:
+        std::cout << "Final Project State:" << std::endl;
         std::cout << project << std::endl;
 }
 

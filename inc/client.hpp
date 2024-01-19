@@ -11,10 +11,12 @@
 
 // Standard C++ Libraries
 #include <string>
+#include <optional>
 
 // Using Declarations
 using std::string;
 using project::Project;
+using project::Dependency;
 
 namespace client {
         // Placeholder for the CLI11 args 
@@ -25,8 +27,14 @@ namespace client {
                 bool    all;
         };
 
+        // Client errors 
+        enum class Err {
+                TargetNotFound,
+        };
+
         // Configures the CLI11 app for CLI args.
         void cli(CLI::App& app, Args& args);
+        void err(Err e, std::optional<string> info);
 
         // Commands
         void add_module(Args& args);
