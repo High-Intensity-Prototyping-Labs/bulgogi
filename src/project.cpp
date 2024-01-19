@@ -53,10 +53,10 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
                         auto dep = *it2;
                         // If dep is found among the target names, its dependency type is target
                         if(targets.count(dep)) {
-                                deps.push_back(Dependency::make(Dependency::Target, dep));
+                                deps.push_back(Dependency::from(Dependency::Target, dep));
                         // Otherwise, it is a module
                         } else {
-                                deps.push_back(Dependency::make(Dependency::Module, dep));
+                                deps.push_back(Dependency::from(Dependency::Module, dep));
                         }
                 }
 
@@ -88,7 +88,7 @@ bool Project::contains_module(string& m, string& t) {
 
         if(this->targets.contains(t)) {
                 auto dep_list = this->targets[t];
-                auto dep = Dependency::make(Dependency::Module, m);
+                auto dep = Dependency::from(Dependency::Module, m);
                 if(std::find(dep_list.begin(), dep_list.end(), dep) != dep_list.end()) {
                         res = true;
                 }
@@ -97,7 +97,7 @@ bool Project::contains_module(string& m, string& t) {
         return res;
 }
 
-Dependency Dependency::make(Dependency::Kind kind, string name) {
+Dependency Dependency::from(Dependency::Kind kind, string name) {
         return (struct Dependency) {
                 .type = kind,
                 .name = name,

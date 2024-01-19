@@ -33,7 +33,7 @@ namespace project {
                 enum Kind { Target, Module } type;
                 string name;
 
-                static Dependency make(Dependency::Kind kind, string name);
+                static Dependency from(Dependency::Kind kind, string name);
         };
         std::ostream& operator<<(std::ostream& out, Dependency& dep);
         bool operator==(const Dependency& a, Dependency& b);

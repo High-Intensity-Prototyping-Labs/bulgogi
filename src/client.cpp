@@ -114,7 +114,7 @@ void client::add_module(Args& args) {
         if(add_module) {
                 // Add module to project 
                 if(project.targets.count(args.TARGET)) {
-                        project.targets[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
+                        project.targets[args.TARGET].push_back(Dependency::from(Dependency::Module, args.MODULE));
                 } else {
                         client::err(Err::TargetNotFound, args.TARGET);
                 }
