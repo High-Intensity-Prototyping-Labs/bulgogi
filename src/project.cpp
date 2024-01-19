@@ -49,6 +49,36 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
         return project;
 }
 
+// Checks whether project contains module at all
+bool Project::contains_module(string& m) {
+        bool res = false;
+
+        for(auto it = this->targets.begin(); it != this->targets.end(); it++) {
+                auto target = it->first;
+                if(this->contains_module(m, target)) {
+                        res = true;
+                        break;
+                }
+        }
+
+        return res;
+}
+
+// Checks whether a project contains a module in a specific target
+bool Project::contains_module(string& m, string& t) {
+        bool res = false;
+
+        if(this->targets.contains(t)) {
+                auto dep_list = this->targets[t];
+                auto dep = Dependency::make(Dependency::Module, m);
+                if(std::find(dep_list.begin(), dep_list.end(), dep) != dep_list.end()) {
+                        res = true;
+                }
+        }
+
+        return res;
+}
+
 Dependency Dependency::make(Dependency::Kind kind, string name) {
         return (struct Dependency) {
                 .type = kind,

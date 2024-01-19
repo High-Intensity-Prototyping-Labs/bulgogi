@@ -17,6 +17,7 @@
 #include <vector>
 #include <variant>
 #include <iostream>
+#include <algorithm>
 #include <unordered_map>
 
 // Using declarations
@@ -41,6 +42,9 @@ namespace project {
                 static Project load(void);
 
                 static Project from(unordered_map<string, vector<string>>);
+
+                bool contains_module(string& m);
+                bool contains_module(string& m, string& t);
         };
         std::ostream& operator<<(std::ostream& out, Project& project);
 }
