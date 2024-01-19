@@ -56,22 +56,8 @@ void client::err(Err e, std::optional<string> info) {
 }
 
 void client::add_module(Args& args) {
-        // DEBUG:
-        std::cout << "Adding a module..." << std::endl;
-        if(args.create) {
-                std::cout << "Going ahead with creating a new module in the FS" << std::endl;
-        } else {
-                std::cout << "Opting to instead search the FS for the MODULE=" << args.MODULE << std::endl;
-        }
-        std::cout << "The desired MODULE = " << args.MODULE << std::endl;
-        std::cout << "The desired TARGET = " << args.TARGET << std::endl;
-
         // Load project 
         Project project = Project::load();
-
-        // DEBUG:
-        std::cout << "Project loaded. Contains the following: " << std::endl;
-        std::cout << project << std::endl;
 
         // Add module to project 
         if(project.targets.count(args.TARGET)) {
@@ -79,10 +65,6 @@ void client::add_module(Args& args) {
         } else {
                 client::err(Err::TargetNotFound, args.TARGET);
         }
-
-        // DEBUG:
-        std::cout << "Final Project State:" << std::endl;
-        std::cout << project << std::endl;
 
         // TODO:
         // 1. Check for duplicates before adding,
