@@ -9,7 +9,7 @@ using project::Project;
 using project::Dependency;
 
 Project Project::make() {
-        return (struct Project) {
+        return Project {
                 .targets = unordered_map<string, vector<Dependency>>(),
         };
 }
@@ -67,6 +67,11 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
         return project;
 }
 
+template<>
+string Project::to<string>() {
+
+}
+
 // Checks whether project contains module at all
 bool Project::contains_module(string& m) {
         bool res = false;
@@ -98,7 +103,7 @@ bool Project::contains_module(string& m, string& t) {
 }
 
 Dependency Dependency::from(Dependency::Kind kind, string name) {
-        return (struct Dependency) {
+        return Dependency {
                 .type = kind,
                 .name = name,
         };
