@@ -31,6 +31,7 @@ namespace project {
 
                 static Dependency make(Dependency::Kind kind, string name);
         };
+        std::ostream& operator<<(std::ostream& out, Dependency& dep);
 
         struct Project {
                 unordered_map<string, vector<Dependency>> targets;

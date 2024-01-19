@@ -15,6 +15,7 @@
 // Using Declarations
 using std::string;
 using project::Project;
+using project::operator<<;
 
 namespace client {
         // Placeholder for the CLI11 args 

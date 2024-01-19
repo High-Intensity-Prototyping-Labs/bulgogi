@@ -55,3 +55,15 @@ Dependency Dependency::make(Dependency::Kind kind, string name) {
                 .name = name,
         };
 }
+
+std::ostream& operator<<(std::ostream& out, Dependency& dep) {
+        out << "(";
+        if(dep.type == Dependency::Target) {
+                out << "Dependency::Target";
+        } else {
+                out << "Dependency::Module";
+        }
+        out << ", " << dep.name << ")";
+
+        return out;
+}

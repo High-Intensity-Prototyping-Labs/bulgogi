@@ -58,6 +58,24 @@ void client::add_module(Args& args) {
 
         // Load project 
         Project project = Project::load();
+
+        // Debug
+        std::cout << "Project loaded. Contains the following: " << std::endl;
+        std::cout << "Project {" << std::endl;
+        std::cout << "\ttargets: {" << std::endl;
+        for(auto it = project.targets.begin(); it != project.targets.end(); it++) {
+                auto target = it->first;
+                auto dep_list = it->second;
+
+                std::cout << "\t\t" << target << ": {" << std::endl;
+                for(auto it2 = dep_list.begin(); it2 != dep_list.end(); it2++) {
+                        auto dep = *it2;
+                        std::cout << "\t\t\t" << dep << ", " << std::endl;
+                }
+                std::cout << "\t\t}" << std::endl;
+        }
+        std::cout << "\t}" << std::endl;
+        std::cout << "}" << std::endl;
 }
 
 void client::rm_module(Args& args) {
