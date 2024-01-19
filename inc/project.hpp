@@ -29,6 +29,8 @@ using std::ofstream;
 using std::unordered_map;
 
 namespace project {
+        using yaml_map = std::unordered_map<string, vector<string>>;
+
         struct Dependency {
                 enum Kind { Target, Module } type;
                 string name;
@@ -46,6 +48,8 @@ namespace project {
 
                 template<class T>
                 T to(void);
+                template<>
+                unordered_map<string, vector<string>> to();
 
                 static Project load(void);
                 void save(void);
