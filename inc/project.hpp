@@ -16,13 +16,16 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <unordered_map>
 
 // Using declarations
+using std::ios;
 using std::string;
 using std::vector;
+using std::ofstream;
 using std::unordered_map;
 
 namespace project {
@@ -39,9 +42,10 @@ namespace project {
                 unordered_map<string, vector<Dependency>> targets;
 
                 static Project make(void);
-                static Project load(void);
-
                 static Project from(unordered_map<string, vector<string>>);
+
+                static Project load(void);
+                void save(void);
 
                 bool contains_module(string& m);
                 bool contains_module(string& m, string& t);

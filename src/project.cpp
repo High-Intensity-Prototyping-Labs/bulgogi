@@ -21,6 +21,24 @@ Project Project::load() {
         return Project::from(map);
 }
 
+void Project::save() {
+        // Save project.yaml, proper override 
+        YAML::Emitter yaml;
+        auto f = ofstream(PROJECT_YAML, ios::out | ios::trunc);
+        if(f.is_open()) {
+                for(auto it = this->targets.begin(); it != targets.end(); it++) {
+                         auto target = it->first;
+                         auto dep_list = it->second;
+                }
+        } 
+        // Handle failed to open error
+        
+        // TODO:
+        // 1. Complete some kind of to_map() function for the Project.
+        // 2. Finish the Project::save() method by writing the map to the emitter.
+        //      Then, write the emitter to c_str to the ofstream.
+}
+
 // Convert project.yaml map into project struct
 Project Project::from(unordered_map<string, vector<string>> targets) {
         auto project = Project::make();

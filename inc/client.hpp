@@ -33,6 +33,7 @@ namespace client {
         enum class Err {
                 TargetNotFound,
                 DuplicateModule,
+                OpenProjectYamlErr,
         };
 
         // Configures the CLI11 app for CLI args.
