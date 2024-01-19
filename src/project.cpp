@@ -68,8 +68,23 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
 }
 
 template<>
-string Project::to<string>() {
-        return "GAFOOKY";
+unordered_map<string, vector<string>> Project::to() {
+        auto map = unordered_map<string, vector<string>>();
+
+        for(auto& it: this->targets) {
+                auto target = it.first;
+                auto dep_list = it.second;
+
+                auto str_list = vector<string>();
+                for(auto& it2: dep_list) {
+                        auto dep = it2;
+
+                        str_list.push_back(dep.name);
+                }
+                map.insert({target, str_list});
+        }
+        
+        return map;
 }
 
 // Checks whether project contains module at all
