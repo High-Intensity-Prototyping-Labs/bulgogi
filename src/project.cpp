@@ -5,15 +5,12 @@
 
 #include "project.hpp"
 
-using project::Target;
 using project::Project;
-using project::TargetID;
 using project::Dependency;
 
 Project Project::make() {
         return (struct Project) {
-                .targets = unordered_map<TargetID, Target>(),
-                .deps = unordered_map<TargetID, vector<Dependency>>(),
+                .targets = unordered_map<string, vector<Dependency>>(),
         };
 }
 
@@ -46,16 +43,31 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
                 }
 
                 // Add the Target/Vec<Dependency> pair to the project targets
-                project.deps.insert({target, deps});
+                project.targets.insert({target, deps});
         }
 
         return project;
 }
 
-Target Target::make(Target::Kind kind) {
-        return Target {
-                .type = kind,
-        };
+// Returns whether a project contains a module as a dependency
+bool Project::contains_module(string &m) {
+        bool result = false;
+
+        for(auto it = this->targets.begin(); it != this->targets.end(); it++) {
+                auto dep_list = it->second;
+                for(auto it2 = dep_list.begin(); it2 != dep_list.end(); it2++) {
+                        auto dep = *it2;
+                        if(m == dep.name) {
+                                result = true;
+                                break;
+                        }
+                }
+                if(result) {
+                        break;
+                }
+        }
+
+        return result;
 }
 
 Dependency Dependency::make(Dependency::Kind kind, string name) {
@@ -81,7 +93,7 @@ std::ostream& project::operator<<(std::ostream& out, Dependency& dep) {
 std::ostream& project::operator<<(std::ostream& out, Project& project) {
         out << "Project {" << std::endl;
         out << "\ttargets: {" << std::endl;
-        for(auto it = project.deps.begin(); it != project.deps.end(); it++) {
+        for(auto it = project.targets.begin(); it != project.targets.end(); it++) {
                 auto target = it->first;
                 auto dep_list = it->second;
 
