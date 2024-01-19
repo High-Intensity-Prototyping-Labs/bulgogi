@@ -59,15 +59,15 @@ void client::err(Err e, std::optional<string> info) {
                 std::cout << "Target not found in project: " << info.value_or(VALUE_UNKNOWN) << std::endl;
                 break;
         case Err::DuplicateModule:
-                 std::cout << "Module already attached to target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
-                 break;
+                std::cout << "Module already attached to target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
+                break;
         case Err::OpenProjectYamlErr:
-                 std::cout << "Unable to open or create the " << PROJECT_YAML << "file." << std::endl;
-                 break;
+                std::cout << "Unable to open or create the " << PROJECT_YAML << "file." << std::endl;
+                break;
         case Err::ModuleDirMissing:
-                 std::cout << "Module directory for " << info.value_or(VALUE_UNKNOWN) << " not found.";
-                 std::cout << "Perhaps you meant to pass the --create flag?" << std::endl;
-                 break;
+                std::cout << "Module directory for " << info.value_or(VALUE_UNKNOWN) 
+                        << " not found. Perhaps you meant to pass the --create flag?" << std::endl;
+                break;
         }
 }
 
