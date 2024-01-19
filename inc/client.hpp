@@ -12,11 +12,13 @@
 // Standard C++ Libraries
 #include <string>
 #include <optional>
+#include <filesystem>
 
 // Using Declarations
 using std::string;
 using project::Project;
 using project::Dependency;
+namespace fs = std::filesystem;
 
 namespace client {
         // Placeholder for the CLI11 args 
@@ -30,6 +32,7 @@ namespace client {
         // Client errors 
         enum class Err {
                 TargetNotFound,
+                DuplicateModule,
         };
 
         // Configures the CLI11 app for CLI args.

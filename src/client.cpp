@@ -4,6 +4,7 @@
  */
 
 #include "client.hpp"
+#include <filesystem>
 
 /**
  * Configures the CLI11 App 
@@ -52,6 +53,9 @@ void client::err(Err e, std::optional<string> info) {
         case Err::TargetNotFound:
                 std::cout << "Target not found in project: " << info.value_or(VALUE_UNKNOWN) << std::endl;
                 break;
+        case Err::DuplicateModule:
+                 std::cout << "Module already attached to target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
+                 break;
         }
 }
 
@@ -59,17 +63,73 @@ void client::add_module(Args& args) {
         // Load project 
         Project project = Project::load();
 
-        // Add module to project 
-        if(project.targets.count(args.TARGET)) {
-                project.targets[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
-        } else {
-                client::err(Err::TargetNotFound, args.TARGET);
+        // Placeholder to track module validation status 
+        bool duplicates = false;
+        bool dir_exists = false;
+        bool valid_tree = false;
+
+        // Placeholders for directories 
+        auto path = fs::path(args.MODULE);
+        auto src = fs::path(path / "src");
+        auto inc = fs::path(path / "inc");
+        auto pri = fs::path(src / "inc");
+
+        // Check for duplicates 
+        if(project.contains_module(args.MODULE, args.TARGET)) {
+                client::err(Err::DuplicateModule, "("+args.MODULE+", "+args.TARGET+")");
+                duplicates = true;
+        }
+
+        // Check if module directory exists in the FS
+        if(fs::is_directory(path)) {
+                dir_exists = true;
+
+                // Validate directory structure...
+                bool src_exists = fs::is_directory(src);
+                bool inc_exists = fs::is_directory(inc);
+                bool pri_exists = fs::is_directory(pri);
+                
+                valid_tree = src_exists && inc_exists && pri_exists;
+        }
+
+        //-- Main control branch --//
+        
+        bool add_module = false;
+        bool need_spawn = false;
+
+        if(!duplicates) {
+                if(dir_exists && valid_tree) {
+                        // Add module 
+                        add_module = true;
+                } else if(args.create) {
+                        // Spawn directory 
+                        need_spawn = true;
+                        // Add module
+                        add_module = true;
+                }
+        }
+
+        //-- Main actions --//
+
+        if(add_module) {
+                // Add module to project 
+                if(project.targets.count(args.TARGET)) {
+                        project.targets[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
+                } else {
+                        client::err(Err::TargetNotFound, args.TARGET);
+                }
+        }
+
+        if(need_spawn) {
+                fs::create_directories(src);
+                fs::create_directories(inc);
+                fs::create_directories(pri);
         }
 
         // TODO:
-        // 1. Check for duplicates before adding,
-        // 2. Check if directory exists in the filesystem (done at the CLI11 level if flag isnt passed),
-        // 3. If --create flag is passed, create directory structure,
+        // ~1. Check for duplicates before adding,
+        // ~2. Check if directory exists in the filesystem (done at the CLI11 level if flag isnt passed),
+        // ~3. If --create flag is passed, create directory structure,
         // 4. Have a means to save the project (Project::save() or something).
 }
 
