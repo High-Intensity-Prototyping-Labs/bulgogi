@@ -49,6 +49,27 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
         return project;
 }
 
+// Returns whether a project contains a module as a dependency
+bool Project::contains_module(string &m) {
+        bool result = false;
+
+        for(auto it = this->targets.begin(); it != this->targets.end(); it++) {
+                auto dep_list = it->second;
+                for(auto it2 = dep_list.begin(); it2 != dep_list.end(); it2++) {
+                        auto dep = *it2;
+                        if(m == dep.name) {
+                                result = true;
+                                break;
+                        }
+                }
+                if(result) {
+                        break;
+                }
+        }
+
+        return result;
+}
+
 Dependency Dependency::make(Dependency::Kind kind, string name) {
         return (struct Dependency) {
                 .type = kind,
