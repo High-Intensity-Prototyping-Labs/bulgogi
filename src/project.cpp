@@ -88,3 +88,7 @@ std::ostream& project::operator<<(std::ostream& out, Project& project) {
 
         return out;
 }
+
+bool project::operator==(const Dependency& a, Dependency& b) {
+        return a.type == b.type && a.name == b.name;
+}
