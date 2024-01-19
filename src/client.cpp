@@ -154,6 +154,9 @@ void client::test() {
         // Load project 
         auto project = Project::load();
 
-        // Convert to string 
-        std::cout << "My converted project: " << project.to<string>() << std::endl;
+        // Remove default target
+        project.targets.erase("default");
+
+        // Save project 
+        project.save();
 }
