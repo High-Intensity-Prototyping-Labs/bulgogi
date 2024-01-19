@@ -61,6 +61,10 @@ void client::err(Err e, std::optional<string> info) {
         case Err::DuplicateModule:
                  std::cout << "Module already attached to target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
                  break;
+        case Err::ModuleDirMissing:
+                 std::cout << "Module directory for " << info.value_or(VALUE_UNKNOWN) << " not found.";
+                 std::cout << "Perhaps you meant to pass the --create flag?" << std::endl;
+                 break;
         }
 }
 
@@ -95,6 +99,9 @@ void client::add_module(Args& args) {
                 bool pri_exists = fs::is_directory(pri);
                 
                 valid_tree = src_exists && inc_exists && pri_exists;
+        } else if(!args.create) {
+        /* dir_exists == false && create == false */
+                client::err(Err::ModuleDirMissing, args.MODULE);
         }
 
         //-- Main control branch --//

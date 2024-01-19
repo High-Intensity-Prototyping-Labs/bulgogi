@@ -34,6 +34,7 @@ namespace client {
                 TargetNotFound,
                 DuplicateModule,
                 OpenProjectYamlErr,
+                ModuleDirMissing,
         };
 
         // Configures the CLI11 app for CLI args.
