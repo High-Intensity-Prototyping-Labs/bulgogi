@@ -83,6 +83,12 @@ void client::add_module(Args& args) {
         // DEBUG:
         std::cout << "Final Project State:" << std::endl;
         std::cout << project << std::endl;
+
+        // TODO:
+        // 1. Check for duplicates before adding,
+        // 2. Check if directory exists in the filesystem (done at the CLI11 level if flag isnt passed),
+        // 3. If --create flag is passed, create directory structure,
+        // 4. Have a means to save the project (Project::save() or something).
 }
 
 void client::rm_module(Args& args) {
