@@ -1,0 +1,1 @@
+- Using --create flag to create a module does not add it to the list of modules in the project.yaml
