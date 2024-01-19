@@ -56,7 +56,7 @@ Dependency Dependency::make(Dependency::Kind kind, string name) {
         };
 }
 
-std::ostream& operator<<(std::ostream& out, Dependency& dep) {
+std::ostream& project::operator<<(std::ostream& out, Dependency& dep) {
         out << "(";
         if(dep.type == Dependency::Target) {
                 out << "Dependency::Target";
