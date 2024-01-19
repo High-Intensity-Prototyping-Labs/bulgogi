@@ -25,6 +25,8 @@ using std::vector;
 using std::unordered_map;
 
 namespace project {
+        using TargetID = std::string;
+
         struct Dependency {
                 enum Kind { Target, Module } type;
                 string name;
@@ -33,8 +35,15 @@ namespace project {
         };
         std::ostream& operator<<(std::ostream& out, Dependency& dep);
 
+        struct Target {
+                enum Kind { Library, Executable } type;
+
+                static Target make(Target::Kind);
+        };
+
         struct Project {
-                unordered_map<string, vector<Dependency>> targets;
+                unordered_map<TargetID, Target> targets;
+                unordered_map<TargetID, vector<Dependency>> deps;
 
                 static Project make(void);
                 static Project load(void);

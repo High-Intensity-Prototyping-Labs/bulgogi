@@ -61,7 +61,7 @@ void client::add_module(Args& args) {
 
         // Add module to project 
         if(project.targets.count(args.TARGET)) {
-                project.targets[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
+                project.deps[args.TARGET].push_back(Dependency::make(Dependency::Module, args.MODULE));
         } else {
                 client::err(Err::TargetNotFound, args.TARGET);
         }
