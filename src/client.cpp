@@ -8,6 +8,7 @@
 // Standard C++ Libraries
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <vector>
 #include <fstream>
 #include <utility>
@@ -47,9 +48,7 @@ void client::cli(CLI::App& app, Args& args) {
         auto module = app.add_subcommand("module", "Manage project modules")
                 ->require_subcommand();
 
-        auto tree = app.add_subcommand("tree", "Displays a tree of the project")
-                ->require_subcommand();
-        (void)tree;
+        auto tree = app.add_subcommand("tree", "Displays a tree of the project");
 
         auto clean = app.add_subcommand("clean", "Cleans the project")
                 ->require_subcommand();
@@ -78,6 +77,9 @@ void client::cli(CLI::App& app, Args& args) {
         module_rm->add_flag<bool>("--cached", args.cached, "Only remove the module's listing the project yaml")->default_val(false);
         module_rm->callback([&]() { rm_module(args); });
 
+        // Tree subcommand config
+        tree->callback([]() { client::tree(); });
+
         // Test command config
         test->callback([&]() { client::test(); });
 }
@@ -103,6 +105,9 @@ void client::err(Err e, std::optional<string> info) {
                 break;
         case Err::ProjectAlreadyInit:
                 std::cout << "Project already initialized." << std::endl;
+                break;
+        case Err::TreeCmdFailed:
+                std::cout << "Failed to run `tree` command using popen()" << std::endl;
                 break;
         }
 }
@@ -242,6 +247,25 @@ void client::rm_module(Args& args) {
                         client::err(Err::SaveProjectErr, std::nullopt);
                 }
         }
+}
+
+void client::tree() {
+        const int buf_len = 256;
+        string cmd = "tree";
+        const char* mode = "r";
+        string result;
+
+        std::array<char, buf_len> buffer;
+
+        FILE *pipe = popen(cmd, mode);
+        if(pipe) {
+                auto bytes = fread(buffer.data(), 1, buf_len, pipe);
+                result.append(buffer.data(), bytes);
+        } else {
+                client::err(Err::TreeCmdFailed, std::nullopt);
+        }
+
+        std::cout << result << std::endl;
 }
 
 void client::test() {

@@ -29,6 +29,7 @@ namespace client {
                 ModuleDirMissing,
                 SaveProjectErr,
                 ProjectAlreadyInit,
+                TreeCmdFailed,
         };
 
         // Configures the CLI11 app for CLI args.
@@ -39,5 +40,6 @@ namespace client {
         void init(void);
         void add_module(Args& args);
         void rm_module(Args& args);
+        void tree(void);
         void test(void);
 }
