@@ -35,6 +35,7 @@ namespace project {
 
                 static Project make(void);
                 static Project from(std::unordered_map<std::string, std::vector<std::string>>);
+                Project copy(void);
 
                 template<class T>
                 T to(void);

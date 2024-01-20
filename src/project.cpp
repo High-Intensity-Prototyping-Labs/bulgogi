@@ -101,6 +101,13 @@ Project Project::from(unordered_map<string, vector<string>> targets) {
         return project;
 }
 
+// Return identical copy of Project 
+Project Project::copy() {
+        return Project {
+                .targets = unordered_map<string, vector<Dependency>>(this->targets),
+        };
+}
+
 template<>
 unordered_map<string, vector<string>> Project::to() {
         auto map = unordered_map<string, vector<string>>();
