@@ -311,10 +311,5 @@ void client::tree() {
 void client::test() {
         // Load project 
         auto project = Project::load();
-
-        // Remove default target
-        project.targets.erase("default");
-
-        // Save project 
-        project.save();
+        std::cout << project << std::endl;
 }
