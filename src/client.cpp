@@ -37,6 +37,8 @@ void client::cli(CLI::App& app, Args& args) {
         });
 
         // Subcommands
+        auto init = app.add_subcommand("init", "Initializes the project in the current working directory");
+
         auto module = app.add_subcommand("module", "Manage project modules")
                 ->require_subcommand();
 
@@ -49,6 +51,9 @@ void client::cli(CLI::App& app, Args& args) {
         (void)clean;
 
         auto test = app.add_subcommand("test", "Runs a test feature");
+
+        // Init subcommand 
+        init->callback([]() { client::init(); });
 
         // Module subcommands
         auto module_add = module->add_subcommand("add", "Adds a module to the project");
