@@ -16,8 +16,9 @@ namespace client {
         struct Args {
                 std::string  MODULE;
                 std::string  TARGET;
-                bool    create;
                 bool    all;
+                bool    create;
+                bool    cached;
         };
 
         // Client errors 

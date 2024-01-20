@@ -6,9 +6,14 @@
 #include "client.hpp"
 
 // Standard C++ Libraries
+#include <algorithm>
+#include <cstdio>
+#include <vector>
 #include <fstream>
+#include <utility>
 #include <optional>
 #include <filesystem>
+#include <unordered_map>
 
 // Project Headers
 #include "project.hpp"
@@ -69,6 +74,7 @@ void client::cli(CLI::App& app, Args& args) {
         module_rm->add_option<string>("MODULE", args.MODULE, "Name of the module to remove")->required(true);
         module_rm->add_option<string>("TARGET", args.TARGET, "Target attached to the module")->default_val("default");
         module_rm->add_flag<bool>("--all", args.all, "Remove all module attachments to targets")->default_val(false);
+        module_rm->add_flag<bool>("--cached", args.cached, "Only remove the module's listing the project yaml")->default_val(false);
         module_rm->callback([&]() { rm_module(args); });
 
         // Test command config
@@ -189,15 +195,51 @@ void client::add_module(Args& args) {
 }
 
 void client::rm_module(Args& args) {
-        std::cout << "Removing a module..." << std::endl;
+        // Load project 
+        auto project = Project::load();
+
+        // Closure to detect matching dependency against module name
+        auto matching_dep = [&](Dependency& d) {
+                return d.name == args.MODULE;
+        };
+
+        // Remove all instances in the project.yaml
+        int erased = 0;
         if(args.all) {
-                std::cout << "Removing ALL modules found" << std::endl;
+                for(auto& [target, dep_list]: project.targets) {
+                        erased = std::erase_if(dep_list, matching_dep);
+                }
+        /* args.all == false */
+        } else if(project.targets.contains(args.TARGET)) {
+                auto& dep_list = project.targets[args.TARGET];
+                erased = std::erase_if(dep_list, matching_dep);
+        /* args.all == false && project.targets.contains(args.TARGET) == false */
         } else {
-                std::cout << "Just removing module (" << args.MODULE << ") attached to target (" << args.TARGET << std::endl;
+                client::err(Err::TargetNotFound, args.TARGET);
         }
 
-        std::cout << "Module to remove: " << args.MODULE << std::endl;
-        std::cout << "Target attached: " << args.TARGET << std::endl;
+        // See if any targets still depend on the module
+        bool any_depends = false;
+        for(auto& [target, dep_list]: project.targets) {
+                if(std::any_of(dep_list.begin(), dep_list.end(), matching_dep)) {
+                        any_depends = true;
+                }
+        }
+
+        // Save project if a module was removed
+        if(erased) {
+                // Filesystem removal logic 
+                if(!any_depends && !args.cached) {
+                        // Remove from the filesystem
+                        fs::remove_all(fs::path(args.MODULE));
+                /* any_depends == true || args.cached == true */
+                } 
+
+                auto err = project.save();
+                if(err != project::Err::None) {
+                        client::err(Err::SaveProjectErr, std::nullopt);
+                }
+        }
 }
 
 void client::test() {
