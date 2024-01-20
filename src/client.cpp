@@ -5,14 +5,18 @@
 
 #include "client.hpp"
 
+// Standard C Libraries 
+#include <sys/wait.h>
+#include <unistd.h>
+
 // Standard C++ Libraries
-#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <fstream>
 #include <utility>
 #include <optional>
+#include <algorithm>
 #include <filesystem>
 #include <unordered_map>
 
@@ -263,6 +267,9 @@ void client::rm_module(Args& args) {
 }
 
 void client::tree() {
+        const char* shell = "tree";
+        vector<string> args;
+
         auto ignore = domfarolino::buildIgnoreVector();
 
         // Load project 
@@ -273,14 +280,24 @@ void client::tree() {
         for(auto& [target, dep_list]: project.targets) {
                 for(auto& dep: dep_list) {
                         if(!std::any_of(printed.begin(), printed.end(), [&](string& s) { return dep.name == s; })) {
-                                std::cout << dep.name << std::endl;
-                                domfarolino::printDirectoryStructure(dep.name, "│", ignore);
-                                std::cout << std::endl;
-
+                                args.push_back(dep.name);
                                 printed.push_back(dep.name);
                         }
                 }
         }
+
+        // Final shebang
+        vector<char*> argv;
+        for(size_t x = 0; x < args.size(); x++) {
+                argv.push_back((char*)args[x].c_str());
+        }
+        argv.push_back(NULL);
+        
+        std::cout << argv.data() << std::endl;
+
+        int pid = execv(shell,  argv.data());
+
+        waitpid(pid, NULL, WEXITED);
 }
 
 void client::test() {
