@@ -5,6 +5,15 @@
 
 #include "project.hpp"
 
+// Standard C++ Libraries
+#include <tuple>
+#include <variant>
+#include <iostream>
+#include <algorithm>
+
+// External Dependencies 
+#include "yaml-cpp/yaml.h"
+
 using project::Err;
 using project::Project;
 using project::Dependency;

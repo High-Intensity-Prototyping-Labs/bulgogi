@@ -4,10 +4,18 @@
  */
 
 #include "client.hpp"
+
+// Standard C++ Libraries
+#include <fstream>
+#include <optional>
 #include <filesystem>
+
+// Project Headers
+#include "project.hpp"
 
 // Using Declarations
 using std::string;
+using std::ofstream;
 
 using project::Project;
 using project::Dependency;
@@ -82,6 +90,11 @@ void client::err(Err e, std::optional<string> info) {
                 std::cout << "Failed to save " << PROJECT_YAML << ". IO Error." << std::endl;
                 break;
         }
+}
+
+void client::init() {
+        // Create project.yaml file. If exists, do nothing.
+        auto f = ofstream(PROJECT_YAML, ofstream::out);
 }
 
 void client::add_module(Args& args) {

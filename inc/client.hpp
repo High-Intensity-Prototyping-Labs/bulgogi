@@ -7,12 +7,9 @@
 
 // Project headers
 #include "CLI11.hpp"
-#include "project.hpp"
 
 // Standard C++ Libraries
 #include <string>
-#include <optional>
-#include <filesystem>
 
 namespace client {
         // Placeholder for the CLI11 args 
@@ -37,6 +34,7 @@ namespace client {
         void err(Err e, std::optional<std::string> info);
 
         // Commands
+        void init(void);
         void add_module(Args& args);
         void rm_module(Args& args);
         void test(void);
