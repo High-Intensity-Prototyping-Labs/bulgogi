@@ -252,7 +252,7 @@ void client::rm_module(Args& args) {
 
 void client::tree() {
         auto ignore = domfarolino::buildIgnoreVector();
-        domfarolino::printDirectoryStructure(string("."), "|", ignore);
+        domfarolino::printDirectoryStructure(string("."), "│", ignore);
 }
 
 void client::test() {
