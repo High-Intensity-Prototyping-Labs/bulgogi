@@ -22,6 +22,7 @@
 
 // Using Declarations
 using std::string;
+using std::vector;
 using std::ofstream;
 
 using project::Project;
@@ -252,7 +253,20 @@ void client::rm_module(Args& args) {
 
 void client::tree() {
         auto ignore = domfarolino::buildIgnoreVector();
-        domfarolino::printDirectoryStructure(string("."), "|", ignore);
+
+        // Load project 
+        auto project = Project::load();
+
+        // Run this function for every module.
+        vector<string> printed;
+        for(auto& [target, dep_list]: project.targets) {
+                for(auto& dep: dep_list) {
+                        if(!std::any_of(printed.begin(), printed.end(), [&](string& s) { return dep.name == s; })) {
+                                domfarolino::printDirectoryStructure(dep.name, "|", ignore);
+                                printed.push_back(dep.name);
+                        }
+                }
+        }
 }
 
 void client::test() {
