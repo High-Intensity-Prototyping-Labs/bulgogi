@@ -1,0 +1,17 @@
+default:
+  - module1*
+  - module2
+target1:
+  - module3
+  - module4
+  - module32
+target2:
+  - module3
+  - module5*
+  - target1
+
+When the project is configured like this (and there is a module32 directory in the project root), running
+```bul module rm module32 --all```
+does **not** delete the module32 attachment from the target1 NOR does it remove it from the filesystem.
+
+It seems like the associated remove-all-deps/remove-from-filesystem relationship was respected, but something obviously went wrong.
