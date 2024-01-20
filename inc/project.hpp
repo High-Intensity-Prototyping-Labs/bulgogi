@@ -19,6 +19,7 @@ namespace project {
         struct Dependency {
                 enum Kind { Target, Module } type;
                 std::string name;
+                bool exe;
 
                 static Dependency from(Dependency::Kind kind, std::string name);
         };

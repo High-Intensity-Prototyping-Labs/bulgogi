@@ -161,7 +161,8 @@ bool Project::contains_module(string& m, string& t) {
 Dependency Dependency::from(Dependency::Kind kind, string name) {
         return Dependency {
                 .type = kind,
-                .name = name,
+                .name = string(name).erase('*'),
+                .exe = std::ranges::count(name, '*') > 0,
         };
 }
 
