@@ -76,7 +76,7 @@ void client::err(Err e, std::optional<string> info) {
                 break;
         case Err::ModuleDirMissing:
                 std::cout << "Module directory for " << info.value_or(VALUE_UNKNOWN) 
-                        << " not found. Perhaps you meant to pass the --create flag?" << std::endl;
+                        << " not found or incorrect. Perhaps you meant to pass the --create flag?" << std::endl;
                 break;
         }
 }
