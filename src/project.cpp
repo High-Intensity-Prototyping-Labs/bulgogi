@@ -11,6 +11,7 @@
 #include <variant>
 #include <iostream>
 #include <algorithm>
+#include <filesystem>
 
 // External Dependencies 
 #include "yaml-cpp/yaml.h"
@@ -26,6 +27,8 @@ using std::vector;
 using std::ofstream;
 using std::unordered_map;
 
+namespace fs = std::filesystem;
+
 Project Project::make() {
         return Project {
                 .targets = unordered_map<string, vector<Dependency>>(),
@@ -33,9 +36,15 @@ Project Project::make() {
 }
 
 Project Project::load() {
-        // Load project.yaml
-        YAML::Node project = YAML::LoadFile(PROJECT_YAML);
-        auto map = project.as<unordered_map<string, vector<string>>>();
+        auto map = unordered_map<string, vector<string>>();
+
+        // Test if file is empty 
+        if(!fs::is_empty(PROJECT_YAML)) {
+                // Load project.yaml
+                YAML::Node project = YAML::LoadFile(PROJECT_YAML);
+                map = project.as<unordered_map<string, vector<string>>>();
+        }
+
         return Project::from(map);
 }
 
