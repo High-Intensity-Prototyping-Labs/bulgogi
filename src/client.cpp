@@ -259,6 +259,13 @@ void client::rm_module(Args& args) {
                 /* any_depends == true || args.cached == true */
                 } 
 
+                // Remove any empty targets
+                for(auto& [target, dep_list]: project.targets) {
+                        if(dep_list.empty()) {
+                                project.targets.erase(target);
+                        }
+                }
+
                 auto err = project.save();
                 if(err != project::Err::None) {
                         client::err(Err::SaveProjectErr, std::nullopt);
