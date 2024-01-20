@@ -1,1 +1,2 @@
 - The executable marker (*) lingers in the internal representation of the modules.
+- Empty targets are allowed to float around when their last module is removed.
