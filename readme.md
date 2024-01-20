@@ -22,10 +22,10 @@ Currently supported subcommands are:
 ```bul module rm <MODULE> [TARGET]```
 
 
-Planned subcommands:
-
-
 ```bul module remove <MODULE> [TARGET]```
+
+
+Planned subcommands:
 
 
 ```bul tree```
