@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-InDev v0.7.1
+InDev v0.7.2
 
 ## Overview
 Bulgogi is a C/C++ build-system orchestrator for CubeSats.
@@ -15,9 +15,11 @@ Currently supported subcommands are:
 
 ```module add <MODULE> [TARGET]```
 
-Planned subcommands:
 
 ```bul init```
+
+
+Planned subcommands:
 
 
 ```bul module rm <MODULE> [TARGET]```
