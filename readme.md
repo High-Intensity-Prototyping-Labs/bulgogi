@@ -11,16 +11,27 @@ See [synopsis.txt](./synopsis.txt)
 
 ## Progress
 Currently supported subcommands are:
+
+
 ```module add <MODULE> [TARGET]```
 
 Planned subcommands:
+
 ```bul init```
 
+
 ```bul module rm <MODULE> [TARGET]```
+
+
 ```bul module remove <MODULE> [TARGET]```
 
+
 ```bul tree```
+
+
 ```bul build```
+
+
 ```bul clean```
 
 ## Usage
