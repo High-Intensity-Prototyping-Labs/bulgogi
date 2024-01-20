@@ -207,7 +207,7 @@ void client::rm_module(Args& args) {
         int erased = 0;
         if(args.all) {
                 for(auto& [target, dep_list]: project.targets) {
-                        erased = std::erase_if(dep_list, matching_dep);
+                        erased += std::erase_if(dep_list, matching_dep);
                 }
         /* args.all == false */
         } else if(project.targets.contains(args.TARGET)) {
