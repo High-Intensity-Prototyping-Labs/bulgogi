@@ -22,6 +22,7 @@ namespace project {
                 bool exe;
 
                 static Dependency from(Dependency::Kind kind, std::string& name);
+                static Dependency from(Dependency::Kind kind, std::string& name, bool exe);
         };
         std::ostream& operator<<(std::ostream& out, Dependency& dep);
         bool operator==(const Dependency& a, Dependency& b);

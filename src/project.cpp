@@ -173,10 +173,12 @@ Dependency Dependency::from(Dependency::Kind kind, string& name) {
                 };
         }
 }
+
+Dependency Dependency::from(Dependency::Kind kind, string& name, bool exe) {
         return Dependency {
                 .type = kind,
                 .name = string(name).erase('*'),
-                .exe = std::ranges::count(name, '*') > 0,
+                .exe = exe,
         };
 }
 
