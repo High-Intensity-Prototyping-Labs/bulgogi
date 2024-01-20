@@ -154,12 +154,6 @@ void client::add_module(Args& args) {
                 fs::create_directories(inc);
                 fs::create_directories(pri);
         }
-
-        // TODO:
-        // ~1. Check for duplicates before adding,
-        // ~2. Check if directory exists in the filesystem (done at the CLI11 level if flag isnt passed),
-        // ~3. If --create flag is passed, create directory structure,
-        // 4. Have a means to save the project (Project::save() or something).
 }
 
 void client::rm_module(Args& args) {
