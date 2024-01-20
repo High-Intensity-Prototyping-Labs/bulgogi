@@ -158,7 +158,7 @@ bool Project::contains_module(string& m, string& t) {
         return res;
 }
 
-Dependency Dependency::from(Dependency::Kind kind, string name) {
+Dependency Dependency::from(Dependency::Kind kind, string& name) {
         if(kind == Dependency::Module) {
                 return Dependency {
                         .type = kind,
