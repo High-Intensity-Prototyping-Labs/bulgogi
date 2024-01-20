@@ -273,8 +273,10 @@ void client::tree() {
         for(auto& [target, dep_list]: project.targets) {
                 for(auto& dep: dep_list) {
                         if(!std::any_of(printed.begin(), printed.end(), [&](string& s) { return dep.name == s; })) {
-                                domfarolino::printDirectoryStructure(dep.name, "|", ignore);
+                                std::cout << dep.name << std::endl;
                                 domfarolino::printDirectoryStructure(dep.name, "│", ignore);
+                                std::cout << std::endl;
+
                                 printed.push_back(dep.name);
                         }
                 }
