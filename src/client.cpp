@@ -161,6 +161,7 @@ void client::add_module(Args& args) {
         
         bool add_module = false;
         bool need_spawn = false;
+        bool proj_chged = false;
 
         if(!duplicates) {
                 if(dir_exists && valid_tree) {
@@ -186,10 +187,13 @@ void client::add_module(Args& args) {
                 // Add module to project 
                 if(project.targets.count(args.TARGET)) {
                         project.targets[args.TARGET].push_back(Dependency::from(Dependency::Module, args.MODULE));
-                        auto err = project.save();
-                        if(err != project::Err::None) {
-                                client::err(Err::SaveProjectErr, std::nullopt);
-                        }
+                        proj_chged = true;
+                } else if(args.create) {
+                        // Auto-create target and add module to the project
+                        project.targets.insert({args.TARGET, vector<Dependency>{
+                                Dependency::from(Dependency::Module, args.MODULE),
+                        }});
+                        proj_chged = true;
                 } else {
                         client::err(Err::TargetNotFound, args.TARGET);
                 }
@@ -199,6 +203,13 @@ void client::add_module(Args& args) {
                 fs::create_directories(src);
                 fs::create_directories(inc);
                 fs::create_directories(pri);
+        }
+
+        if(proj_chged) {
+                auto err = project.save();
+                if(err != project::Err::None) {
+                        client::err(Err::SaveProjectErr, std::nullopt);
+                }
         }
 }
 
