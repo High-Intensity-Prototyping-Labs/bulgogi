@@ -274,6 +274,7 @@ void client::tree() {
                 for(auto& dep: dep_list) {
                         if(!std::any_of(printed.begin(), printed.end(), [&](string& s) { return dep.name == s; })) {
                                 domfarolino::printDirectoryStructure(dep.name, "|", ignore);
+                                domfarolino::printDirectoryStructure(dep.name, "│", ignore);
                                 printed.push_back(dep.name);
                         }
                 }
