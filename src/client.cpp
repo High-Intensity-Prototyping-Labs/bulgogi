@@ -78,6 +78,9 @@ void client::err(Err e, std::optional<string> info) {
                 std::cout << "Module directory for " << info.value_or(VALUE_UNKNOWN) 
                         << " not found or incorrect. Perhaps you meant to pass the --create flag?" << std::endl;
                 break;
+        case Err::SaveProjectErr:
+                std::cout << "Failed to save " << PROJECT_YAML << ". IO Error." << std::endl;
+                break;
         }
 }
 
@@ -143,7 +146,10 @@ void client::add_module(Args& args) {
                 // Add module to project 
                 if(project.targets.count(args.TARGET)) {
                         project.targets[args.TARGET].push_back(Dependency::from(Dependency::Module, args.MODULE));
-                        project.save();
+                        auto err = project.save();
+                        if(err != project::Err::None) {
+                                client::err(Err::SaveProjectErr, std::nullopt);
+                        }
                 } else {
                         client::err(Err::TargetNotFound, args.TARGET);
                 }

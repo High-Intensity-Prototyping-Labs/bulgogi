@@ -31,6 +31,11 @@ namespace project {
         std::ostream& operator<<(std::ostream& out, Dependency& dep);
         bool operator==(const Dependency& a, Dependency& b);
 
+        enum class Err {
+                None,
+                IOError,
+        };
+
         struct Project {
                 std::unordered_map<std::string, std::vector<Dependency>> targets;
 
@@ -44,7 +49,7 @@ namespace project {
                 std::unordered_map<std::string, std::vector<std::string>> to();
 
                 static Project load(void);
-                void save(void);
+                Err save(void);
 
                 bool contains_module(std::string& m);
                 bool contains_module(std::string& m, std::string& t);

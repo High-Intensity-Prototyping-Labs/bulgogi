@@ -5,6 +5,7 @@
 
 #include "project.hpp"
 
+using project::Err;
 using project::Project;
 using project::Dependency;
 
@@ -28,7 +29,7 @@ Project Project::load() {
         return Project::from(map);
 }
 
-void Project::save() {
+Err Project::save() {
         // Save project.yaml, proper override 
         YAML::Emitter yaml;
         auto f = ofstream(PROJECT_YAML, ios::out | ios::trunc);
@@ -46,13 +47,11 @@ void Project::save() {
                 yaml << YAML::EndMap;
 
                 f << yaml.c_str();
+
+                return Err::None;
+        } else {
+                return Err::IOError;
         }
-        // Handle failed to open error
-        
-        // TODO:
-        // ~1. Complete some kind of to_map() function for the Project.
-        // 2. Finish the Project::save() method by writing the map to the emitter.
-        //      Then, write the emitter to c_str to the ofstream.
 }
 
 // Convert project.yaml map into project struct
