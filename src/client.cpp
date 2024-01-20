@@ -89,12 +89,20 @@ void client::err(Err e, std::optional<string> info) {
         case Err::SaveProjectErr:
                 std::cout << "Failed to save " << PROJECT_YAML << ". IO Error." << std::endl;
                 break;
+        case Err::ProjectAlreadyInit:
+                std::cout << "Project already initialized." << std::endl;
+                break;
         }
 }
 
 void client::init() {
         // Create project.yaml file. If exists, do nothing.
-        auto f = ofstream(PROJECT_YAML, ofstream::out);
+        auto path = fs::path(PROJECT_YAML);
+        if(!fs::exists(path)) {
+                auto f = ofstream(path, ofstream::out);
+        } else {
+                client::err(Err::ProjectAlreadyInit, std::nullopt);
+        }
 }
 
 void client::add_module(Args& args) {

@@ -27,6 +27,7 @@ namespace client {
                 OpenProjectYamlErr,
                 ModuleDirMissing,
                 SaveProjectErr,
+                ProjectAlreadyInit,
         };
 
         // Configures the CLI11 app for CLI args.
