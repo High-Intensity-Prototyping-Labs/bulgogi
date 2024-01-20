@@ -251,7 +251,7 @@ void client::rm_module(Args& args) {
 
 void client::tree() {
         const int buf_len = 256;
-        string cmd = "tree";
+        const char* cmd = "tree";
         const char* mode = "r";
         string result;
 
