@@ -260,7 +260,8 @@ void client::rm_module(Args& args) {
                 } 
 
                 // Remove any empty targets
-                for(auto& [target, dep_list]: project.targets) {
+                auto ref_project = project.copy();
+                for(auto& [target, dep_list]: ref_project.targets) {
                         if(dep_list.empty()) {
                                 project.targets.erase(target);
                         }
