@@ -1,3 +1,2 @@
 - The executable marker (*) lingers in the internal representation of the modules.
-- The YAML parser loses its mind when run with an empty project.yaml file. This is typical of new projects.
 - Missing targets (particularly the default one) do not auto-add when creating a module for them.
