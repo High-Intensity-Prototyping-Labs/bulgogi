@@ -267,15 +267,11 @@ void client::rm_module(Args& args) {
 }
 
 void client::tree() {
-        const char* shell = "tree";
-        vector<string> args;
-
-        auto ignore = domfarolino::buildIgnoreVector();
-
         // Load project 
         auto project = Project::load();
 
         // Run this function for every module.
+        vector<string> args;
         vector<string> printed;
         for(auto& [target, dep_list]: project.targets) {
                 for(auto& dep: dep_list) {
@@ -287,17 +283,21 @@ void client::tree() {
         }
 
         // Final shebang
-        vector<char*> argv;
+        string argv = "tree";
+        std::array<char, 32> buffer;
+
         for(size_t x = 0; x < args.size(); x++) {
-                argv.push_back((char*)args[x].c_str());
+                argv += " " + args[x];
         }
-        argv.push_back(NULL);
-        
-        std::cout << argv.data() << std::endl;
-
-        int pid = execv(shell,  argv.data());
-
-        waitpid(pid, NULL, WEXITED);
+        FILE *fp = popen(argv.c_str(), "r");
+        if(fp) {
+                while(fgets(buffer.data(), buffer.size(), fp) != NULL) {
+                        std::cout << buffer.data();
+                }
+                std::cout << std::endl;
+        } else {
+                client::err(Err::TreeCmdFailed, std::nullopt);
+        }
 }
 
 void client::test() {
