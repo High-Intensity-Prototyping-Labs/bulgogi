@@ -5,5 +5,8 @@ a.out
 # Added by cargo
 
 /target
+
 bul
-lib
+bulgogi
+lib/libyaml-cpp.a
+lib/libyaml-cpp.a

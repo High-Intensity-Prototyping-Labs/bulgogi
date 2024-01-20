@@ -1,10 +1,20 @@
 # Bulgogi Synopsis
-# InDev v1.0.0
+# InDev v0.7.1
 
 # NOTE: Largely inspired by git cli.
 
-# Initializes a new bulgogi project
-bulgogi init .
+# Why C++?
+As far as bulgogi is concerned, what the project needs is a community; an ability to grow in features and be maintainable by many other people. Even if Rust is faster to implement features in (it’s not) and more maintainable (probably is), having access to 1/20th of the developer pool at best and 1/100th of the developer-years of experience available significantly shrinks the pool of interested and capable contributors to the core codebase.
+
+# Why CEX?
+Because given enough time and developers, the gargantuan set of C++ features leads to mind-splintering code. Restricting that to "basically C" is the only sane approach.
+
+# Initializes a new bulgogi project in the current dir
+bulgogi init
+
+# Empty projects do not contain anything.
+
+# Alias: Bulgogi CLI tool should be aliased to `bul`.
 
 # Adds a module to the bulgogi project
 bulgogi module add module1
@@ -62,7 +72,7 @@ bulgogi add source5.c module2 # Adds source to specific module
 
 # project.yaml
 default:		# Target 
-	module1		# Dependency 1
+	module1*	# Dependency 1 (contains main)
 	module2		# Dependency 2
 
 target1:		# Target
@@ -71,7 +81,8 @@ target1:		# Target
 
 target2:		# Target
 	module3		# Dependency 1
-	target1		# Dependency 2 (implies target1 is a lib)
+	module5*	# Dependency 2 (contains main)
+	target1		# Dependency 3 (implies target1 is a lib/shared lib)
 
 **NOTE: A dependency can be a target OR a module. Targets used as dependencies imply lib.
 
@@ -89,6 +100,171 @@ project/
 				|- private2.h 
 
 /* Repeat the same for module 2 */
+
+# CMake Targets
+default:	# default.out			# What the user wants
+	module1*	# default.out		# What bulgogi tells CMake
+	module2		# libmodule2.a		# || || || || || || || ||
+
+target1:	# libtarget1.a
+	module3		# libmodule3.a
+	module4		# libmodule4.a
+
+target2:	# target2.out
+	module3		# libmodule3.a
+	module5*	# target2.out
+	target1		# libtarget1.a (implies library)
+
+# Exceptions
+default:	# default.out
+	target1*	# Shared object?
+	module2
+
+target1:	# target1.out
+	module1*	# target1.out
+
+# Bottom line: targets marked as executable dependencies are treated as
+# normal target-libraries
+
+# HashMaps
+targets:
+        default: 
+                kind: Executable 
+        target1:
+                kind: Library 
+        target2:
+                kind: Executable 
+
+modules:
+        module1:
+                kind: Executable
+        module2:
+                kind: Normal
+        module3:
+                kind: Normal 
+        module4:
+                kind: Normal
+        module5:
+                kind: Executable
+
+deps:
+        default:
+                Module(module1)
+                Module(module2)
+        target1:
+                Module(module3)
+                Module(module4)
+        target2:
+                Module(module3)
+                Module(module5)
+                Target(target1)
+
+/** Long-form droney bits **/
+
+# Gotta give up on proxy libraries 
+# --------------------------------
+# After many flip flops, I have realized that it will not be practical
+# to use proxy submodules for Bulgogi/CMake libraries.
+#
+# The main reason for this being that, unlike executable proxies (which are
+# required), proxy libraries are not indicated in the project config.
+#
+# Although it would not be impossible to implement a 'dibs' system on such 
+# proxy lib submodules, this can allow for situations in which 2 'twin' target
+# libraries are defined with the same module-dependencies. The orchestrator would
+# need to account for these situations, which would be annoying and require more 
+# back and forth with the user.
+#
+# The simplest solution here is to compile modules as standalone libraries and then 
+# add each of the target-libraries to the CMake build as meta-libraries which simply 
+# link globs of libmodules together.
+#
+# Executables then proxy themselves based on the (*) indicator. Library targets are 
+# declared in the highest-level CMakelist.txt after all of the submodules are included.
+
+# The HashMap Update: 0.5.0
+# -------------------------
+# This time we've realized that HashMaps are our friends. 
+#
+# The Project struct will now be a hasmap which can be crawled like a graph.
+#
+# Every target has a target ID, which is in fact its name. The key will be a String.
+#
+# Targets have lists of Dependencies, of which some may be modules (with module IDs) and others 
+# may be targets (with Target IDs corresponding to an existing target in the HashMap).
+#
+# This way, without fighting the underlying data structures, the desired representation and functionality 
+# may be implemented. This will also greatly ease conversion from the bulgogi Project to a CMakeProject.
+#
+# Dependencies must also be defined. The must, at the very least, define a source directory or another 
+# target.
+
+# I just remembered: executables are special 
+# ------------------------------------------
+# The whole need for "proxy" modules for targets stems from the special need for executable targets 
+# to have the main() sources added directly to them.
+#
+# If a mechanism exists for executables to be created this way in the CMake translation, why wouldn't 
+# libraries do this as well? Now I remember the line of thinking I was going on and why it's been so 
+# damn hard to break from it.
+#
+# Still, for now, I think it would be best to let executables think they're special (and so treat them
+# that way) and then continue with the direct interpretation for the libraries and the rest.
+#
+# So in other words: executables have proxy modules (which is what the * helps with anyway) and everything
+# else is a library.
+
+# New way of thinking: Bulgogi is a CMake orchestrator
+# ----------------------------------------------------
+# Rather than try and be clever by designating some module directories to be 'proxy' libraries 
+# and executables, passing modules directly as libraries to CMake (even in cases when the library
+# target and the module are indistinguishable) and leaving it to be CMake's problem (or the user's 
+# desire), a level of simplicity and fine-grained control is simultaneously unlocked.
+#
+# I am seeing this as a bit of an A/B test, especially considering that I have flip-flopped between
+# wanting to have proxy target modules and not. 
+#
+# On the positive end, proxy modules are a more natural/stylistic interpretation of the desired project
+# layout. If a human were adapting the bulgogi project.yaml file into a CMake project, it would be 
+# surprising to me if they would choose to create a library which only links to another lone library.
+#
+# On the flipside, if the bulgogi configuration _implies_ that a lone module is part of a lone library,
+# why not accept this as the user's wish? This would be a much more direct interpretation of the desired
+# project layout. This could be a very easy to produce a library file which I can send to my buddy just 
+# on the side. 
+
+# All modules are treated as libraries
+# -----------------------------------
+# Unless indicated by a * in the project config, all modules are treated like potential libraries.
+# 
+# This is helpful because it supports the existing CMake architecture that is being inherited and
+# allows more than one target to link against the module.
+#
+# Additionally, when flagged as containing a main() routine with a *, executable targets can ensure
+# the presence of a dedicated main() module. For simplicity, they can also be standalone executables
+# in smaller/simpler projects
+
+# Bulgogi targets are abstract groupings
+# --------------------------------------
+# As an orchestrator, bulgogi constructs and concepts are designed to faciliate
+# build system management and the user development process.
+#
+# The high-level distinction between a target and a module is merely an abstraction
+# which serves to distinguish products (executables) from intermediaries (libraries).
+#
+# This is not a conventional or 'good' way of thinking of binaries and libraries. But
+# that isn't the point. Within a self-contained project, this is how things conceptually
+# flow.
+
+# Targets without an executable component
+# ---------------------------------------
+# A new thought: targets which do not have an executable component specified (module*)
+# will be considered target libraries.
+#
+# This way, there are 3 kinds of CMake targets that bulgogi can generate:
+# - Executable target (links against libraries + has executable component),
+# - Library target (composed of modules but no executable component),
+# - Library modules (smallest compilation unit recognized by bulgogi).
 
 ################## Cyclic Dependencies 
 # A cyclic dependency check has been implemented for every conversion
