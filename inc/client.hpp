@@ -14,17 +14,11 @@
 #include <optional>
 #include <filesystem>
 
-// Using Declarations
-using std::string;
-using project::Project;
-using project::Dependency;
-namespace fs = std::filesystem;
-
 namespace client {
         // Placeholder for the CLI11 args 
         struct Args {
-                string  MODULE;
-                string  TARGET;
+                std::string  MODULE;
+                std::string  TARGET;
                 bool    create;
                 bool    all;
         };
@@ -39,7 +33,7 @@ namespace client {
 
         // Configures the CLI11 app for CLI args.
         void cli(CLI::App& app, Args& args);
-        void err(Err e, std::optional<string> info);
+        void err(Err e, std::optional<std::string> info);
 
         // Commands
         void add_module(Args& args);

@@ -6,6 +6,14 @@
 #include "client.hpp"
 #include <filesystem>
 
+// Using Declarations
+using std::string;
+
+using project::Project;
+using project::Dependency;
+
+// Namespace aliases
+namespace fs = std::filesystem;
 /**
  * Configures the CLI11 App 
  *

@@ -8,6 +8,13 @@
 using project::Project;
 using project::Dependency;
 
+// Using declarations
+using std::ios;
+using std::string;
+using std::vector;
+using std::ofstream;
+using std::unordered_map;
+
 Project Project::make() {
         return Project {
                 .targets = unordered_map<string, vector<Dependency>>(),
@@ -39,7 +46,7 @@ void Project::save() {
                 yaml << YAML::EndMap;
 
                 f << yaml.c_str();
-        } 
+        }
         // Handle failed to open error
         
         // TODO:

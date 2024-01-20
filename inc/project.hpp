@@ -21,42 +21,33 @@
 #include <algorithm>
 #include <unordered_map>
 
-// Using declarations
-using std::ios;
-using std::string;
-using std::vector;
-using std::ofstream;
-using std::unordered_map;
-
 namespace project {
-        using yaml_map = std::unordered_map<string, vector<string>>;
-
         struct Dependency {
                 enum Kind { Target, Module } type;
-                string name;
+                std::string name;
 
-                static Dependency from(Dependency::Kind kind, string name);
+                static Dependency from(Dependency::Kind kind, std::string name);
         };
         std::ostream& operator<<(std::ostream& out, Dependency& dep);
         bool operator==(const Dependency& a, Dependency& b);
 
         struct Project {
-                unordered_map<string, vector<Dependency>> targets;
+                std::unordered_map<std::string, std::vector<Dependency>> targets;
 
                 static Project make(void);
-                static Project from(unordered_map<string, vector<string>>);
+                static Project from(std::unordered_map<std::string, std::vector<std::string>>);
 
                 template<class T>
                 T to(void);
 
                 template<>
-                unordered_map<string, vector<string>> to();
+                std::unordered_map<std::string, std::vector<std::string>> to();
 
                 static Project load(void);
                 void save(void);
 
-                bool contains_module(string& m);
-                bool contains_module(string& m, string& t);
+                bool contains_module(std::string& m);
+                bool contains_module(std::string& m, std::string& t);
         };
         std::ostream& operator<<(std::ostream& out, Project& project);
 }
