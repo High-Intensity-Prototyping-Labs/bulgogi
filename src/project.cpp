@@ -159,6 +159,20 @@ bool Project::contains_module(string& m, string& t) {
 }
 
 Dependency Dependency::from(Dependency::Kind kind, string name) {
+        if(kind == Dependency::Module) {
+                return Dependency {
+                        .type = kind,
+                        .name = string(name).erase('*'),
+                        .exe = std::ranges::count(name, '*') > 0,
+                };
+        } else {
+                return Dependency {
+                        .type = kind,
+                        .name = string(name).erase('*'),
+                        .exe = false,
+                };
+        }
+}
         return Dependency {
                 .type = kind,
                 .name = string(name).erase('*'),
