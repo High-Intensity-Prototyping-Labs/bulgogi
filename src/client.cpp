@@ -223,6 +223,7 @@ void client::rm_module(Args& args) {
         for(auto& [target, dep_list]: project.targets) {
                 if(std::any_of(dep_list.begin(), dep_list.end(), matching_dep)) {
                         any_depends = true;
+                        break;
                 }
         }
 
