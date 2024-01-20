@@ -34,9 +34,11 @@ void client::cli(CLI::App& app, Args& args) {
 
         auto tree = app.add_subcommand("tree", "Displays a tree of the project")
                 ->require_subcommand();
+        (void)tree;
 
         auto clean = app.add_subcommand("clean", "Cleans the project")
                 ->require_subcommand();
+        (void)clean;
 
         auto test = app.add_subcommand("test", "Runs a test feature");
 
