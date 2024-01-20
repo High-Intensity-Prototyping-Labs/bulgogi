@@ -39,14 +39,14 @@ namespace project {
                 template<class T>
                 T to(void);
 
-                template<>
-                std::unordered_map<std::string, std::vector<std::string>> to();
-
                 static Project load(void);
                 Err save(void);
 
                 bool contains_module(std::string& m);
                 bool contains_module(std::string& m, std::string& t);
         };
+        template<>
+        std::unordered_map<std::string, std::vector<std::string>> Project::to();
+
         std::ostream& operator<<(std::ostream& out, Project& project);
 }

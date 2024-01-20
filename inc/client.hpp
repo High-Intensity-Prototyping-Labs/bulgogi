@@ -10,6 +10,7 @@
 
 // Standard C++ Libraries
 #include <string>
+#include <optional>
 
 namespace client {
         // Placeholder for the CLI11 args 
