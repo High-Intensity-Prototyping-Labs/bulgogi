@@ -112,9 +112,6 @@ void client::add_module(Args& args) {
                 bool pri_exists = fs::is_directory(pri);
                 
                 valid_tree = src_exists && inc_exists && pri_exists;
-        } else if(!args.create) {
-        /* dir_exists == false && create == false */
-                client::err(Err::ModuleDirMissing, args.MODULE);
         }
 
         //-- Main control branch --//
