@@ -62,7 +62,8 @@ void client::cli(CLI::App& app, Args& args) {
 
         // Module subcommands
         auto module_add = module->add_subcommand("add", "Adds a module to the project");
-        auto module_rm = module->add_subcommand("rm", "Removes a module from the project");
+        auto module_rm = module->add_subcommand("rm", "Removes a module from the project")
+                ->alias("remove");
 
         // Module add subcommand config
         module_add->add_option<string>("MODULE", args.MODULE, "Name of module to add")->required(true);
