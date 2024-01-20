@@ -126,11 +126,17 @@ void client::add_module(Args& args) {
                 if(dir_exists && valid_tree) {
                         // Add module 
                         add_module = true;
+                /* dir_exists == false || valid_tree == false */
                 } else if(args.create) {
                         // Spawn directory 
                         need_spawn = true;
                         // Add module
                         add_module = true;
+                /* (dir_exists == false || valid_tree == false) && args.create == false */
+                } else {
+                        // There is either something wrong with the directory structure 
+                        // or it is outright missing.
+                        client::err(Err::ModuleDirMissing, args.MODULE);
                 }
         }
 
