@@ -6,6 +6,7 @@
 #pragma once 
 
 // Project Settings 
+#include <optional>
 #define PROJECT_YAML "project.yaml"
 
 // Standard C++ Libraries
@@ -28,6 +29,7 @@ namespace project {
                 None,
                 IOError,
         };
+        void err_if(Err e, std::optional<std::string> info);
 
         struct Project {
                 std::unordered_map<std::string, std::vector<Dependency>> targets;

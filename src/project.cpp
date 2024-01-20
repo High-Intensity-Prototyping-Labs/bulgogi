@@ -6,6 +6,7 @@
 #include "project.hpp"
 
 // Standard C++ Libraries
+#include <optional>
 #include <tuple>
 #include <variant>
 #include <iostream>
@@ -24,6 +25,18 @@ using std::string;
 using std::vector;
 using std::ofstream;
 using std::unordered_map;
+
+void project::err_if(Err e, std::optional<string> info) {
+        const string UNKNOWN = "(UNKNOWN)";
+
+        switch (e) {
+        case Err::None:
+                break;
+        case Err::IOError:
+                std::cout << "IO Error: " << info.value_or(UNKNOWN) << std::endl;
+                break;
+        }
+}
 
 Project Project::make() {
         return Project {
