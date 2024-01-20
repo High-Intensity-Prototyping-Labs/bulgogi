@@ -18,6 +18,7 @@
 
 // Project Headers
 #include "project.hpp"
+#include "directory-tree-print.hpp"
 
 // Using Declarations
 using std::string;
@@ -250,22 +251,8 @@ void client::rm_module(Args& args) {
 }
 
 void client::tree() {
-        const int buf_len = 256;
-        const char* cmd = "tree";
-        const char* mode = "r";
-        string result;
-
-        std::array<char, buf_len> buffer;
-
-        FILE *pipe = popen(cmd, mode);
-        if(pipe) {
-                auto bytes = fread(buffer.data(), 1, buf_len, pipe);
-                result.append(buffer.data(), bytes);
-        } else {
-                client::err(Err::TreeCmdFailed, std::nullopt);
-        }
-
-        std::cout << result << std::endl;
+        auto ignore = domfarolino::buildIgnoreVector();
+        domfarolino::printDirectoryStructure(string("."), "|", ignore);
 }
 
 void client::test() {
