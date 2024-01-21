@@ -154,6 +154,15 @@ CMakeProject CMakeProject::from(project::Project &p) {
         }
         std::cout << std::endl;
 
+        std::cout << "Subdirectories:" << std::endl;
+        for(auto& [subdir, targets]: subdirectories) {
+                std::cout << "\t" << subdir << std::endl;
+                for(auto& target: targets) {
+                        std::cout << "\t\t" << target << "," << std::endl;
+                }
+                std::cout << std::endl;
+        }
+
         return CMakeProject::make();
 }
 
