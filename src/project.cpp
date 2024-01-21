@@ -158,6 +158,41 @@ bool Project::contains_module(string& m, string& t) {
         return res;
 }
 
+// Returns whether any targets in the project depend on the specified module 
+bool Project::any_depends(string& m) {
+        bool any_depends = false;
+
+        auto matching_dep = [&](Dependency& d) {
+                return d.name == m;
+        };
+
+        for(auto& [target, dep_list]: this->targets) {
+                if(std::any_of(dep_list.begin(), dep_list.end(), matching_dep)) {
+                        any_depends = true;
+                        break;
+                }
+        }
+
+        return any_depends;
+}
+
+bool Project::any_depends(std::string& m, Dependency::Kind k) {
+        bool any_depends = false;
+        
+        auto matching_both = [&](Dependency& d) {
+                return (d.name == m && d.type == k);
+        };
+
+        for(auto& [target, dep_list]: this->targets) {
+                if(std::any_of(dep_list.begin(), dep_list.end(), matching_both)) {
+                        any_depends = true;
+                        break;
+                }
+        }
+
+        return any_depends;
+}
+
 Dependency Dependency::from(Dependency::Kind kind, string& name) {
         auto clean_name = string(name);
         std::erase(clean_name, '*');

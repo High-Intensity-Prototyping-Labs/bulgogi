@@ -47,6 +47,9 @@ namespace project {
 
                 bool contains_module(std::string& m);
                 bool contains_module(std::string& m, std::string& t);
+
+                bool any_depends(std::string& m);
+                bool any_depends(std::string& m, Dependency::Kind k);
         };
         template<>
         std::unordered_map<std::string, std::vector<std::string>> Project::to();
