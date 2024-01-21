@@ -1,1 +1,0 @@
-- The executable marker (*) lingers in the internal representation of the modules.
