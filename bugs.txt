@@ -1,0 +1,2 @@
+- Using the wildcard `bul module rm "*" --all` does in fact remove everything from the project.yaml. Directories linger.
+- Running `bul tree` with an empty project.yaml dumps the whole project repo.
