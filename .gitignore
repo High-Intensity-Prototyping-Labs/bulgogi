@@ -10,3 +10,5 @@ bul
 bulgogi
 lib/libyaml-cpp.a
 lib/libyaml-cpp.a
+obj_c
+bul_c
