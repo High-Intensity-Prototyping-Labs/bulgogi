@@ -81,6 +81,7 @@ CMakeProject CMakeProject::from(project::Project &p) {
         auto targets = vector<CMakeTarget>();
         auto links = unordered_map<string, vector<string>>();
         auto subdirectories = unordered_map<string, vector<CMakeTarget>>();
+        auto libmodules = vector<string>();
 
         for(std::pair<string, vector<project::Dependency>> it: p.targets) {
                 auto& [target, dep_list] = it;
@@ -109,7 +110,8 @@ CMakeProject CMakeProject::from(project::Project &p) {
                         }
 
                         // Target name used for subdirectory
-                        subdirectory = target;
+                        subdirectory = TARGET_LIB_DIR;
+                        // (target libraries have no subdirectory (all in parent CMakeList.txt)
                 } else {
                         // Create CMake Executable target and add all but executable dep as link.
                         new_target = CMakeTarget::from(CMakeTarget::Executable, target);
@@ -120,6 +122,16 @@ CMakeProject CMakeProject::from(project::Project &p) {
                                 } else {
                                         links_list.push_back(dep.name);
                                 }
+                        }
+                }
+
+                // Add libmodules from target dependencies
+                for(auto& dep: dep_list) {
+                        if(dep.type == project::Dependency::Module 
+                                && dep.exe == false
+                                && !std::count(libmodules.begin(), libmodules.end(), dep.name)
+                        ) {
+                                libmodules.push_back(dep.name);
                         }
                 }
 
@@ -137,10 +149,26 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 }
         }
 
+        // Add libmodules to the subdirectories 
+        for(auto& libmodule: libmodules) {
+                subdirectories.insert({
+                        libmodule, 
+                        vector{
+                                CMakeTarget::from(CMakeTarget::Library, libmodule),
+                        },
+                });
+        }
+
         // DEBUG
         std::cout << "Targets:" << std::endl;
         for(auto& target: targets) {
                 std::cout << target << std::endl;
+        }
+        std::cout << std::endl;
+
+        std::cout << "Libmodules:" << std::endl;
+        for(auto& libmodule: libmodules) {
+                std::cout << libmodule << std::endl;
         }
         std::cout << std::endl;
 

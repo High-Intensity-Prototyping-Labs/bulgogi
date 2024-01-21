@@ -9,6 +9,9 @@
 // Project headers
 #include "project.hpp"
 
+// Settings
+#define TARGET_LIB_DIR "."
+
 namespace cmake {
         struct CMakeTarget {
                 enum Kind { Library, Executable } kind;
