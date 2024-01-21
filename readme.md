@@ -9,6 +9,16 @@ Bulgogi is a C/C++ build-system orchestrator for CubeSats.
 ## Synopsis
 See [synopsis.txt](./synopsis.txt)
 
+## Dependencies
+Credit is owed where it is due:
+- [CLIUtils/CLI11](https://github.com/CLIUtils/CLI11) - Command line parser for C++11.
+- [jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp) - A YAML parser and emitter in C++.
+- [pantor/inja](https://github.com/pantor/inja) - A template engine for Modern C++.
+
+All license requirements have been satisfied and do not conflict with this project's GPLv3 license.
+
+See `LICENSE.<project>.txt` for dependency licenses and `COPYING` for a copy of this project's license.
+
 ## Progress
 Currently supported subcommands are:
 
