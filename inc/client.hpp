@@ -31,6 +31,7 @@ namespace client {
                 SaveProjectErr,
                 ProjectAlreadyInit,
                 TreeCmdFailed,
+                TargetDepends,
         };
 
         // Configures the CLI11 app for CLI args.

@@ -115,6 +115,9 @@ void client::err(Err e, std::optional<string> info) {
         case Err::TreeCmdFailed:
                 std::cout << "Failed to run `tree` command using popen()" << std::endl;
                 break;
+        case Err::TargetDepends:
+                std::cout << "At least 1 other target depends on target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
+                break;
         }
 }
 
@@ -220,6 +223,7 @@ void client::add_module(Args& args) {
 void client::rm_module(Args& args) {
         // Load project 
         auto project = Project::load();
+        auto ref_copy = project.copy();
 
         // Closure to detect matching dependency against module name
         auto matching_dep = [&](Dependency& d) {
@@ -233,16 +237,19 @@ void client::rm_module(Args& args) {
         // Set wildcard condition
         bool wildcard = (args.MODULE == "*");
 
-        int erased = 0;
-
         // Check wildcard condition
+        int erased = 0;
         if(wildcard && !project.targets.empty()) {
-                if(args.all) {
-                        project.targets.clear();
-                        erased++;
-                } else if(project.targets.contains(args.TARGET)) {
-                        project.targets.erase(args.TARGET);
-                        erased++;
+                if(!project.any_depends(args.TARGET, Dependency::Target)) {
+                        if(args.all) {
+                                project.targets.clear();
+                                erased++;
+                        } else if(project.targets.contains(args.TARGET)) {
+                                project.targets.erase(args.TARGET);
+                                erased++;
+                        }
+                } else {
+                        client::err(Err::TargetDepends, args.TARGET);
                 }
         // Remove all instances in the project.yaml
         } else if(args.all) {
@@ -259,39 +266,36 @@ void client::rm_module(Args& args) {
         }
 
         // See if any targets still depend on the module
-        bool any_depends = false;
-        if(wildcard) {
-                for(auto& [target, dep_list]: project.targets) {
-                        if(std::any_of(dep_list.begin(), dep_list.end(), matching_target)) {
-                                any_depends = true;
-                                break;
-                        }
-                }
-
-        } else {
-                for(auto& [target, dep_list]: project.targets) {
-                        if(std::any_of(dep_list.begin(), dep_list.end(), matching_dep)) {
-                                any_depends = true;
-                                break;
-                        }
-                }
-        }
+        bool any_depends = project.any_depends(args.MODULE, Dependency::Module);
 
         // TODO:
-        // 1. Create an Project::any_depends() method.
-        // 2. Create a ref_copy of the project before nuking it with the wildcard.
-        // 3. When nuking is complete, check each dep in the ref_copy with Project::any_depends(),
-        // 4. Those which any do not depend, remove from the filesystem as well (unless --cached was passed),
+        // ~1. Create an Project::any_depends() method.
+        // ~2. Create a ref_copy of the project before nuking it with the wildcard.
+        // ~3. When nuking is complete, check each dep in the ref_copy with Project::any_depends(),
+        // ~4. Those which any do not depend, remove from the filesystem as well (unless --cached was passed),
         //      Those which are still depended on must stay in the project root.
+        // ~5. Add a clause which prevents a wildcard remove of just one target which ensures 
+        //      that not other targets depend on that target as a dependency.
+        //      Provide a client::err of dependency issue if that's the case.
 
         // Save project if a module was removed
         if(erased) {
                 // Filesystem removal logic 
-                if(!any_depends && !args.cached) {
-                        // Remove from the filesystem
-                        fs::remove_all(fs::path(args.MODULE));
-                /* any_depends == true || args.cached == true */
-                } 
+                if(!args.cached) {
+                        if(wildcard && !args.all) {
+                                /* assuming wildcard && erased implies the target existed */
+                                for(auto& dep: ref_copy.targets[args.TARGET]) {
+                                        if(dep.type == Dependency::Module && !project.any_depends(dep.name, Dependency::Module)) {
+                                                // Nuke out of FS
+                                                fs::remove_all(fs::path(dep.name));
+                                        }
+                                }
+                        } else if(!any_depends) {
+                                // Remove from the filesystem
+                                fs::remove_all(fs::path(args.MODULE));
+                        /* any_depends == true || args.cached == true */
+                        } 
+                }
 
                 // Remove any empty targets
                 auto ref_project = project.copy();
