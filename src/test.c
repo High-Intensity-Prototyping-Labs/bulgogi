@@ -1,0 +1,4 @@
+void ok(void) {
+
+        return;
+}
