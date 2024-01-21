@@ -21,16 +21,18 @@ namespace cmake {
         };
         std::ostream& operator<<(std::ostream&, CMakeTarget&);
 
+        using CMakeTargetID = std::string;
         struct CMakeList {
                 std::vector<CMakeTarget> targets;
-                std::unordered_map<std::string, std::vector<std::string>> links;
+                std::unordered_map<CMakeTargetID, std::vector<CMakeTargetID>> links;
 
                 static CMakeList make(void);
         };
         std::ostream& operator<<(std::ostream&, CMakeList&);
 
+        using Subdirectory = std::string;
         struct CMakeProject {
-                std::unordered_map<std::string, CMakeList> lists;
+                std::unordered_map<Subdirectory, CMakeList> lists;
 
                 static CMakeProject make(void);
                 static CMakeProject from(project::Project&);
