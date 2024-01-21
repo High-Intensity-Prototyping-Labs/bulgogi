@@ -22,6 +22,7 @@
 
 // Project Headers
 #include "project.hpp"
+#include "cmake.hpp"
 
 // Using Declarations
 using std::string;
@@ -30,6 +31,8 @@ using std::ofstream;
 
 using project::Project;
 using project::Dependency;
+
+using cmake::CMakeProject;
 
 // Namespace aliases
 namespace fs = std::filesystem;
@@ -54,6 +57,8 @@ void client::cli(CLI::App& app, Args& args) {
                 ->require_subcommand();
 
         auto tree = app.add_subcommand("tree", "Displays a tree of the project");
+
+        auto build = app.add_subcommand("build", "Builds the project");
 
         auto clean = app.add_subcommand("clean", "Cleans the project")
                 ->require_subcommand();
@@ -84,6 +89,9 @@ void client::cli(CLI::App& app, Args& args) {
 
         // Tree subcommand config
         tree->callback([]() { client::tree(); });
+
+        // Build subcommand config 
+        build->callback([]() { client::build(); });
 
         // Test command config
         test->callback([&]() { client::test(); });
@@ -334,6 +342,15 @@ void client::tree() {
         } else {
                 client::err(Err::TreeCmdFailed, std::nullopt);
         }
+}
+
+void client::build() {
+        // Load project 
+        auto project = Project::load();
+
+        // Convert to CMakeProject 
+        auto cmake = CMakeProject::from(project);
+        (void)cmake;
 }
 
 void client::test() {

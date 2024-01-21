@@ -2,6 +2,7 @@
 
 // Standard C++ Libraries
 #include <vector>
+#include <iostream>
 #include <filesystem>
 #include <unordered_map>
 
@@ -15,6 +16,7 @@ namespace cmake {
 
                 static CMakeTarget from(CMakeTarget::Kind, std::string& name);
         };
+        std::ostream& operator<<(std::ostream&, CMakeTarget&);
 
         struct CMakeList {
                 std::vector<CMakeTarget> targets;
@@ -22,6 +24,7 @@ namespace cmake {
 
                 static CMakeList make(void);
         };
+        std::ostream& operator<<(std::ostream&, CMakeList&);
 
         struct CMakeProject {
                 std::unordered_map<std::filesystem::path, CMakeList> lists;
