@@ -8,8 +8,3 @@ target2:		# Target
 - module3		# Dependency 1
 - module5*	# Dependency 2 (contains main)
 - target1		# Dependency 3 (implies target1 is a lib/shared lib)
-
-default2:
-- module1*
-- module2
-- target1
