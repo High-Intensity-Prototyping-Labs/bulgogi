@@ -22,6 +22,8 @@ using std::unordered_map;
 using cmake::CMakeList;
 using cmake::CMakeTarget;
 using cmake::CMakeProject;
+using cmake::Subdirectory;
+using cmake::CMakeTargetID;
 
 // Namespace aliases 
 namespace fs = std::filesystem;
@@ -47,6 +49,13 @@ CMakeList CMakeList::make() {
         return CMakeList {
                 .targets = vector<CMakeTarget>(),
                 .links = unordered_map<string, vector<string>>(),
+        };
+}
+
+CMakeList CMakeList::from(std::vector<CMakeTarget>& targets, std::unordered_map<CMakeTargetID, std::vector<CMakeTargetID>>& links) {
+        return CMakeList {
+                .targets = vector<CMakeTarget>(targets),
+                .links = unordered_map<CMakeTargetID, vector<CMakeTargetID>>(links),
         };
 }
 
@@ -78,9 +87,11 @@ CMakeProject CMakeProject::make() {
 }
 
 CMakeProject CMakeProject::from(project::Project &p) {
+        auto project = CMakeProject::make();
+
         auto targets = vector<CMakeTarget>();
-        auto links = unordered_map<string, vector<string>>();
-        auto subdirectories = unordered_map<string, vector<CMakeTarget>>();
+        auto links = unordered_map<CMakeTargetID, vector<string>>();
+        auto subdirectories = unordered_map<Subdirectory, vector<CMakeTarget>>();
         auto libmodules = vector<string>();
 
         for(std::pair<string, vector<project::Dependency>> it: p.targets) {
@@ -191,7 +202,29 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 std::cout << std::endl;
         }
 
-        return CMakeProject::make();
+        // Amalgamate all of those lists 
+        for(auto& [subdir, targets]: subdirectories) {
+                auto list = CMakeList::make();
+                for(auto& target: targets) {
+                        list.targets.push_back(target);
+                        list.links.insert({target.name, links[target.name]});
+                        /* assumes every target.name has an entry in links */
+                }
+                project.lists.insert({subdir, list});
+                // TODO: Exception: there will be multiple 'lists' in the '.' subdir. Fix this.
+        }
+
+        // DEBUG
+        std::cout << "Project {" << std::endl;
+        std::cout << "\tlists: {" << std::endl;
+        for(auto& [subdir, list]: project.lists) {
+                std::cout << "\t\t\t" << subdir << ": " << std::endl;
+                std::cout << list << std::endl;
+        }
+        std::cout << "\t}" << std::endl;
+        std::cout << "}" << std::endl;
+
+        return project;
 }
 
 void CMakeProject::generate() {

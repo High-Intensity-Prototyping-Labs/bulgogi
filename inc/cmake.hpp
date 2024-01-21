@@ -27,6 +27,7 @@ namespace cmake {
                 std::unordered_map<CMakeTargetID, std::vector<CMakeTargetID>> links;
 
                 static CMakeList make(void);
+                static CMakeList from(std::vector<CMakeTarget>&, std::unordered_map<CMakeTargetID, std::vector<CMakeTargetID>>&);
         };
         std::ostream& operator<<(std::ostream&, CMakeList&);
 
