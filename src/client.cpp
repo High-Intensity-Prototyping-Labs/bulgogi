@@ -268,16 +268,6 @@ void client::rm_module(Args& args) {
         // See if any targets still depend on the module
         bool any_depends = project.any_depends(args.MODULE, Dependency::Module);
 
-        // TODO:
-        // ~1. Create an Project::any_depends() method.
-        // ~2. Create a ref_copy of the project before nuking it with the wildcard.
-        // ~3. When nuking is complete, check each dep in the ref_copy with Project::any_depends(),
-        // ~4. Those which any do not depend, remove from the filesystem as well (unless --cached was passed),
-        //      Those which are still depended on must stay in the project root.
-        // ~5. Add a clause which prevents a wildcard remove of just one target which ensures 
-        //      that not other targets depend on that target as a dependency.
-        //      Provide a client::err of dependency issue if that's the case.
-
         // Save project if a module was removed
         if(erased) {
                 // Filesystem removal logic 
