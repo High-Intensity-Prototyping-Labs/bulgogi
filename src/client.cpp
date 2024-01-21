@@ -282,7 +282,7 @@ void client::rm_module(Args& args) {
         if(erased) {
                 // Filesystem removal logic 
                 if(!args.cached) {
-                        if(wildcard && !args.all) {
+                        if(wildcard) {
                                 /* assuming wildcard && erased implies the target existed */
                                 for(auto& dep: ref_copy.targets[args.TARGET]) {
                                         if(dep.type == Dependency::Module && !project.any_depends(dep.name, Dependency::Module)) {
