@@ -161,6 +161,57 @@ deps:
 
 /** Long-form droney bits **/
 
+# Taking a moment to reconsider C++
+# ---------------------------------
+# I've become quite cognizent of the bloat that has been introduced from the choice of 
+# using C++. Not so much in the code that I've written myself for the project (although 
+# still worth consideration) but moreso in the external libraries that were supposed to 
+# introduced 'nice' functionality.
+#
+# On the one hand, 'nice' APIs with a lot of defaults built-in have a flatter learning 
+# curve to them. Maybe it reduces the time until comfortable adjustment in half to 1/4 
+# in more extreme cases. But once that hump is overcome, then what?
+#
+# I'm sitting on a +3 MB library dependency which just parses yaml. I'm sure it does a 
+# good job at it - and certainly having the yaml.to<map> one-liner makes life awesome as 
+# I get to move on with the map itself. But is that worth 3 MB?
+#
+# Further, on the topic of C++ exceptions, I got very interested in the idea of disabling 
+# them. After all, any more than an abort() call when something goes wrong is not more or 
+# less preventable than the fancy stack unwinding and often ambiguous exception messages 
+# anyway.
+#
+# This proved to be a bit of a dead-end when the header-only library I was importing to 
+# use for CLI parsing turned out to use the crap out of them. I _could_ rejig the library 
+# not to use try/catch or throw statements, but then isn't that going against the work I
+# originally wanted to prevent?
+#
+# This leads into the idea of building value into a project. What has made things like git 
+# and linux so damn valuable wasn't so much the ends they achieved. Sure, your malloc()s 
+# and your write()s are much needed, but plenty of Unix distributions and variants followed 
+# this pattern (the so-called POSIX standard) and surely _achieved_ what they described.
+#
+# Same goes for other version trackers. Even if mercurial had 100% the same API as git 
+# (which it seems to be pretty similar anyway), git would somehow come out on top.
+#
+# When I think about Minecraft, somehow a game with 100% the same mechanics and visuals,
+# I still feel a bit off about using the non-OG version. As Minecraft is more than a game,
+# it's a game-engine. 
+#
+# Git is more than just a version tracker, it's _part_ of the directory. And it would 
+# only be able to do that if its footprint was small enough to be negligible.
+#
+# The bigger and hunkier a program is, the more setup and involvement it requires and 
+# the easier it is the notice, the less seamless it becomes. A program can never 
+# become essential if it constantly reminds the user and the system of its existence.
+#
+# I don't just want features - that's something C++ and even Python can give me just fine.
+# I want to build the mother of all build-system projects. I need a program which takes 
+# everything I know and puts it into one place so I can springboard off of that point 
+# anytime I start a new project.
+#
+# And unfortunately I know better than to link 3 MB libraries to parse yaml.
+
 # Gotta give up on proxy libraries 
 # --------------------------------
 # After many flip flops, I have realized that it will not be practical
