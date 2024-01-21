@@ -20,14 +20,14 @@ namespace cmake {
 
         struct CMakeList {
                 std::vector<CMakeTarget> targets;
-                std::unordered_map<CMakeTarget, std::vector<std::string>> links;
+                std::unordered_map<std::string, std::vector<std::string>> links;
 
                 static CMakeList make(void);
         };
         std::ostream& operator<<(std::ostream&, CMakeList&);
 
         struct CMakeProject {
-                std::unordered_map<std::filesystem::path, CMakeList> lists;
+                std::unordered_map<std::string, CMakeList> lists;
 
                 static CMakeProject make(void);
                 static CMakeProject from(project::Project&);

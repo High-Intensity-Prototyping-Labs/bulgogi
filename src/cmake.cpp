@@ -46,7 +46,7 @@ ostream& cmake::operator<<(ostream& out, CMakeTarget& t) {
 CMakeList CMakeList::make() {
         return CMakeList {
                 .targets = vector<CMakeTarget>(),
-                .links = unordered_map<CMakeTarget, vector<string>>(),
+                .links = unordered_map<string, vector<string>>(),
         };
 }
 
@@ -59,7 +59,7 @@ ostream& cmake::operator<<(ostream& out, CMakeList& l) {
         std::cout << "\t}," << std::endl;
         std::cout << "\tlinks: {" << std::endl;
         for(auto& [target, links]: l.links) {
-                std::cout << "\t\t" << target.name << ": [";
+                std::cout << "\t\t" << target<< ": [";
                 for(auto& link: links) {
                         std::cout << link << ", ";
                 }
@@ -73,14 +73,14 @@ ostream& cmake::operator<<(ostream& out, CMakeList& l) {
 
 CMakeProject CMakeProject::make() {
         return CMakeProject {
-                .lists = unordered_map<fs::path, CMakeList>(),
+                .lists = unordered_map<string, CMakeList>(),
         };
 }
 
 CMakeProject CMakeProject::from(project::Project &p) {
         auto targets = vector<CMakeTarget>();
-        auto links = unordered_map<CMakeTarget, vector<string>>();
-        auto subdirectories = unordered_map<fs::path, vector<CMakeTarget>>();
+        auto links = unordered_map<string, vector<string>>();
+        auto subdirectories = unordered_map<string, vector<CMakeTarget>>();
 
         for(std::pair<string, vector<project::Dependency>> it: p.targets) {
                 auto& [target, dep_list] = it;
@@ -127,7 +127,7 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 targets.push_back(new_target);
 
                 // Associate the CMake target to its target link requirements (excludes executable one)
-                links.insert({new_target, links_list});
+                links.insert({new_target.name, links_list});
 
                 // Combine targets under the same subdirectory (if applicable)
                 if(subdirectories.contains(subdirectory)) {
@@ -146,7 +146,7 @@ CMakeProject CMakeProject::from(project::Project &p) {
 
         std::cout << "Links:" << std::endl;
         for(auto& link: links) {
-                std::cout << link.first.name << ": " << std::endl;
+                std::cout << link.first<< ": " << std::endl;
                 for(auto& link_list: link.second) {
                         std::cout << "\t" << link_list << ", " << std::endl;
                 }
