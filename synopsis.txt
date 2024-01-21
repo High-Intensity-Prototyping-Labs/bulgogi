@@ -161,6 +161,36 @@ deps:
 
 /** Long-form droney bits **/
 
+# The C Lag?
+# ----------
+# After the previously long-winded schpiel on C++ vs C, I've noticed that the lag that 
+# I observed from running my C++ application (possibly in my head) seemed _just_ as bad 
+# as that of my 'hello world' C program that I started just for sake of setting up the 
+# Makefile.
+#
+# To be completely honest, I'm surprised - this is making me think that part of the irr-
+# -ational basis for my grievance over C++ may go unchanged in C.
+#
+# If I don't get that superficial quick-execution from C (but the very cool/small binary
+# fingerprint), will I really care or be much more proud? Will _others_ care? I just 
+# can't answer that.
+#
+# I don't want to be so focused on the _what_ that I lose track of _why_. And I think 
+# this is where _trying_ to start a revolution can be its downfall. 
+#
+# Personally, I have **no** opposition to substituting some modules of the program for C 
+# in the future. I'm not writing an operating system or a bootloader, I can live with 
+# dormant exceptions in the underbelly of the program. And if I so get interested in one 
+# day replacing the whole thing in C, I can. But that slick superficial boost I was looking 
+# for totally imploded in my hello-world test.
+#
+# In the end, data structures like unordered_maps are really handy representations of 
+# things and they aren't at the root of my grievances (for example, I'd just as happily
+# use an uglier / buggier C implementation I'd make myself of the equivalent of a string 
+# lookup map specifically for the purpose of this...or would I?).
+#
+# Let's have some fun with this, either way.
+
 # Taking a moment to reconsider C++
 # ---------------------------------
 # I've become quite cognizent of the bloat that has been introduced from the choice of 
