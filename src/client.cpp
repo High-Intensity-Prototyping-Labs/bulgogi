@@ -233,6 +233,7 @@ void client::rm_module(Args& args) {
         auto matching_target = [&](Dependency& d) {
                 return d.name == args.TARGET;
         };
+        (void)matching_target;
 
         // Set wildcard condition
         bool wildcard = (args.MODULE == "*");
