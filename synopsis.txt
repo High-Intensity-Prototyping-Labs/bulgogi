@@ -161,6 +161,29 @@ deps:
 
 /** Long-form droney bits **/
 
+# The need to re-use executable modules 
+# -------------------------------------
+# Suppose I wanted to release multiple variants of the same binary.
+#
+# I wouldn't have separate versions of the same `main()` beholden module.
+#
+# Consider the following targets:
+#
+# default:
+# - module1*
+# - module2
+#
+# default2:
+# - module1*
+# - module2
+# - module7
+# - flags:
+#     - "-Duse_feature3"
+#
+# Ignore the non-existent `- flags:` entry for now. Notice how similar they are 
+# but actually target different binaries? One has a pre-processor flag enabled 
+# which inevitably actually requires different behaviour from the linker. Cool eh?
+
 # The C Lag?
 # ----------
 # After the previously long-winded schpiel on C++ vs C, I've noticed that the lag that 
