@@ -12,6 +12,9 @@
 
 // Settings
 #define TARGET_LIB_DIR "."
+#define CMAKE_LIST_TXT "CMakeLists.txt"
+#define TEMPLATE_MOD "templates/mod.blg"
+#define TEMPLATE_PROJ "templates/proj.blg"
 
 namespace cmake {
         struct CMakeTarget {
@@ -35,6 +38,8 @@ namespace cmake {
                 T to(void);
 
                 void generate(Subdirectory&);
+                void generate_mod(Subdirectory&);
+                void generate_proj(void);
         };
         template<>
         inja::json CMakeList::to<inja::json>(void);
@@ -50,4 +55,6 @@ namespace cmake {
                 static CMakeProject from(project::Project&);
         };
         std::ostream& operator<<(std::ostream&, CMakeProject&);
+
+        void from_template(inja::json& j, const char* template_path, const char* path_dst);
 }
