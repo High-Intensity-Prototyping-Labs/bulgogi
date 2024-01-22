@@ -68,14 +68,6 @@ CMakeList CMakeList::from(std::vector<CMakeTarget>& targets, std::unordered_map<
         };
 }
 
-void CMakeList::generate(Subdirectory& subdir) {
-        if(subdir == TARGET_LIB_DIR) {
-                this->generate_proj();
-        } else {
-                this->generate_mod(subdir);
-        }
-}
-
 void CMakeList::generate_mod(Subdirectory& subdir) {
         // Convert CMakeList to json
         auto j = this->to<json>();
@@ -83,8 +75,15 @@ void CMakeList::generate_mod(Subdirectory& subdir) {
         cmake::from_template(j, TEMPLATE_MOD, subdir.c_str());
 }
 
-void CMakeList::generate_proj() {
+void CMakeList::generate_proj(unordered_map<Subdirectory, CMakeList>& lists) {
         auto j = this->to<json>();
+        
+        for(auto& [subdir, _]: lists) {
+                if(subdir != TARGET_LIB_DIR) {
+                        j["subdirs"] += subdir;
+                }
+        }
+
         cmake::from_template(j, TEMPLATE_PROJ, TARGET_LIB_DIR);
 }
 

@@ -373,7 +373,13 @@ void client::generate(Args& args) {
                 auto path = fs::path(subdir);
                 if(fs::exists(path) || args.create) {
                         fs::create_directories(path);
-                        list.generate((string&)subdir);
+
+                        if(subdir == TARGET_LIB_DIR) {
+                                list.generate_proj(cmake.lists);
+                        } else {
+                                list.generate_mod((string&)subdir);
+                        }
+
                         pass = true;
                 } else {
                         client::err(Err::ModuleDirMissing, subdir);
@@ -392,5 +398,10 @@ void client::build() {
 void client::test() {
         // Load project 
         auto project = Project::load();
-        std::cout << project << std::endl;
+
+        auto cmake = CMakeProject::from(project);
+
+        auto list = cmake.lists[TARGET_LIB_DIR];
+        auto j = list.to<json>();
+        cmake::from_template(j, TEMPLATE_PROJ, TARGET_LIB_DIR);
 }

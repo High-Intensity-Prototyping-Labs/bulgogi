@@ -37,9 +37,8 @@ namespace cmake {
                 template<class T>
                 T to(void);
 
-                void generate(Subdirectory&);
                 void generate_mod(Subdirectory&);
-                void generate_proj(void);
+                void generate_proj(std::unordered_map<Subdirectory, CMakeList>&);
         };
         template<>
         inja::json CMakeList::to<inja::json>(void);
