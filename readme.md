@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-InDev v0.7.4
+InDev v0.7.5
 
 ## Overview
 Bulgogi is a C/C++ build-system orchestrator for CubeSats.
@@ -30,13 +30,21 @@ Currently supported subcommands are:
 ```bul init```
 
 
-```bul module rm <MODULE> [TARGET]```
+```
+bul module rm <MODULE> [TARGET]             # Remove module and contents from project
+bul module rm --cached <MODULE> [TARGET]    # Only remove entry in project.yaml
 
-
-```bul module remove <MODULE> [TARGET]```
+bul module remove <MODULE> [TARGET]         # Alias for `bul rm ...`
+```
 
 
 ```bul tree```
+
+
+```
+bul generate            # Generates CMakeLists
+bul generate --create   # Creates modules dirs if missing
+```
 
 
 Planned subcommands:
@@ -94,3 +102,12 @@ project
 ```
 
 This is generally how things should look. There are subtleties and details embedded within this overview that will be covered later.
+
+### Generating the CMakeLists 
+Now that a very simplistic project structure has been made (1 target, 1 module), it's time to generate the build files.
+
+```
+bul gen 
+```
+
+You should now have a `module1/` directory populated with a `CMakeLists.txt` file, as well as one in the project root.
