@@ -6,13 +6,13 @@
 #pragma once 
 
 // Project Settings 
-#include <optional>
 #define PROJECT_YAML "project.yaml"
 
 // Standard C++ Libraries
 #include <string>
 #include <vector>
 #include <fstream>
+#include <optional>
 #include <unordered_map>
 
 namespace project {
