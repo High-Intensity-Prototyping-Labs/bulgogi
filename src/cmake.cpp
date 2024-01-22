@@ -181,10 +181,18 @@ CMakeProject CMakeProject::from(project::Project &p) {
                  * So new rule: having the executable component is what distinguishes libs from exes.
                  */
 
+                // Check whether dep_list contains executable component
+                bool contains_exe = false;
+                for(auto& d: dep_list) {
+                        if(d.exe) {
+                                contains_exe = true;
+                        }
+                }
+
                 fs::path subdirectory;
                 CMakeTarget new_target;
                 vector<string> links_list;
-                if(p.any_depends(target, project::Dependency::Target)) {
+                if(!contains_exe) {
                         // Create CMake Library target and add every dep as a linkable library
                         new_target = CMakeTarget::from(CMakeTarget::Library, target);
                         for(auto& dep: dep_list) {
