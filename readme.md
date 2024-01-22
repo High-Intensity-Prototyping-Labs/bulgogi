@@ -14,6 +14,7 @@ Credit is owed where it is due:
 - [CLIUtils/CLI11](https://github.com/CLIUtils/CLI11) - Command line parser for C++11.
 - [jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp) - A YAML parser and emitter in C++.
 - [pantor/inja](https://github.com/pantor/inja) - A template engine for Modern C++.
+- [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++.
 
 All license requirements have been satisfied and do not conflict with this project's GPLv3 license.
 
