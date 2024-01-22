@@ -1,3 +1,0 @@
-- The `./CMakeLists.txt` add_library() trick for target-libraries without resident modules will only work if its dependencies are 
-        declared by the time it tries to be linked.
-=> So link after all of the submodules are added?
