@@ -246,25 +246,10 @@ void client::rm_module(Args& args) {
         };
         (void)matching_target;
 
-        // Set wildcard condition
-        bool wildcard = (args.MODULE == "*");
-
         // Check wildcard condition
         int erased = 0;
-        if(wildcard && !project.targets.empty()) {
-                if(!project.any_depends(args.TARGET, Dependency::Target)) {
-                        if(args.all) {
-                                project.targets.clear();
-                                erased++;
-                        } else if(project.targets.contains(args.TARGET)) {
-                                project.targets.erase(args.TARGET);
-                                erased++;
-                        }
-                } else {
-                        client::err(Err::TargetDepends, args.TARGET);
-                }
         // Remove all instances in the project.yaml
-        } else if(args.all) {
+        if(args.all) {
                 for(auto& [target, dep_list]: project.targets) {
                         erased += std::erase_if(dep_list, matching_dep);
                 }
@@ -284,15 +269,7 @@ void client::rm_module(Args& args) {
         if(erased) {
                 // Filesystem removal logic 
                 if(!args.cached) {
-                        if(wildcard) {
-                                /* assuming wildcard && erased implies the target existed */
-                                for(auto& dep: ref_copy.targets[args.TARGET]) {
-                                        if(dep.type == Dependency::Module && !project.any_depends(dep.name, Dependency::Module)) {
-                                                // Nuke out of FS
-                                                fs::remove_all(fs::path(dep.name));
-                                        }
-                                }
-                        } else if(!any_depends) {
+                        if(!any_depends) {
                                 // Remove from the filesystem
                                 fs::remove_all(fs::path(args.MODULE));
                         /* any_depends == true || args.cached == true */
