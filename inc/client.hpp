@@ -43,6 +43,7 @@ namespace client {
         void add_module(Args& args);
         void rm_module(Args& args);
         void tree(void);
+        void generate(void);
         void build(void);
         void test(void);
 }

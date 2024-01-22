@@ -58,6 +58,9 @@ void client::cli(CLI::App& app, Args& args) {
 
         auto tree = app.add_subcommand("tree", "Displays a tree of the project");
 
+        auto generate = app.add_subcommand("generate", "Generates the build files")
+                ->alias("gen");
+
         auto build = app.add_subcommand("build", "Builds the project");
 
         auto clean = app.add_subcommand("clean", "Cleans the project")
@@ -89,6 +92,9 @@ void client::cli(CLI::App& app, Args& args) {
 
         // Tree subcommand config
         tree->callback([]() { client::tree(); });
+
+        // Generate subcommand config 
+        generate->callback([]() { client::generate(); });
 
         // Build subcommand config 
         build->callback([]() { client::build(); });
@@ -344,13 +350,16 @@ void client::tree() {
         }
 }
 
-void client::build() {
+void client::generate() {
         // Load project 
         auto project = Project::load();
 
         // Convert to CMakeProject 
         auto cmake = CMakeProject::from(project);
         (void)cmake;
+}
+
+void client::build() {
 }
 
 void client::test() {
