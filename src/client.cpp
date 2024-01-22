@@ -33,6 +33,7 @@ using std::vector;
 using std::ofstream;
 
 using inja::json;
+using inja::Environment;
 
 using project::Project;
 using project::Dependency;
@@ -365,7 +366,15 @@ void client::generate() {
         // Generate the CMakeLists.txt
         for(auto& [subdir, list]: cmake.lists) {
                 auto j = list.to<json>();
-                std::cout << subdir << ": " << j << std::endl;
+                j["subdir"] = subdir;
+
+                // DEBUG 
+                std::cout << j << std::endl;
+
+                // Apply template
+                Environment env;
+                auto result = env.render_file("templates/mod.blg", j);
+                std::cout << result << std::endl;
         }
 }
 
