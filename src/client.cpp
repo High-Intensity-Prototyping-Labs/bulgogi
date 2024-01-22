@@ -69,9 +69,8 @@ void client::cli(CLI::App& app, Args& args) {
 
         auto build = app.add_subcommand("build", "Builds the project");
 
-        auto clean = app.add_subcommand("clean", "Cleans the project")
+        auto clean = app.add_subcommand("clean", "Cleans project build files")
                 ->require_subcommand();
-        (void)clean;
 
         auto test = app.add_subcommand("test", "Runs a test feature");
 
@@ -106,8 +105,13 @@ void client::cli(CLI::App& app, Args& args) {
         // Build subcommand config 
         build->callback([]() { client::build(); });
 
+        // Clean subcommand config 
+        clean->add_flag<bool>("--all", args.all, "Also cleans generated CMakeLists.txt")->default_val(false);
+        clean->add_flag<bool>("--purge", args.purge, "Permanently deletes module sources (DANGER)")->default_val(false);
+        clean->callback([&]() { client::clean(args); });
+
         // Test command config
-        test->callback([&]() { client::test(); });
+        test->callback([]() { client::test(); });
 }
 
 void client::err(Err e, std::optional<string> info) {
@@ -140,6 +144,9 @@ void client::err(Err e, std::optional<string> info) {
                 break;
         case Err::GenerateFaied:
                 std::cout << "Failed to generate project" << std::endl;
+                break;
+        case Err::PurgeWithoutAll:
+                std::cout << "The --purge flag must be passed with --all to CONFIRM permanent removal of sources" << std::endl;
                 break;
         }
 }
@@ -356,6 +363,30 @@ void client::generate(Args& args) {
 }
 
 void client::build() {
+}
+
+void client::clean(Args& args) {
+        // Clear build files 
+        fs::remove_all(BUILD_DIR);
+
+        // If --all 
+        if(args.all) {
+                // Load project 
+                auto project = Project::load();
+
+                // Clear generated CMakeLists.txt
+                for(auto& m: project.modules()) {
+                        fs::remove(client::module_dir(m) / CMAKE_LIST_TXT);
+
+                        // (DANGER) Purges module sources as well 
+                        if(args.purge) {
+                                fs::remove_all(client::module_dir(m));
+                        }
+                }
+        } else if(args.purge) {
+                // Flag --purge passed without --all
+                client::err(Err::PurgeWithoutAll, std::nullopt);
+        }
 }
 
 void client::test() {

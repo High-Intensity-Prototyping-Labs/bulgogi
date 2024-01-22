@@ -14,6 +14,7 @@
 #include <filesystem>
 
 // Settings 
+#define BUILD_DIR "build"
 #define MODULE_SRC_DIR "src"
 #define MODULE_INC_DIR "inc"
 #define MODULE_PRI_DIR "inc"
@@ -26,6 +27,7 @@ namespace client {
                 bool    all;
                 bool    create;
                 bool    cached;
+                bool    purge;
         };
 
         // Client errors 
@@ -39,6 +41,7 @@ namespace client {
                 TreeCmdFailed,
                 TargetDepends,
                 GenerateFaied,
+                PurgeWithoutAll,
         };
 
         // Configures the CLI11 app for CLI args.
@@ -52,6 +55,7 @@ namespace client {
         void tree(void);
         void generate(Args& args);
         void build(void);
+        void clean(Args& args);
         void test(void);
 
         // Utilities 
