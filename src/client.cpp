@@ -368,16 +368,26 @@ void client::generate() {
 
         // Generate the CMakeLists.txt
         for(auto& [subdir, list]: cmake.lists) {
+                // Convert CMakeList to json
                 auto j = list.to<json>();
                 j["subdir"] = subdir;
-
-                // DEBUG 
-                std::cout << j << std::endl;
 
                 // Apply template
                 Environment env;
                 auto result = env.render_file("templates/mod.blg", j);
-                std::cout << result << std::endl;
+
+                // Write CMakeList.txt file to subdir 
+                auto path = fs::path(subdir);
+                if(fs::exists(path)) {
+                        ofstream f(path / "CMakeLists.txt");
+                        if(f.is_open()) {
+                                f << result;
+                        }
+                        f.close();
+                } else {
+                        client::err(Err::ModuleDirMissing, subdir);
+                        client::err(Err::GenerateFaied, std::nullopt);
+                }
         }
 }
 
