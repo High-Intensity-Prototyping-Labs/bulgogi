@@ -161,6 +161,50 @@ deps:
 
 /** Long-form droney bits **/
 
+# Re-thinking the executable marker (*)
+# -------------------------------------
+# I've really preferred the existing trend to always make sane assumptions 
+# whenever possible so long as it simplifies and streamlines the UX.
+#
+# At first, the simplest thing was to say that every target is an executable 
+# unless another target depends on it. This was really beautiful.
+#
+# The problem arose in the CMake configuration: executables needed sources that 
+# contained a `main()` routine. This couldn't easily be worked around as 
+# executable CMake targets are not very portable between other targets.
+#
+# The idea then came to have an executable marker (*) next to dependency names 
+# of the modules that contained the `main()` routines. It would be unobtrusive 
+# and signal that they are special (in fact they are).
+#
+# This would also be a nice visual check for conflicts: if there are more than 1 
+# asterix-denoted entry in an executable target's list, there is a problem. There
+# cannot be 2 `main()` routines.
+# 
+# So the latest issue is that requiring the executable marker has seemed both 
+# redundant (target or library status can already be inferred) and a source of 
+# occasional complication (which could escalate into needing intervention).
+#
+# For example, when the "default" target is created when the target field is 
+# unspecified, this is nice is kick-starting a project with no modules. 
+#
+# But should the generated `project.yaml` _need_ to point out exactly which 
+# module is executable? After all, there is only 1. Even if additional deps 
+# are attached to the default target, they could all be library targets.
+#
+# Ambiguity error: instead of being required by default, the executability 
+# market is *only* required when there is ambiguity. Ambiguity occurs when 
+# an executable target has more than 1 module dependency.
+#
+# Advanced inference: it should also be possible to notice when the same 
+# module is used in other targets as a non-executable. For example, if 
+# any library targets include that suspected module, it could not be 
+# executable. Therefore ambiguity is reduced.
+#
+# In fact, the only time there would be ambiguity is when more than one 
+# executable share at least 2 modules that are not used anywhere else in 
+# the project. This would seem like a special case.
+
 # The need to re-use executable modules 
 # -------------------------------------
 # Suppose I wanted to release multiple variants of the same binary.
