@@ -331,16 +331,7 @@ void client::tree() {
         auto project = Project::load();
 
         // Run this function for every module.
-        vector<string> args;
-        vector<string> printed;
-        for(auto& [target, dep_list]: project.targets) {
-                for(auto& dep: dep_list) {
-                        if(!std::any_of(printed.begin(), printed.end(), [&](string& s) { return dep.name == s; })) {
-                                args.push_back(dep.name);
-                                printed.push_back(dep.name);
-                        }
-                }
-        }
+        auto args = project.modules();
 
         // Final shebang
         if(args.size() > 0) {
