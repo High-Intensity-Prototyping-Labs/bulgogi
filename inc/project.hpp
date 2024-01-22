@@ -61,7 +61,8 @@ namespace project {
                 bool any_depends(DependID& m);
                 bool any_depends(DependID& m, Dependency::Kind k);
 
-                Usage get_usage(ModuleID& m, std::unordered_map<ModuleID, Usage>& usages);
+                Usage get_usage(ModuleID& m);
+                Usage get_usage(ModuleID& m, std::unordered_map<ModuleID, Usage>&);
 
                 std::vector<ModuleID> modules(void);
                 std::vector<ModuleID> modules(TargetID& t);
