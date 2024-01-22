@@ -163,12 +163,6 @@ void client::add_module(Args& args) {
         bool dir_exists = false;
         bool valid_tree = false;
 
-        // Placeholders for directories 
-        auto path = fs::path(args.MODULE);
-        auto src = fs::path(path / "src");
-        auto inc = fs::path(path / "inc");
-        auto pri = fs::path(src / "inc");
-
         // Check for duplicates 
         if(project.contains_module(args.MODULE, args.TARGET)) {
                 client::err(Err::DuplicateModule, "("+args.MODULE+", "+args.TARGET+")");
@@ -176,15 +170,11 @@ void client::add_module(Args& args) {
         }
 
         // Check if module directory exists in the FS
-        if(fs::is_directory(path)) {
+        if(client::module_dir_exists(args.MODULE)) {
                 dir_exists = true;
 
                 // Validate directory structure...
-                bool src_exists = fs::is_directory(src);
-                bool inc_exists = fs::is_directory(inc);
-                bool pri_exists = fs::is_directory(pri);
-                
-                valid_tree = src_exists && inc_exists && pri_exists;
+                valid_tree = client::valid_module_dirs(args.MODULE);
         }
 
         //-- Main control branch --//
@@ -230,9 +220,7 @@ void client::add_module(Args& args) {
         }
 
         if(need_spawn) {
-                fs::create_directories(src);
-                fs::create_directories(inc);
-                fs::create_directories(pri);
+                client::create_module_dirs(args.MODULE);
         }
 
         if(proj_chged) {
