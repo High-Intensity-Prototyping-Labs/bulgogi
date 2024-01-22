@@ -13,3 +13,8 @@
         - Yes like `bul gen --create` on a big project.yaml in an empty repo. 
         - Bug maybe `bul module add modules.txt` could spin up a list of things too.
         - Could `bulgogi add` one day fetch git repos from the internet??????
+
+- It would be frustrating to _only_ want to generate the dirs of 1 module 
+        - But the --create flag passes over the entire project.yaml 
+        - Maybe generate could accept an optional module list 
+        - Otherwise it does all by default
