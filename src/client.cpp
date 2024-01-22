@@ -100,7 +100,8 @@ void client::cli(CLI::App& app, Args& args) {
         tree->callback([]() { client::tree(); });
 
         // Generate subcommand config 
-        generate->callback([]() { client::generate(); });
+        generate->add_flag<bool>("--create", args.create, "Create module directories (if missing)")->default_val(false);
+        generate->callback([&]() { client::generate(args); });
 
         // Build subcommand config 
         build->callback([]() { client::build(); });
@@ -359,7 +360,7 @@ void client::tree() {
         }
 }
 
-void client::generate() {
+void client::generate(Args& args) {
         // Load project 
         auto project = Project::load();
 
@@ -367,6 +368,7 @@ void client::generate() {
         auto cmake = CMakeProject::from(project);
 
         // Generate the CMakeLists.txt
+        bool pass = true;
         for(auto& [subdir, list]: cmake.lists) {
                 // Convert CMakeList to json
                 auto j = list.to<json>();
@@ -378,7 +380,9 @@ void client::generate() {
 
                 // Write CMakeList.txt file to subdir 
                 auto path = fs::path(subdir);
-                if(fs::exists(path)) {
+                if(fs::exists(path) || args.create) {
+                        fs::create_directories(path);
+
                         ofstream f(path / "CMakeLists.txt");
                         if(f.is_open()) {
                                 f << result;
@@ -386,8 +390,12 @@ void client::generate() {
                         f.close();
                 } else {
                         client::err(Err::ModuleDirMissing, subdir);
-                        client::err(Err::GenerateFaied, std::nullopt);
+                        pass = false;
                 }
+        }
+
+        if(!pass) {
+                client::err(Err::GenerateFaied, std::nullopt);
         }
 }
 
