@@ -356,13 +356,13 @@ Dependency Dependency::from(Dependency::Kind kind, string& name) {
                 return Dependency {
                         .type = kind,
                         .name = clean_name,
-                        .exe = std::ranges::count(name, '*') > 0,
+                        .exe_flag = std::ranges::count(name, '*') > 0,
                 };
         } else {
                 return Dependency {
                         .type = kind,
                         .name = clean_name,
-                        .exe = false,
+                        .exe_flag = false,
                 };
         }
 }
@@ -374,7 +374,7 @@ Dependency Dependency::from(Dependency::Kind kind, string& name, bool exe) {
         return Dependency {
                 .type = kind,
                 .name = clean_name,
-                .exe = exe,
+                .exe_flag = exe,
         };
 }
 

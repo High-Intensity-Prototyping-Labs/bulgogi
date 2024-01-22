@@ -218,7 +218,7 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 // Add libmodules from target dependencies
                 for(auto& dep: dep_list) {
                         if(dep.type == project::Dependency::Module 
-                                && dep.exe == false
+                                && dep.exe_flag == false
                                 && !std::count(libmodules.begin(), libmodules.end(), dep.name)
                         ) {
                                 libmodules.push_back(dep.name);
