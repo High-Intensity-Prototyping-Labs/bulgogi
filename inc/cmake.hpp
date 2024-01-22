@@ -36,7 +36,8 @@ namespace cmake {
 
                 template<class T>
                 T to(void);
-
+                
+                // TODO: Get rid of this object model crap
                 void generate_mod(Subdirectory&);
                 void generate_proj(std::unordered_map<Subdirectory, CMakeList>&);
         };
