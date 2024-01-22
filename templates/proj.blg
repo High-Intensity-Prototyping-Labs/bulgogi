@@ -181,8 +181,9 @@ function(add_library lib)
 endfunction(add_library lib)
 endif(NOT COMMAND _add_library)
 
-# All of the libraries that don't have submodules 
+#----------------- Target libraries
 ## for target in targets 
+# lib{{ target.name }}
 set(LIB_{{ target.name }} "{{ target.name }}") # this is PROJECT_NAME, NOT CMAKE_PROJECT_NAME
 message("CONFIGURING TARGET : ${LIB_{{ target.name }}}")
 
@@ -192,13 +193,18 @@ else()
     add_library(${LIB_{{ target.name }}})
 endif(TARGET ${LIB_{{ target.name }}})
 
-## for link in target.links
-target_link_libraries(${TARGET_{{ target.name }}} PUBLIC {{ link }})
 ## endfor
 
-## endfor
-
-# dependencies come first
+#----------------- Add subdirectories
 ## for subdir in subdirs
 add_subdirectory({{ subdir }})
+## endfor
+
+#----------------- Target library links
+## for target in targets 
+# Links for lib{{ target.name }}
+## for link in target.links
+target_link_libraries(${LIB_{{ target.name }}} PUBLIC {{ link }})
+## endfor
+
 ## endfor
