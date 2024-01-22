@@ -1,0 +1,22 @@
+- Can't help but notice that sometimes a `bul module rm "*" --all` removes all but module4.
+
+- Adding a module with `bul module add "module1*" --create` does not create a clean-name module1 dir.
+- Furthermore, the name in the project.yaml _is_ clean, which is practically opposite.
+- Sometimes I create projects weirdly...is this related?
+        module1
+        ├── CMakeLists.txt
+        ├── inc
+        └── src
+            └── inc
+        module2
+        ├── CMakeLists.txt
+        ├── inc
+        └── src
+            └── inc
+        module3
+        ├── CMakeLists.txt
+        ├── inc
+        └── src
+            └── inc
+        module4
+        └── CMakeLists.txt
