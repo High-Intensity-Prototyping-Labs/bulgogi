@@ -20,18 +20,18 @@ project(
 
 ## for target in targets
 
-set(LIB_{{ target.name }} "{{ target.name }}") # this is PROJECT_NAME, NOT CMAKE_PROJECT_NAME
-message("CONFIGURING TARGET : ${LIB_{{ target.name }}}")
+set(TARGET_{{ target.name }} "{{ target.name }}") # this is PROJECT_NAME, NOT CMAKE_PROJECT_NAME
+message("CONFIGURING TARGET : ${TARGET_{{ target.name }}}")
 
-if(TARGET ${LIB_{{ target.name }}})
-    message(FATAL_ERROR "Target ${LIB_{{ target.name }}} already exists in this project!")
+if(TARGET ${TARGET_{{ target.name }}})
+    message(FATAL_ERROR "Target ${TARGET_{{ target.name }}} already exists in this project!")
 else()
 ## if target.exe
-    add_executable(${LIB_{{ target.name }}})
+    add_executable(${TARGET_{{ target.name }}})
 ## else
-    add_library(${LIB_{{ target.name }}})
+    add_library(${TARGET_{{ target.name }}})
 ## endif
-endif(TARGET ${LIB_{{ target.name }}})
+endif(TARGET ${TARGET_{{ target.name }}})
 
 ## endfor
 
@@ -59,9 +59,9 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-    target_compile_options(${LIB_{{ target.name }}} PUBLIC "-Wall")
-    target_compile_options(${LIB_{{ target.name }}} PUBLIC "-Wextra")
-    target_compile_options(${LIB_{{ target.name }}} PUBLIC "-Wshadow")
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wall")
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wextra")
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wshadow")
     set(BUILD_TESTING ON CACHE BOOL "" FORCE)
     set(BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
 endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -74,19 +74,19 @@ endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 ## for target in targets
 
-get_property(${LIB_{{ target.name }}}_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
-foreach(lang ${${LIB_{{ target.name }}}_languages})
+get_property(${TARGET_{{ target.name }}}_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
     if(${lang} STREQUAL CXX)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
     elseif(${lang} STREQUAL C)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
     elseif(${lang} STREQUAL ASM)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.asm")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.asm")
     else()
         # language not supported
     endif()
-    target_sources(${LIB_{{ target.name }}} PRIVATE ${${LIB_{{ target.name }}}_${lang}_sources})
-endforeach(lang ${${LIB_{{ target.name }}}_languages})
+    target_sources(${TARGET_{{ target.name }}} PRIVATE ${${TARGET_{{ target.name }}}_${lang}_sources})
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
 
 ## endfor
 
@@ -96,25 +96,25 @@ endforeach(lang ${${LIB_{{ target.name }}}_languages})
 
 ## for target in targets
 
-foreach(lang ${${LIB_{{ target.name }}}_languages})
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
     if(${lang} STREQUAL CXX)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp")
     elseif(${lang} STREQUAL C)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
     elseif(${lang} STREQUAL ASM)
     
     else()
         # language not supported
     endif()
 
-    set(${LIB_{{ target.name }}}_${lang}_private_include_directories "")
-    foreach(hdr ${${LIB_{{ target.name }}}_${lang}_private_headers})
+    set(${TARGET_{{ target.name }}}_${lang}_private_include_directories "")
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_private_headers})
         get_filename_component(hdr_dir ${hdr} DIRECTORY)
-        list(APPEND ${LIB_{{ target.name }}}_${lang}_private_include_directories ${hdr_dir})
-    endforeach(hdr ${${LIB_{{ target.name }}}_${lang}_private_headers})
-    list(REMOVE_DUPLICATES ${LIB_{{ target.name }}}_${lang}_private_include_directories)
-    target_include_directories(${LIB_{{ target.name }}} PRIVATE ${${LIB_{{ target.name }}}_${lang}_private_include_directories})
-endforeach(lang ${${LIB_{{ target.name }}}_languages})
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_private_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_private_headers})
+    list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_private_include_directories)
+    target_include_directories(${TARGET_{{ target.name }}} PRIVATE ${${TARGET_{{ target.name }}}_${lang}_private_include_directories})
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
 
 ## endfor
 
@@ -124,25 +124,25 @@ endforeach(lang ${${LIB_{{ target.name }}}_languages})
 
 ## for target in targets
 
-foreach(lang ${${LIB_{{ target.name }}}_languages})
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
     if(lang STREQUAL CXX)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.hpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.hpp")
     elseif(lang STREQUAL C)
-        file(GLOB_RECURSE ${LIB_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
     elseif(lang STREQUAL ASM)
     
     else()
         # language not supported
     endif()
 
-    set(${LIB_{{ target.name }}}_${lang}_public_include_directories "")
-    foreach(hdr ${${LIB_{{ target.name }}}_${lang}_public_headers})
+    set(${TARGET_{{ target.name }}}_${lang}_public_include_directories "")
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_headers})
         get_filename_component(hdr_dir ${hdr} DIRECTORY)
-        list(APPEND ${LIB_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
-    endforeach(hdr ${${LIB_{{ target.name }}}_${lang}_public_headers})
-    list(REMOVE_DUPLICATES ${LIB_{{ target.name }}}_${lang}_public_include_directories)
-    target_include_directories(${LIB_{{ target.name }}} PUBLIC ${${LIB_{{ target.name }}}_${lang}_public_include_directories})
-endforeach(lang ${${LIB_{{ target.name }}}_languages})
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_headers})
+    list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_public_include_directories)
+    target_include_directories(${TARGET_{{ target.name }}} PUBLIC ${${TARGET_{{ target.name }}}_${lang}_public_include_directories})
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
 
 ## endfor
 
@@ -152,7 +152,7 @@ endforeach(lang ${${LIB_{{ target.name }}}_languages})
 
 ## for target in targets
 
-target_compile_options(${LIB_{{ target.name }}} PUBLIC "-g")
+target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-g")
 
 ## endfor
 
@@ -162,7 +162,7 @@ target_compile_options(${LIB_{{ target.name }}} PUBLIC "-g")
 # Project libs
 ## for target in targets
 ## for link in target.links
-target_link_libraries(${LIB_{{ target.name }}} PUBLIC {{ link }})
+target_link_libraries(${TARGET_{{ target.name }}} PUBLIC {{ link }})
 ## endfor
 
 ## endfor
@@ -174,15 +174,15 @@ find_package(Threads REQUIRED)
 if(Threads_FOUND) 
     if(WIN32)
         if(CMAKE_USE_WIN32_THREADS_INIT)
-            target_link_libraries(${LIB_{{ target.name }}} PUBLIC pthread)
-            target_compile_options(${LIB_{{ target.name }}} PUBLIC "-lpthread")
+            target_link_libraries(${TARGET_{{ target.name }}} PUBLIC pthread)
+            target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-lpthread")
         else()
             message(FATAL_ERROR "BLAHHH ")
         endif()
     elseif(UNIX)
         if(CMAKE_USE_PTHREADS_INIT)
-            target_link_libraries(${LIB_{{ target.name }}} PUBLIC pthread)
-            target_compile_options(${LIB_{{ target.name }}} PUBLIC "-lpthread")
+            target_link_libraries(${TARGET_{{ target.name }}} PUBLIC pthread)
+            target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-lpthread")
         else()
             message(FATAL_ERROR "BLAHHH ")
         endif()
