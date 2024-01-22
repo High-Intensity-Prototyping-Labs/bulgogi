@@ -170,6 +170,15 @@ CMakeProject CMakeProject::from(project::Project &p) {
                  * Can I conceive of a library which contains an executable main() function?
                  * Maybe...a shared library perhaps? I just don't know how this wouldn't cause 
                  * a conflict down the road in the linker.
+                 *
+                 * Lo and behold: this has become a problem. Un-attached library targets with no 
+                 * executable components are attempted executables but have no subdirectory (proxy)
+                 * to attach to. Thus resulting in a subdir value of "" and thus confusing the hell 
+                 * out of the fs::create_directories() function.
+                 *
+                 * I'm glad it was this easy to spot - if "" defaulted to ., it would fail silently.
+                 *
+                 * So new rule: having the executable component is what distinguishes libs from exes.
                  */
 
                 fs::path subdirectory;
