@@ -1,1 +1,2 @@
 - Running `bul tree` with an empty project.yaml dumps the whole project repo.
+- Running `bul tree` will sometimes tree and print from a non-module target directory (won't ever exist).
