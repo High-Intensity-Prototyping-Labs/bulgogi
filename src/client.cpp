@@ -382,6 +382,9 @@ void client::clean(Args& args) {
                                 fs::remove_all(client::module_dir(m));
                         }
                 }
+
+                // Dont forget project-level
+                fs::remove(client::project_dir() / CMAKE_LIST_TXT);
         } else if(args.purge) {
                 // Flag --purge passed without --all
                 client::err(Err::PurgeWithoutAll, std::nullopt);
@@ -396,6 +399,10 @@ void client::test() {
         for(auto& m: modules) {
                 std::cout << m << std::endl;
         }
+}
+
+fs::path client::project_dir() {
+        return fs::path(PROJECT_DIR);
 }
 
 fs::path client::module_dir(std::string& m) {

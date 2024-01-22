@@ -15,6 +15,7 @@
 
 // Settings 
 #define BUILD_DIR "build"
+#define PROJECT_DIR "."
 #define MODULE_SRC_DIR "src"
 #define MODULE_INC_DIR "inc"
 #define MODULE_PRI_DIR "inc"
@@ -59,6 +60,7 @@ namespace client {
         void test(void);
 
         // Utilities 
+        std::filesystem::path project_dir(void);
         std::filesystem::path module_dir(std::string& m);
         std::filesystem::path module_src_dir(std::string& m);
         std::filesystem::path module_inc_dir(std::string& m);
