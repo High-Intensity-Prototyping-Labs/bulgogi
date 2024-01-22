@@ -1,1 +1,5 @@
 - There should be a command `bul module rm --all`
+- Passing the --create flag to `bul gen` should create the full directory structure.
+- The `bul clean` command should remove all of the build files (but not the CMakeLists.txt or sources).
+        - Then `bul clean --all` should remove all the build files and the CMakeLists.txt 
+        - Lastly `bul clean --purge` should remove all modules that are not depended on.
