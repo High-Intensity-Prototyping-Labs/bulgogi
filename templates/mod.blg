@@ -26,7 +26,11 @@ message("CONFIGURING TARGET : ${LIB_{{ target.name }}}")
 if(TARGET ${LIB_{{ target.name }}})
     message(FATAL_ERROR "Target ${LIB_{{ target.name }}} already exists in this project!")
 else()
+## if target.exe
+    add_executable(${LIB_{{ target.name }}})
+## else
     add_library(${LIB_{{ target.name }}})
+## endif
 endif(TARGET ${LIB_{{ target.name }}})
 
 ## endfor
