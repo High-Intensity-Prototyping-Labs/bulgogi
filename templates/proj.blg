@@ -204,7 +204,7 @@ add_subdirectory({{ subdir }})
 ## for target in targets 
 # Links for lib{{ target.name }}
 ## for link in target.links
-target_link_libraries(${LIB_{{ target.name }}} PUBLIC {{ link }})
+target_link_libraries(${LIB_{{ target.name }}} INTERFACE {{ link }})
 ## endfor
 
 ## endfor
