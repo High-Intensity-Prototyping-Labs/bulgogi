@@ -1,5 +1,5 @@
 # Bulgogi Synopsis
-# InDev v0.7.5
+# InDev v0.7.6
 
 # NOTE: Largely inspired by git cli.
 

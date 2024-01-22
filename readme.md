@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-InDev v0.7.5
+InDev v0.7.6
 
 ## Overview
 Bulgogi is a C/C++ build-system orchestrator for CubeSats.
@@ -47,13 +47,17 @@ bul generate --create   # Creates modules dirs if missing
 ```
 
 
+```
+bul clean               # Clean project build files 
+bul clean --all         # Additionally remove generated CMakeLists.txt
+bul clean --all --purge # Permanently deletes all modules (DANGER)
+```
+
+
 Planned subcommands:
 
 
 ```bul build```
-
-
-```bul clean```
 
 ## Limitations
 - Must be used from the root of the project.
