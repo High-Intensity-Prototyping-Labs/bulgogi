@@ -69,8 +69,7 @@ void client::cli(CLI::App& app, Args& args) {
 
         auto build = app.add_subcommand("build", "Builds the project");
 
-        auto clean = app.add_subcommand("clean", "Cleans project build files")
-                ->require_subcommand();
+        auto clean = app.add_subcommand("clean", "Cleans project build files");
 
         auto test = app.add_subcommand("test", "Runs a test feature");
 
