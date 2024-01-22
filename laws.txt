@@ -1,0 +1,6 @@
+Bulgogi Laws:
+
+1. Modules are completely homogeous and atomic across the project.
+        An executable module in one project is not being re-used as a library in another.
+        
+
