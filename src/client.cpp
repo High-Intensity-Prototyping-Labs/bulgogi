@@ -20,6 +20,9 @@
 #include <filesystem>
 #include <unordered_map>
 
+// External Libraries 
+#include "inja.hpp"
+
 // Project Headers
 #include "project.hpp"
 #include "cmake.hpp"
@@ -28,6 +31,8 @@
 using std::string;
 using std::vector;
 using std::ofstream;
+
+using inja::json;
 
 using project::Project;
 using project::Dependency;
@@ -356,7 +361,12 @@ void client::generate() {
 
         // Convert to CMakeProject 
         auto cmake = CMakeProject::from(project);
-        (void)cmake;
+
+        // Generate the CMakeLists.txt
+        for(auto& [subdir, list]: cmake.lists) {
+                auto j = list.to<json>();
+                std::cout << subdir << ": " << j << std::endl;
+        }
 }
 
 void client::build() {
