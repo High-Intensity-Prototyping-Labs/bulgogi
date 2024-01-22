@@ -30,6 +30,8 @@ namespace cmake {
                 static CMakeList from(std::vector<CMakeTarget>&, std::unordered_map<CMakeTargetID, std::vector<CMakeTargetID>>&);
         };
         std::ostream& operator<<(std::ostream&, CMakeList&);
+        CMakeList operator+(CMakeList&, CMakeList&);
+        CMakeList operator+=(CMakeList&, CMakeList&);
 
         using Subdirectory = std::string;
         struct CMakeProject {

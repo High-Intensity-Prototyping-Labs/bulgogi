@@ -80,6 +80,17 @@ ostream& cmake::operator<<(ostream& out, CMakeList& l) {
         return out;
 }
 
+CMakeList cmake::operator+(CMakeList& a, CMakeList& b) {
+        auto list = CMakeList(a);
+        list.targets.insert(list.targets.end(), b.targets.begin(), b.targets.end());
+        list.links.insert(b.links.begin(), b.links.end());
+        return list;
+}
+
+CMakeList cmake::operator+=(CMakeList& a, CMakeList& b) {
+        return a + b;
+}
+
 CMakeProject CMakeProject::make() {
         return CMakeProject {
                 .lists = unordered_map<string, CMakeList>(),
@@ -210,8 +221,13 @@ CMakeProject CMakeProject::from(project::Project &p) {
                         list.links.insert({target.name, links[target.name]});
                         /* assumes every target.name has an entry in links */
                 }
-                project.lists.insert({subdir, list});
-                // TODO: Exception: there will be multiple 'lists' in the '.' subdir. Fix this.
+                // Catch/prevent any overrides of 2 entries with the same subdirectory
+                if(project.lists.contains(subdir)) {
+                        // Combine lists
+                        project.lists[subdir] += list;
+                } else {
+                        project.lists.insert({subdir, list});
+                }
         }
 
         // DEBUG
