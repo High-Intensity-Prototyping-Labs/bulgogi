@@ -200,5 +200,5 @@ target_link_libraries(${TARGET_{{ target.name }}} PUBLIC {{ link }})
 
 # dependencies come first
 ## for subdir in subdirs
-add_subdirectory(subdir)
+add_subdirectory({{ subdir }})
 ## endfor
