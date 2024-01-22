@@ -83,14 +83,19 @@ json CMakeList::to<json>() {
         auto j = json();
         for(auto& t: targets) {
                 // Set executable or not
+                bool exe = false;
                 if(t.kind == CMakeTarget::Executable) {
-                        j["targets"][t.name]["exe"] = true;
+                        exe = true;
                 } else {
-                        j["targets"][t.name]["exe"] = false;
+                        exe = false;
                 }
 
                 // Set links
-                j["targets"][t.name]["links"] = this->links[t.name];
+                j["targets"] += {
+                        {"name", t.name}, 
+                        {"exe", exe}, 
+                        {"links", this->links[t.name]}
+                };
         }
 
         return j;
