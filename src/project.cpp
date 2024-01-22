@@ -6,10 +6,11 @@
 #include "project.hpp"
 
 // Standard C++ Libraries
-#include <optional>
+#include <set>
 #include <tuple>
 #include <variant>
 #include <iostream>
+#include <optional>
 #include <algorithm>
 #include <filesystem>
 
@@ -22,6 +23,7 @@ using project::Dependency;
 
 // Using declarations
 using std::ios;
+using std::set;
 using std::string;
 using std::vector;
 using std::ofstream;
@@ -191,6 +193,24 @@ bool Project::any_depends(std::string& m, Dependency::Kind k) {
         }
 
         return any_depends;
+}
+
+vector<string> Project::modules() {
+        auto modules = vector<string>();
+        auto unique = set<string>();
+
+        for(auto& [_, dep_list]: this->targets) {
+                for(auto& d: dep_list) {
+                        if(d.type == Dependency::Module) {
+                                modules.push_back(d.name);
+                        }
+                }
+        }
+
+        unique.insert(modules.begin(), modules.end());
+        modules.assign(unique.begin(), unique.end());
+
+        return modules;
 }
 
 Dependency Dependency::from(Dependency::Kind kind, string& name) {

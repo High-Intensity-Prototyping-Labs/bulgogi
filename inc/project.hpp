@@ -50,6 +50,8 @@ namespace project {
 
                 bool any_depends(std::string& m);
                 bool any_depends(std::string& m, Dependency::Kind k);
+
+                std::vector<std::string> modules(void);
         };
         template<>
         std::unordered_map<std::string, std::vector<std::string>> Project::to();

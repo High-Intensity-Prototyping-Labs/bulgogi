@@ -401,10 +401,9 @@ void client::build() {
 void client::test() {
         // Load project 
         auto project = Project::load();
+        auto modules = project.modules();
 
-        auto cmake = CMakeProject::from(project);
-
-        auto list = cmake.lists[TARGET_LIB_DIR];
-        auto j = list.to<json>();
-        cmake::from_template(j, TEMPLATE_PROJ, TARGET_LIB_DIR);
+        for(auto& m: modules) {
+                std::cout << m << std::endl;
+        }
 }
