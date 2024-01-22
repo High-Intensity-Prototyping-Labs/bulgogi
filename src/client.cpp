@@ -343,20 +343,23 @@ void client::tree() {
         }
 
         // Final shebang
-        string argv = "tree";
-        std::array<char, 32> buffer;
+        if(args.size() > 0) {
+                string argv = "tree";
+                std::array<char, 32> buffer;
 
-        for(size_t x = 0; x < args.size(); x++) {
-                argv += " " + args[x];
-        }
-        FILE *fp = popen(argv.c_str(), "r");
-        if(fp) {
-                while(fgets(buffer.data(), buffer.size(), fp) != NULL) {
-                        std::cout << buffer.data();
+                for(size_t x = 0; x < args.size(); x++) {
+                        argv += " " + args[x];
                 }
-                std::cout << std::endl;
-        } else {
-                client::err(Err::TreeCmdFailed, std::nullopt);
+
+                FILE *fp = popen(argv.c_str(), "r");
+                if(fp) {
+                        while(fgets(buffer.data(), buffer.size(), fp) != NULL) {
+                                std::cout << buffer.data();
+                        }
+                        std::cout << std::endl;
+                } else {
+                        client::err(Err::TreeCmdFailed, std::nullopt);
+                }
         }
 }
 

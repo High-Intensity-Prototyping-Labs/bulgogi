@@ -1,4 +1,3 @@
-- Running `bul tree` with an empty project.yaml dumps the whole project repo.
 - Running `bul tree` will sometimes tree and print from a non-module target directory (won't ever exist).
 
 - The `./CMakeLists.txt` add_library() trick for target-libraries without resident modules will only work if its dependencies are 
