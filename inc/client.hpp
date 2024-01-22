@@ -11,6 +11,12 @@
 // Standard C++ Libraries
 #include <string>
 #include <optional>
+#include <filesystem>
+
+// Settings 
+#define MODULE_SRC_DIR "src"
+#define MODULE_INC_DIR "inc"
+#define MODULE_PRI_DIR "inc"
 
 namespace client {
         // Placeholder for the CLI11 args 
@@ -47,4 +53,14 @@ namespace client {
         void generate(Args& args);
         void build(void);
         void test(void);
+
+        // Utilities 
+        std::filesystem::path module_dir(std::string& m);
+        std::filesystem::path module_src_dir(std::string& m);
+        std::filesystem::path module_inc_dir(std::string& m);
+        std::filesystem::path module_pri_dir(std::string& m);
+
+        void create_module_dirs(std::string& m);
+        bool valid_module_dirs(std::string& m);
+        bool module_dir_exists(std::string& m);
 }

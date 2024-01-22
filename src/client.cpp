@@ -398,3 +398,39 @@ void client::test() {
                 std::cout << m << std::endl;
         }
 }
+
+fs::path client::module_dir(std::string& m) {
+        return fs::path(m);
+}
+
+fs::path client::module_src_dir(std::string& m) {
+        return client::module_dir(m) / MODULE_SRC_DIR;
+}
+
+fs::path client::module_inc_dir(std::string& m) {
+        return client::module_dir(m) / MODULE_INC_DIR;
+}
+
+fs::path client::module_pri_dir(std::string& m) {
+        return client::module_src_dir(m) / MODULE_PRI_DIR;
+}
+
+void client::create_module_dirs(string& m) {
+        fs::create_directories(client::module_dir(m));
+        fs::create_directories(client::module_src_dir(m));
+        fs::create_directories(client::module_inc_dir(m));
+        fs::create_directories(client::module_pri_dir(m));
+}
+
+bool client::valid_module_dirs(std::string& m) {
+        bool mod = client::module_dir_exists(m);
+        bool src = fs::exists(client::module_src_dir(m));
+        bool inc = fs::exists(client::module_inc_dir(m));
+        bool pri = fs::exists(client::module_pri_dir(m));
+
+        return (mod && src && inc && pri);
+}
+
+bool client::module_dir_exists(std::string& m) {
+        return fs::exists(client::module_dir(m));
+}
