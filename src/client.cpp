@@ -370,24 +370,11 @@ void client::generate(Args& args) {
         // Generate the CMakeLists.txt
         bool pass = true;
         for(auto& [subdir, list]: cmake.lists) {
-                // Convert CMakeList to json
-                auto j = list.to<json>();
-                j["subdir"] = subdir;
-
-                // Apply template
-                Environment env;
-                auto result = env.render_file("templates/mod.blg", j);
-
-                // Write CMakeList.txt file to subdir 
                 auto path = fs::path(subdir);
                 if(fs::exists(path) || args.create) {
                         fs::create_directories(path);
-
-                        ofstream f(path / "CMakeLists.txt");
-                        if(f.is_open()) {
-                                f << result;
-                        }
-                        f.close();
+                        list.generate((string&)subdir);
+                        pass = true;
                 } else {
                         client::err(Err::ModuleDirMissing, subdir);
                         pass = false;

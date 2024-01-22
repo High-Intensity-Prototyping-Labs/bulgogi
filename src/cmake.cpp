@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <filesystem>
@@ -19,10 +20,12 @@
 using std::string;
 using std::vector;
 using std::ostream;
+using std::ofstream;
 using std::unordered_map;
 
 // External library using directives 
 using inja::json;
+using inja::Environment;
 
 // Project using directives
 using cmake::CMakeList;
@@ -66,16 +69,23 @@ CMakeList CMakeList::from(std::vector<CMakeTarget>& targets, std::unordered_map<
 }
 
 void CMakeList::generate(Subdirectory& subdir) {
-        (void)subdir;
-        // Load template 
-        
-        // For each target, populate template 
-        
-        // For each links, populate template
-        
-        // Make sure subdir exists 
-        
-        // Write CMakeList.txt out
+        if(subdir == TARGET_LIB_DIR) {
+                this->generate_proj();
+        } else {
+                this->generate_mod(subdir);
+        }
+}
+
+void CMakeList::generate_mod(Subdirectory& subdir) {
+        // Convert CMakeList to json
+        auto j = this->to<json>();
+        j["subdir"] = subdir;
+        cmake::from_template(j, TEMPLATE_MOD, subdir.c_str());
+}
+
+void CMakeList::generate_proj() {
+        auto j = this->to<json>();
+        cmake::from_template(j, TEMPLATE_PROJ, TARGET_LIB_DIR);
 }
 
 template<>
@@ -255,4 +265,16 @@ ostream& cmake::operator<<(ostream& out, CMakeProject& p) {
         out << "}" << std::endl;
 
         return out;
+}
+
+void cmake::from_template(json& j, const char* template_path, const char* path_dst) {
+        Environment env;
+        auto result = env.render_file(template_path, j);
+        auto path = fs::path(path_dst);
+
+        ofstream f(path / CMAKE_LIST_TXT);
+        if(f.is_open()) {
+                f << result;
+        }
+        f.close();
 }
