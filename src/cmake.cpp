@@ -181,38 +181,6 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 });
         }
 
-        // DEBUG
-        std::cout << "Targets:" << std::endl;
-        for(auto& target: targets) {
-                std::cout << target << std::endl;
-        }
-        std::cout << std::endl;
-
-        std::cout << "Libmodules:" << std::endl;
-        for(auto& libmodule: libmodules) {
-                std::cout << libmodule << std::endl;
-        }
-        std::cout << std::endl;
-
-        std::cout << "Links:" << std::endl;
-        for(auto& link: links) {
-                std::cout << link.first<< ": " << std::endl;
-                for(auto& link_list: link.second) {
-                        std::cout << "\t" << link_list << ", " << std::endl;
-                }
-                std::cout << std::endl;
-        }
-        std::cout << std::endl;
-
-        std::cout << "Subdirectories:" << std::endl;
-        for(auto& [subdir, targets]: subdirectories) {
-                std::cout << "\t" << subdir << std::endl;
-                for(auto& target: targets) {
-                        std::cout << "\t\t" << target << "," << std::endl;
-                }
-                std::cout << std::endl;
-        }
-
         // Amalgamate all of those lists 
         for(auto& [subdir, targets]: subdirectories) {
                 auto list = CMakeList::make();
