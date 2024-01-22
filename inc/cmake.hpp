@@ -43,4 +43,5 @@ namespace cmake {
                 void generate(void);
                 void build(void);
         };
+        std::ostream& operator<<(std::ostream&, CMakeProject&);
 }
