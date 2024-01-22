@@ -36,6 +36,7 @@ using inja::json;
 using inja::Environment;
 
 using project::Project;
+using project::ModuleID;
 using project::Dependency;
 
 using cmake::CMakeProject;

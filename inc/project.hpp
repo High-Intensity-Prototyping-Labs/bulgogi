@@ -32,8 +32,11 @@ namespace project {
                 IOError,
         };
 
+        using TargetID = std::string;
+        using ModuleID = std::string;
+        using DependID = std::string;
         struct Project {
-                std::unordered_map<std::string, std::vector<Dependency>> targets;
+                std::unordered_map<TargetID, std::vector<Dependency>> targets;
 
                 static Project make(void);
                 static Project from(std::unordered_map<std::string, std::vector<std::string>>);
@@ -45,13 +48,19 @@ namespace project {
                 static Project load(void);
                 Err save(void);
 
-                bool contains_module(std::string& m);
-                bool contains_module(std::string& m, std::string& t);
+                bool contains_module(ModuleID& m);
+                bool contains_module(ModuleID& m, TargetID& t);
 
-                bool any_depends(std::string& m);
-                bool any_depends(std::string& m, Dependency::Kind k);
+                bool any_depends(DependID& m);
+                bool any_depends(DependID& m, Dependency::Kind k);
 
-                std::vector<std::string> modules(void);
+                Usage get_usage(ModuleID& m, std::unordered_map<ModuleID, Usage>& usages);
+
+                std::vector<ModuleID> modules(void);
+                std::vector<ModuleID> modules(TargetID& t);
+
+                std::vector<TargetID> libraries(void);
+                std::vector<TargetID> executables(void);
         };
         template<>
         std::unordered_map<std::string, std::vector<std::string>> Project::to();

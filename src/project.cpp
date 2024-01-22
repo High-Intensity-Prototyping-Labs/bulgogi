@@ -19,6 +19,9 @@
 
 using project::Err;
 using project::Project;
+using project::TargetID;
+using project::ModuleID;
+using project::DependID;
 using project::Dependency;
 
 // Using declarations
@@ -131,7 +134,7 @@ unordered_map<string, vector<string>> Project::to() {
 }
 
 // Checks whether project contains module at all
-bool Project::contains_module(string& m) {
+bool Project::contains_module(ModuleID& m) {
         bool res = false;
 
         for(auto it = this->targets.begin(); it != this->targets.end(); it++) {
@@ -146,7 +149,7 @@ bool Project::contains_module(string& m) {
 }
 
 // Checks whether a project contains a module in a specific target
-bool Project::contains_module(string& m, string& t) {
+bool Project::contains_module(ModuleID& m, TargetID& t) {
         bool res = false;
 
         if(this->targets.contains(t)) {
@@ -161,7 +164,7 @@ bool Project::contains_module(string& m, string& t) {
 }
 
 // Returns whether any targets in the project depend on the specified module 
-bool Project::any_depends(string& m) {
+bool Project::any_depends(DependID& m) {
         bool any_depends = false;
 
         auto matching_dep = [&](Dependency& d) {
@@ -178,7 +181,7 @@ bool Project::any_depends(string& m) {
         return any_depends;
 }
 
-bool Project::any_depends(std::string& m, Dependency::Kind k) {
+bool Project::any_depends(DependID& m, Dependency::Kind k) {
         bool any_depends = false;
         
         auto matching_both = [&](Dependency& d) {
@@ -195,7 +198,7 @@ bool Project::any_depends(std::string& m, Dependency::Kind k) {
         return any_depends;
 }
 
-vector<string> Project::modules() {
+vector<ModuleID> Project::modules() {
         auto modules = vector<string>();
         auto unique = set<string>();
 
@@ -211,6 +214,44 @@ vector<string> Project::modules() {
         modules.assign(unique.begin(), unique.end());
 
         return modules;
+}
+
+vector<ModuleID> Project::modules(string& t) {
+        auto modules = vector<string>();
+
+        if(this->targets.contains(t)) {
+                for(auto& d: this->targets[t]) {
+                        if(d.type == Dependency::Module) {
+                                modules.push_back(d.name);
+                        }
+                }
+        }
+
+        return modules;
+}
+
+vector<TargetID> Project::libraries() {
+        vector<TargetID> libs;
+
+        for(auto& [target, _]: this->targets) {
+                if(this->any_depends((string&)target)) {
+                        libs.push_back(target);
+                }
+        }
+
+        return libs;
+}
+
+vector<TargetID> Project::executables() {
+        vector<TargetID> exes;
+
+        for(auto& [target, _]: this->targets) {
+                if(!this->any_depends((string&)target)) {
+                        exes.push_back(target);
+                }
+        }
+
+        return exes;
 }
 
 Dependency Dependency::from(Dependency::Kind kind, string& name) {
