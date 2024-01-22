@@ -63,6 +63,7 @@ namespace project {
 
                 Usage get_usage(ModuleID& m);
                 Usage get_usage(ModuleID& m, std::unordered_map<ModuleID, Usage>&);
+                Usage get_dep_usage(Dependency& d);
 
                 std::vector<ModuleID> modules(void);
                 std::vector<ModuleID> modules(TargetID& t);

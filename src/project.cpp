@@ -216,6 +216,22 @@ bool Project::any_depends(DependID& m, Dependency::Kind k) {
         return any_depends;
 }
 
+// Public-facing version (non-recursive, top-level)
+Usage Project::get_usage(ModuleID &m) {
+        unordered_map<ModuleID, Usage> usages;
+        return get_usage(m, usages);
+}
+
+// Adapted for dependencies, not just those in project.modules()
+// NOTE: Trying to get the usage of a non-module Dependency always results in Usage::Ambiguous
+Usage Project::get_dep_usage(Dependency& d) {
+        if(d.type == Dependency::Module) {
+                return get_usage(d.name);
+        } else {
+                return Usage::Ambiguous;
+        }
+}
+
 // Assumes that mod is in the list of project.modules()
 // Assumes ambiguity can be resolved within 1 pass.
 // Assumes the parent call to this function provides a clean instance of the usages vec
