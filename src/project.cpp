@@ -364,6 +364,26 @@ vector<TargetID> Project::executables() {
         return exes;
 }
 
+bool Project::is_library(TargetID& t) {
+        return (
+                std::find(
+                        this->libraries().begin(), 
+                        this->libraries().end(), 
+                        t
+                ) != this->libraries().end()
+        );
+}
+
+bool Project::is_executable(TargetID& t) {
+        return (
+                std::find(
+                        this->executables().begin(),
+                        this->executables().end(),
+                        t
+                ) != this->executables().end()
+        );
+}
+
 Dependency Dependency::from(Dependency::Kind kind, string& name) {
         auto clean_name = string(name);
         std::erase(clean_name, '*');

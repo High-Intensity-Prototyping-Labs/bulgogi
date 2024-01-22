@@ -70,6 +70,9 @@ namespace project {
 
                 std::vector<TargetID> libraries(void);
                 std::vector<TargetID> executables(void);
+
+                bool is_library(TargetID&);
+                bool is_executable(TargetID&);
         };
         template<>
         std::unordered_map<std::string, std::vector<std::string>> Project::to();
