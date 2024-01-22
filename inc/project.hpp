@@ -32,6 +32,13 @@ namespace project {
                 IOError,
         };
 
+        enum class Usage {
+                Libmodule,
+                Exemodule,
+                Ambiguous,
+        };
+        std::ostream& operator<<(std::ostream&, Usage);
+
         using TargetID = std::string;
         using ModuleID = std::string;
         using DependID = std::string;

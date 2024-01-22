@@ -18,6 +18,7 @@
 #include "yaml-cpp/yaml.h"
 
 using project::Err;
+using project::Usage;
 using project::Project;
 using project::TargetID;
 using project::ModuleID;
@@ -29,10 +30,27 @@ using std::ios;
 using std::set;
 using std::string;
 using std::vector;
+using std::ostream;
 using std::ofstream;
 using std::unordered_map;
 
 namespace fs = std::filesystem;
+
+ostream& project::operator<<(ostream& out, Usage u) {
+        switch(u) {
+        case Usage::Ambiguous:
+                out << "Usage::Ambiguous";
+                break;
+        case Usage::Exemodule:
+                out << "Usage::Exemodule";
+                break;
+        case Usage::Libmodule:
+                out << "Usage::Libmodule";
+                break;
+        }
+
+        return out;
+}
 
 Project Project::make() {
         return Project {
@@ -196,6 +214,82 @@ bool Project::any_depends(DependID& m, Dependency::Kind k) {
         }
 
         return any_depends;
+}
+
+// Assumes that mod is in the list of project.modules()
+// Assumes ambiguity can be resolved within 1 pass.
+// Assumes the parent call to this function provides a clean instance of the usages vec
+Usage Project::get_usage(ModuleID& mod, unordered_map<ModuleID, Usage>& usages) {
+        Usage use = Usage::Ambiguous;
+
+        // Go after library targets 
+        for(auto& lib: this->libraries()) {
+                if(this->contains_module(mod, lib)) {
+                        use = Usage::Libmodule;
+                        usages.insert({mod, use});
+                        return use;
+                }
+        }
+        // NOTE: Deliberate early to prevent uncessarily checking executables
+
+        // Check any executables that it is the sole module 
+        for(auto& exe: this->executables()) {
+                if(this->contains_module(mod, exe) ) {
+                        if(this->modules(exe).size() == 1) {
+                                use = Usage::Exemodule;
+                                break;
+                        } else {
+                                // See if the others are unambiguous
+                                int other_amb = 0;
+                                bool other_exe = false;
+                                Usage other_use = Usage::Ambiguous;
+
+                                for(auto& other_m: this->modules(exe)) {
+                                        // Skip current module 
+                                        if(other_m == mod) {
+                                                continue;
+                                        }
+
+                                        // Obtain other modules' ambiguity
+                                        if(usages.contains(other_m)) {
+                                                other_use = usages[other_m];
+                                        } else {
+                                                // Seeking external conf - temporarily setting 
+                                                // this mod as Ambiguous in hope of resolve.
+                                                usages.insert({mod, Usage::Ambiguous});
+
+                                                other_use = this->get_usage(other_m, usages);
+                                        }
+
+                                        // Test ambiguity
+                                        if(other_use == Usage::Ambiguous) {
+                                                other_amb++;
+                                        } else if(other_use == Usage::Exemodule) {
+                                                other_exe = true;
+                                        }
+                                }
+
+                                // See if ambiguity eliminated 
+                                if(other_exe) {
+                                        use = Usage::Libmodule;
+                                /* other_exe == false */
+                                } else if(!other_amb) {
+                                        use = Usage::Exemodule;
+                                } else {
+                                        use = Usage::Ambiguous;
+                                }
+                                usages.insert({mod, use});
+                                /* End of the line */
+                        }
+                }
+
+                // See if there's an escape 
+                if(use != Usage::Ambiguous) {
+                        break;
+                }
+        }
+
+        return use;
 }
 
 vector<ModuleID> Project::modules() {

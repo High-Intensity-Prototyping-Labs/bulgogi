@@ -395,10 +395,11 @@ void client::clean(Args& args) {
 void client::test() {
         // Load project 
         auto project = Project::load();
-        auto modules = project.modules();
 
-        for(auto& m: modules) {
-                std::cout << m << std::endl;
+        auto usages = unordered_map<ModuleID, Usage>();
+        for(auto& m: project.modules()) {
+                std::cout << m << ": " << project.get_usage(m, usages) << std::endl;
+                usages.clear();
         }
 }
 
