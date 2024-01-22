@@ -137,6 +137,9 @@ void client::err(Err e, std::optional<string> info) {
         case Err::TargetDepends:
                 std::cout << "At least 1 other target depends on target: " << info.value_or(VALUE_UNKNOWN) << std::endl;
                 break;
+        case Err::GenerateFaied:
+                std::cout << "Failed to generate project" << std::endl;
+                break;
         }
 }
 
