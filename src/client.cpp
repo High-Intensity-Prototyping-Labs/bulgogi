@@ -351,11 +351,15 @@ void client::generate(Args& args) {
 
         // Generate the CMakeLists.txt
         bool pass = true;
-        for(auto& [subdir, list]: cmake.lists) {
-                auto path = fs::path(subdir);
-                if(fs::exists(path) || args.create) {
-                        fs::create_directories(path);
 
+        for(auto& [subdir, list]: cmake.lists) {
+                // Generate dirs condition
+                if(args.create) {
+                        client::create_module_dirs((string&)subdir);
+                }
+
+                // Normal path 
+                if(client::module_dir_exists((string&)subdir)) {
                         if(subdir == TARGET_LIB_DIR) {
                                 list.generate_proj(cmake.lists);
                         } else {
