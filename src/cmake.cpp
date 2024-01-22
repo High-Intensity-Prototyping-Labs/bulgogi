@@ -198,16 +198,6 @@ CMakeProject CMakeProject::from(project::Project &p) {
                 }
         }
 
-        // DEBUG
-        std::cout << "Project {" << std::endl;
-        std::cout << "\tlists: {" << std::endl;
-        for(auto& [subdir, list]: project.lists) {
-                std::cout << "\t\t\t" << subdir << ": " << std::endl;
-                std::cout << list << std::endl;
-        }
-        std::cout << "\t}" << std::endl;
-        std::cout << "}" << std::endl;
-
         return project;
 }
 
@@ -217,4 +207,18 @@ void CMakeProject::generate() {
 
 void CMakeProject::build() {
 
+}
+
+// TODO: Make me prettier
+ostream& cmake::operator<<(ostream& out, CMakeProject& p) {
+        out << "Project {" << std::endl;
+        out << "\tlists: {" << std::endl;
+        for(auto& [subdir, list]: p.lists) {
+                out << "\t\t\t" << subdir << ": " << std::endl;
+                out << list << std::endl;
+        }
+        out << "\t}" << std::endl;
+        out << "}" << std::endl;
+
+        return out;
 }
