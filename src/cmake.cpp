@@ -9,6 +9,9 @@
 #include <filesystem>
 #include <unordered_map>
 
+// External Libraries 
+#include "inja.hpp"
+
 // Project headers
 #include "project.hpp"
 
@@ -17,6 +20,9 @@ using std::string;
 using std::vector;
 using std::ostream;
 using std::unordered_map;
+
+// External library using directives 
+using inja::json;
 
 // Project using directives
 using cmake::CMakeList;
@@ -57,6 +63,37 @@ CMakeList CMakeList::from(std::vector<CMakeTarget>& targets, std::unordered_map<
                 .targets = vector<CMakeTarget>(targets),
                 .links = unordered_map<CMakeTargetID, vector<CMakeTargetID>>(links),
         };
+}
+
+void CMakeList::generate(Subdirectory& subdir) {
+        (void)subdir;
+        // Load template 
+        
+        // For each target, populate template 
+        
+        // For each links, populate template
+        
+        // Make sure subdir exists 
+        
+        // Write CMakeList.txt out
+}
+
+template<>
+json CMakeList::to<json>() {
+        auto j = json();
+        for(auto& t: targets) {
+                // Set executable or not
+                if(t.kind == CMakeTarget::Executable) {
+                        j["targets"][t.name]["exe"] = true;
+                } else {
+                        j["targets"][t.name]["exe"] = false;
+                }
+
+                // Set links
+                j["targets"][t.name]["links"] = this->links[t.name];
+        }
+
+        return j;
 }
 
 ostream& cmake::operator<<(ostream& out, CMakeList& l) {
@@ -199,14 +236,6 @@ CMakeProject CMakeProject::from(project::Project &p) {
         }
 
         return project;
-}
-
-void CMakeProject::generate() {
-
-}
-
-void CMakeProject::build() {
-
 }
 
 // TODO: Make me prettier
