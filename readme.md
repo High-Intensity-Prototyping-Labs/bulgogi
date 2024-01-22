@@ -55,6 +55,11 @@ Planned subcommands:
 
 ```bul clean```
 
+## Limitations
+- Must be used from the root of the project.
+- Only supports 1 module/project layout.
+- Assumes Unix-like or Linux environment.
+
 ## Usage
 ### Getting Started
 All bulgogi projects need to be initialized in the current working directory.
