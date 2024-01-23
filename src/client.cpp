@@ -31,10 +31,12 @@
 using std::string;
 using std::vector;
 using std::ofstream;
+using std::unordered_map;
 
 using inja::json;
 using inja::Environment;
 
+using project::Usage;
 using project::Project;
 using project::ModuleID;
 using project::Dependency;
@@ -86,6 +88,7 @@ void client::cli(CLI::App& app, Args& args) {
         module_add->add_option<string>("MODULE", args.MODULE, "Name of module to add")->required(true);
         module_add->add_option<string>("TARGET", args.TARGET, "Parent target (depends on module)")->default_val("default");
         module_add->add_flag<bool>("--create", args.create, "Create new module if not found in FS.")->default_val(false);
+        module_add->add_flag<bool>("-x,--exe", args.exe, "Specifices that the module contains an executable component.")->default_val(false);
         module_add->callback([&]() { add_module(args); });
 
         // Module rm subcommand config 
@@ -147,6 +150,9 @@ void client::err(Err e, std::optional<string> info) {
                 break;
         case Err::PurgeWithoutAll:
                 std::cout << "The --purge flag must be passed with --all to CONFIRM permanent removal of sources" << std::endl;
+                break;
+        case Err::Ambiguity:
+                std::cout << "Ambiguity encountered. Consider resolving with an executable indicator (*)." << std::endl;
                 break;
         }
 }
@@ -213,7 +219,7 @@ void client::add_module(Args& args) {
         if(add_module) {
                 // Add module to project 
                 if(project.targets.count(args.TARGET)) {
-                        project.targets[args.TARGET].push_back(Dependency::from(Dependency::Module, args.MODULE));
+                        project.targets[args.TARGET].push_back(Dependency::from(Dependency::Module, args.MODULE, args.exe));
                         proj_chged = true;
                 } else if(args.create) {
                         // Auto-create target and add module to the project
@@ -336,24 +342,30 @@ void client::generate(Args& args) {
         // Generate the CMakeLists.txt
         bool pass = true;
 
-        for(auto& [subdir, list]: cmake.lists) {
-                // Generate dirs condition
-                if(args.create) {
-                        client::create_module_dirs((string&)subdir);
-                }
-
-                // Normal path 
-                if(client::module_dir_exists((string&)subdir)) {
-                        if(subdir == TARGET_LIB_DIR) {
-                                list.generate_proj(cmake.lists);
-                        } else {
-                                list.generate_mod((string&)subdir);
+        // Check for any ambiguity 
+        if(cmake.lists.contains(AMBIGUOUS_DIR)) {
+                client::err(Err::Ambiguity, std::nullopt);
+                pass = false;
+        } else {
+                for(auto& [subdir, list]: cmake.lists) {
+                        // Generate dirs condition
+                        if(args.create) {
+                                client::create_module_dirs((string&)subdir);
                         }
 
-                        pass = true;
-                } else {
-                        client::err(Err::ModuleDirMissing, subdir);
-                        pass = false;
+                        // Normal path 
+                        if(client::module_dir_exists((string&)subdir)) {
+                                if(subdir == TARGET_LIB_DIR) {
+                                        list.generate_proj(cmake.lists);
+                                } else {
+                                        list.generate_mod((string&)subdir);
+                                }
+
+                                pass = true;
+                        } else {
+                                client::err(Err::ModuleDirMissing, subdir);
+                                pass = false;
+                        }
                 }
         }
 
@@ -395,11 +407,12 @@ void client::clean(Args& args) {
 void client::test() {
         // Load project 
         auto project = Project::load();
+        auto cmake = CMakeProject::from(project);
 
-        auto usages = unordered_map<ModuleID, Usage>();
-        for(auto& m: project.modules()) {
-                std::cout << m << ": " << project.get_usage(m, usages) << std::endl;
-                usages.clear();
+        if(cmake.lists.contains(AMBIGUOUS_DIR)) {
+                client::err(Err::Ambiguity, std::nullopt);
+        } else {
+                std::cout << "Amen brother" << std::endl;
         }
 }
 

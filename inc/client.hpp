@@ -29,6 +29,7 @@ namespace client {
                 bool    create;
                 bool    cached;
                 bool    purge;
+                bool    exe;
         };
 
         // Client errors 
@@ -43,6 +44,7 @@ namespace client {
                 TargetDepends,
                 GenerateFaied,
                 PurgeWithoutAll,
+                Ambiguity,
         };
 
         // Configures the CLI11 app for CLI args.
