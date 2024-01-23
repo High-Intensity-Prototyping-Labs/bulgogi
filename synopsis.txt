@@ -160,6 +160,58 @@ deps:
                 Target(target1)
 
 /** Long-form droney bits **/
+# The Re-Introduction of Proxy Libs 
+# ---------------------------------
+# Lo and behold it is revealed that the idea of removing proxy libs came back to bite.
+#
+# I'm grateful that it happened so early-on (pre-bootstrapping) since it's a pretty fund-
+# -amental error. I'd like to elaborate on it.
+#
+# The premise of bulgogi target libraries was that they could be purely interfaces. Just 
+# intermediaries to executables. You can group low-level atomic modules together and form 
+# these larger executables at the top. 
+#
+# That's fine, until you realize that some modules depend on others. And the moment this 
+# happens, the current version of bulgogi begins to treat that higher-level module as a 
+# target lib. In other words, as just an interface.
+#
+# And interfaces don't have source code. They just have other libs linked to them. This 
+# also means no headers. No headers, no includes, no shared APIs.
+#
+# The way to fix this is to give library targets the option to have source code. The  
+# problem is finding in which file or directory they should live. The way that the 
+# templates work at the moment is by globbing sources and headers in a module dir 
+# to form one libmodule (or the executable component of an executable target). 
+# 
+# Without a so-called 'proxy module' as is handled by the executable targets, there 
+# is a need to create random directories (or floating CMakeLists.txt) which just 
+# server to orchestrate these higher-level libraries.
+#
+# So - the inference engine needs an upgrade. It needs to not only be able to pin down 
+# which modules contain the executable component for executable targets, but they also 
+# need to pin down which modules the target lib will 'reside' in.
+#
+# ALTERNATIVELY, you _do_ create those directories for targets. After all, it wouldn't 
+# be so inappropriate since the user _did_ ask for those targets to exist in the 
+# project.yaml. I think the thing I wouldn't accept would be something similar for the 
+# executables (and now that I think about it, it would be an impossible task for the 
+# executables since the main() directives need to be inserted as sources directly.
+#
+# I actually seem to be a bit stuck on this. It may be best to give it a break until things 
+# clear up. I can't tell if this is a problem on the CMake side of things (make the templates 
+# from scratch) or whether it is bulgogi purely. Leaning towards the bulgogi configuration.
+#
+# Ideallistically, for bulgogi's self build, I think the configuration I wish worked was:
+#
+# bulgogi:
+# - client*
+# - cmake
+# - project
+#
+# And for that to work, I think it's CMake that may need to be changed. It almost feels to me 
+# like `cmake` depending on `project` shouldn't matter when they're under the same umbrella...
+#
+# Anyway, like I said, I'll let this simmer.
 
 # Re-thinking the executable marker (*)
 # -------------------------------------
