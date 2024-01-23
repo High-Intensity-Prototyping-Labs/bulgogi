@@ -182,6 +182,7 @@ endfunction(add_library lib)
 endif(NOT COMMAND _add_library)
 
 #----------------- Target libraries
+## if n_targets > 0
 ## for target in targets 
 # lib{{ target.name }}
 set(LIB_{{ target.name }} "{{ target.name }}") # this is PROJECT_NAME, NOT CMAKE_PROJECT_NAME
@@ -194,6 +195,7 @@ else()
 endif(TARGET ${LIB_{{ target.name }}})
 
 ## endfor
+## endif
 
 #----------------- Add subdirectories
 ## for subdir in subdirs
@@ -201,6 +203,7 @@ add_subdirectory({{ subdir }})
 ## endfor
 
 #----------------- Target library links
+## if n_targets > 0
 ## for target in targets 
 # Links for lib{{ target.name }}
 ## for link in target.links
@@ -208,3 +211,4 @@ target_link_libraries(${LIB_{{ target.name }}} INTERFACE {{ link }})
 ## endfor
 
 ## endfor
+## endif
