@@ -139,7 +139,13 @@ foreach(lang ${${TARGET_{{ target.name }}}_languages})
     endif()
 
     # Debug 
-    message(TARGET_{{ target.name }}_${lang}_pulic_hpp="${TARGET_{{ target.name }}_${lang}_public_hpp}")
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_hpp ", " ${TARGET_{{ target.name }}}_${lang}_public_hpp_str)
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_h ", " ${TARGET_{{ target.name }}}_${lang}_public_h_str)
+    message(${TARGET_{{ target.name }}}_${lang}_pulic_hpp_str="${${TARGET_{{ target.name }}}_${lang}_public_hpp_str}")
+    message("")
+    message(${TARGET_{{ target.name }}}_${lang}_pulic_h_str="${${TARGET_{{ target.name }}}_${lang}_public_h_str}")
+    message("")
+    # Enddebug
 
     set(${TARGET_{{ target.name }}}_${lang}_public_include_directories "")
 
@@ -153,8 +159,22 @@ foreach(lang ${${TARGET_{{ target.name }}}_languages})
         list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
     endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_h})
 
+    # Debug 
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_include_directories ", " ${TARGET_{{ target.name }}}_${lang}_public_include_directories_str)
+    message("# PRE-TRIM #")
+    message(${TARGET_{{ target.name }}}_${lang}_public_include_directories_str="${${TARGET_{{ target.name }}}_${lang}_public_include_directories_str}")
+    message("")
+    # Enddebug
+
     list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_public_include_directories)
     target_include_directories(${TARGET_{{ target.name }}} PUBLIC ${${TARGET_{{ target.name }}}_${lang}_public_include_directories})
+
+    # Debug 
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_include_directories ", " ${TARGET_{{ target.name }}}_${lang}_public_include_directories_str)
+    message("# POST-TRIM #")
+    message(${TARGET_{{ target.name }}}_${lang}_public_include_directories_str="${${TARGET_{{ target.name }}}_${lang}_public_include_directories_str}")
+    message("")
+    # Enddebug
 endforeach(lang ${${TARGET_{{ target.name }}}_languages})
 
 ## endfor
