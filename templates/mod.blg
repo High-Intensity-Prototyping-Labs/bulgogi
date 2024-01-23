@@ -66,6 +66,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
 endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
+set_property(TARGET ${TARGET_{{ target.name }}} PROPERTY CXX_STANDARD 20)
+
 ## endfor
 
 #--------------------------------------------------------------------------
@@ -126,20 +128,31 @@ endforeach(lang ${${TARGET_{{ target.name }}}_languages})
 
 foreach(lang ${${TARGET_{{ target.name }}}_languages})
     if(lang STREQUAL CXX)
-        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.hpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_hpp "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.hpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_h "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
     elseif(lang STREQUAL C)
-        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_headers "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_h "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
     elseif(lang STREQUAL ASM)
     
     else()
         # language not supported
     endif()
 
+    # Debug 
+    message(TARGET_{{ target.name }}_${lang}_pulic_hpp="${TARGET_{{ target.name }}_${lang}_public_hpp}")
+
     set(${TARGET_{{ target.name }}}_${lang}_public_include_directories "")
-    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_headers})
+
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_hpp})
         get_filename_component(hdr_dir ${hdr} DIRECTORY)
         list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
-    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_headers})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_hpp})
+
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_h})
+        get_filename_component(hdr_dir ${hdr} DIRECTORY)
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_h})
+
     list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_public_include_directories)
     target_include_directories(${TARGET_{{ target.name }}} PUBLIC ${${TARGET_{{ target.name }}}_${lang}_public_include_directories})
 endforeach(lang ${${TARGET_{{ target.name }}}_languages})
