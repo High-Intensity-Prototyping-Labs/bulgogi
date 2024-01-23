@@ -106,6 +106,7 @@ json CMakeList::to<json>() {
                         {"links", this->links[t.name]}
                 };
         }
+        j["n_targets"] = targets.size();
 
         return j;
 }
