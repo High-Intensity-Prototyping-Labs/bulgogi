@@ -1,18 +1,7 @@
 - There should be a command `bul module rm --all`
 
-- Passing the --create flag to `bul gen` should create the full directory structure.
-
 - There needs to be a way to add target-dependencies to other targets 
         - Probably with a `bul target add target1 default`
-
-- The `bul clean` command should remove all of the build files (but not the CMakeLists.txt or sources).
-        - Then `bul clean --all` should remove all the build files and the CMakeLists.txt 
-        - Lastly `bul clean --purge` should remove all modules that are not depended on.
-
-- There should be a way to 'mass add' modules from scratch
-        - Yes like `bul gen --create` on a big project.yaml in an empty repo. 
-        - Bug maybe `bul module add modules.txt` could spin up a list of things too.
-        - Could `bulgogi add` one day fetch git repos from the internet??????
 
 - It would be frustrating to _only_ want to generate the dirs of 1 module 
         - But the --create flag passes over the entire project.yaml 
