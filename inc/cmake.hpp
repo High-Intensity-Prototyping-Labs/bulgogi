@@ -12,6 +12,7 @@
 
 // Settings
 #define TARGET_LIB_DIR "."
+#define AMBIGUOUS_DIR "{{ AMBIGUITY }}"
 #define CMAKE_LIST_TXT "CMakeLists.txt"
 #define TEMPLATE_MOD "templates/mod.blg"
 #define TEMPLATE_PROJ "templates/proj.blg"

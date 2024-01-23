@@ -159,40 +159,10 @@ CMakeProject CMakeProject::from(project::Project &p) {
         for(std::pair<string, vector<project::Dependency>> it: p.targets) {
                 auto& [target, dep_list] = it;
 
-                /**
-                 * There is a potential conflict here on how targets are determined to be 
-                 * libraries or executables.
-                 * 
-                 * Here the executable marker (*) is only considered when separating links 
-                 * from source code. Otherwise it is the dependency of _other_ targets on 
-                 * the target in question which determines whether or not is a library.
-                 *
-                 * Can I conceive of a library which contains an executable main() function?
-                 * Maybe...a shared library perhaps? I just don't know how this wouldn't cause 
-                 * a conflict down the road in the linker.
-                 *
-                 * Lo and behold: this has become a problem. Un-attached library targets with no 
-                 * executable components are attempted executables but have no subdirectory (proxy)
-                 * to attach to. Thus resulting in a subdir value of "" and thus confusing the hell 
-                 * out of the fs::create_directories() function.
-                 *
-                 * I'm glad it was this easy to spot - if "" defaulted to ., it would fail silently.
-                 *
-                 * So new rule: having the executable component is what distinguishes libs from exes.
-                 */
-
-                // Check whether dep_list contains executable component
-                bool contains_exe = false;
-                for(auto& d: dep_list) {
-                        if(d.exe) {
-                                contains_exe = true;
-                        }
-                }
-
                 fs::path subdirectory;
                 CMakeTarget new_target;
                 vector<string> links_list;
-                if(!contains_exe) {
+                if(p.is_library(target)) {
                         // Create CMake Library target and add every dep as a linkable library
                         new_target = CMakeTarget::from(CMakeTarget::Library, target);
                         for(auto& dep: dep_list) {
@@ -204,14 +174,25 @@ CMakeProject CMakeProject::from(project::Project &p) {
                         // (target libraries have no subdirectory (all in parent CMakeList.txt)
                 } else {
                         // Create CMake Executable target and add all but executable dep as link.
+                        project::Usage exe_conf = project::Usage::Ambiguous;
                         new_target = CMakeTarget::from(CMakeTarget::Executable, target);
                         for(auto& dep: dep_list) {
-                                if(dep.exe) {
+                                if(dep.exe_flag || p.get_dep_usage(dep) == project::Usage::Exemodule) {
                                         // Executable dep name used for subdirectory
                                         subdirectory = dep.name;
+                                        exe_conf = project::Usage::Exemodule;
                                 } else {
                                         links_list.push_back(dep.name);
                                 }
+                        }
+
+                        // Double-check that target isn't left in ambiguity 
+                        if(exe_conf == project::Usage::Ambiguous) {
+                                // Ambiguity error
+                                subdirectory = AMBIGUOUS_DIR;
+                                // NOTE: This uses a weird hack. Any contents in the AMBIGUOUS_DIR 
+                                // of the project should signal to the parent caller that an ambiguity 
+                                // error was encountered. Should be pretty straightforward.
                         }
                 }
 
