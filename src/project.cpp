@@ -365,24 +365,14 @@ vector<TargetID> Project::executables() {
 }
 
 bool Project::is_library(TargetID& t) {
-        return (
-                std::find(
-                        this->libraries().begin(), 
-                        this->libraries().end(), 
-                        t
-                ) != this->libraries().end()
-        );
+        auto libs = this->libraries();
+        return std::find(libs.begin(), libs.end(), t) != libs.end();
 }
 
 bool Project::is_executable(TargetID& t) {
-        return (
-                std::find(
-                        this->executables().begin(),
-                        this->executables().end(),
-                        t
-                ) != this->executables().end()
-        );
-}
+        auto exes = this->executables();
+        return std::find(exes.begin(), exes.end(), t) != exes.end();
+}       
 
 Dependency Dependency::from(Dependency::Kind kind, string& name) {
         auto clean_name = string(name);
