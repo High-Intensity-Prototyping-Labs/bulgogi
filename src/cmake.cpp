@@ -156,6 +156,10 @@ CMakeProject CMakeProject::from(project::Project &p) {
         auto subdirectories = unordered_map<Subdirectory, vector<CMakeTarget>>();
         auto libmodules = vector<string>();
 
+        // Patch: force-insert a project-level empty list to gen 
+        // top-level CMakeLists.txt 
+        subdirectories.insert({TARGET_LIB_DIR, vector<CMakeTarget>()});
+
         for(std::pair<string, vector<project::Dependency>> it: p.targets) {
                 auto& [target, dep_list] = it;
 
