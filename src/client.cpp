@@ -418,11 +418,9 @@ void client::test() {
         auto project = Project::load();
         auto cmake = CMakeProject::from(project);
 
-        if(cmake.lists.contains(AMBIGUOUS_DIR)) {
-                client::err(Err::Ambiguity, std::nullopt);
-        } else {
-                std::cout << "Amen brother" << std::endl;
-        }
+        std::cout << project << std::endl;
+        std::cout << std::endl;
+        std::cout << cmake << std::endl;
 }
 
 fs::path client::project_dir() {
