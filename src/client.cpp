@@ -154,6 +154,9 @@ void client::err(Err e, std::optional<string> info) {
         case Err::Ambiguity:
                 std::cout << "Ambiguity encountered. Consider resolving with an executable indicator (*)." << std::endl;
                 break;
+        case Err::BuildFailed:
+                std::cout << "Build failed: " << info.value_or(VALUE_UNKNOWN) << std::endl;
+                break;
         }
 }
 
@@ -309,6 +312,7 @@ void client::tree() {
         auto project = Project::load();
 
         // Run this function for every module.
+        string argv = "tree";
         auto args = project.modules();
 
         // Final shebang
@@ -364,6 +368,22 @@ void client::generate(Args& args) {
 }
 
 void client::build() {
+        // Run first cmake configuration command 
+        string cmake_cmd = CMAKE_CMD;
+        vector<string> cmake_args = {"-B", BUILD_DIR, PROJECT_DIR};
+        if(client::run_command(cmake_cmd, cmake_args)) {
+                std::cout << std::endl;
+        } else {
+                client::err(Err::BuildFailed, "first stage");
+        }
+
+        // Run cmake build
+        vector<string> cmake_args2 = {"--build", BUILD_DIR};
+        if(client::run_command(cmake_cmd, cmake_args2)) {
+                std::cout << std::endl;
+        } else {
+                client::err(Err::BuildFailed, "second stage");
+        }
 }
 
 void client::clean(Args& args) {

@@ -16,6 +16,7 @@
 // Settings 
 #define BUILD_DIR "build"
 #define PROJECT_DIR "."
+#define CMAKE_CMD "cmake"
 #define MODULE_SRC_DIR "src"
 #define MODULE_INC_DIR "inc"
 #define MODULE_PRI_DIR "inc"
@@ -45,6 +46,7 @@ namespace client {
                 GenerateFaied,
                 PurgeWithoutAll,
                 Ambiguity,
+                BuildFailed,
         };
 
         // Configures the CLI11 app for CLI args.
