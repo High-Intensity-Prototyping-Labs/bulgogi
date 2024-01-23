@@ -71,4 +71,6 @@ namespace client {
         void create_module_dirs(std::string& m);
         bool valid_module_dirs(std::string& m);
         bool module_dir_exists(std::string& m);
+
+        bool run_command(std::string& cmd, std::vector<std::string>& args);
 }

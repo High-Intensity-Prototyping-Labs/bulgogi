@@ -313,18 +313,7 @@ void client::tree() {
 
         // Final shebang
         if(args.size() > 0) {
-                string argv = "tree";
-                std::array<char, 32> buffer;
-
-                for(size_t x = 0; x < args.size(); x++) {
-                        argv += " " + args[x];
-                }
-
-                FILE *fp = popen(argv.c_str(), "r");
-                if(fp) {
-                        while(fgets(buffer.data(), buffer.size(), fp) != NULL) {
-                                std::cout << buffer.data();
-                        }
+                if(client::run_command(argv, args)) {
                         std::cout << std::endl;
                 } else {
                         client::err(Err::TreeCmdFailed, std::nullopt);
@@ -454,4 +443,24 @@ bool client::valid_module_dirs(std::string& m) {
 
 bool client::module_dir_exists(std::string& m) {
         return fs::exists(client::module_dir(m));
+}
+
+bool client::run_command(std::string& cmd, std::vector<std::string>& args) {
+        string run_str = cmd;
+
+        for(auto& arg: args) {
+                run_str += " " + arg;
+        }
+
+        std::array<char, 128> buffer;
+        FILE *fp = popen(run_str.c_str(), "r");
+        if(fp) {
+                while(fgets(buffer.data(), buffer.size(), fp) != NULL) {
+                        std::cout << buffer.data();
+                }
+
+                return true;
+        } else {
+                return false;
+        }
 }
