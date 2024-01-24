@@ -24,3 +24,18 @@ Target Configuration:
         - project
 
         -> Notice that the name cmake is re-used. This should be an integral feature.
+
+
+Engine Operation:
+        -> For each sequence event,
+                -> Add the previous scalar event as a potential target.
+                -> Add each scalar event in the sequence as potential targets.
+                -> Stop. 
+        -> For each potential target 
+                -> First assume they are executable.
+                -> If the same target re-appears, it becomes a library.
+                -> Stop.
+        -> Review the list of targets 
+                -> If a target has more than 1 executable dependency, flag ambiguity.
+                -> Otherwise, generate build files.
+                -> Done.
