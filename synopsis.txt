@@ -19,7 +19,7 @@ The same kind of bad feeling you get when you made too much cereal and had to th
 
 With this project, there are no corporate deadlines. There are no developer qualms about writing low-level code.
 
-Quite frankly, my annoyance with the C++ compile times alone brings me me sufficient joy to want to spend 10x longer writing C code from scratch.
+Quite frankly, my annoyance with the C++ compile times alone brings me sufficient joy to want to spend 10x longer writing C code from scratch.
 
 I don't just want a tool that does what it promotes - I want good technology. I want the best.
 
