@@ -2,3 +2,6 @@ bulgogi:
 - client*
 - cmake
 - project
+
+cmake:
+- project
