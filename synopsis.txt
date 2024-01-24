@@ -4,11 +4,24 @@
 # NOTE: Largely inspired by git cli.
 
 # Why C?
-I care about really good technology. Leading all the way up to version InDev v0.8.0, C++ was promising largely thanks to its `std::unordered_map`s and other goodies.
+I care about really good technology. 
+
+Leading all the way up to version InDev v0.8.0, C++ was promising largely thanks to its `std::unordered_map`s and other goodies.
 
 The C++ community also had 'nice' libraries to offer, like `CLI11` for the arg parser and `yaml-cpp` for the yaml parsing.
 
-But when a small project with a few external dependencies grew to be 
+But when a parsing a few lines of yaml and a small CLI set of 5 subcommands grew to generate a 6.65 MB binary, something didn't sit right.
+
+Proof:
+-rwxr-xr-x    1 alex  staff  6657264 24 Jan 17:41 bul
+
+The same kind of bad feeling you get when you made too much cereal and had to throw some out. It feels wasteful.
+
+With this project, there are no corporate deadlines. There are no developer qualms about writing low-level code.
+
+Quite frankly, my annoyance with the C++ compile times alone brings me me sufficient joy to want to spend 10x longer writing C code from scratch.
+
+I don't just want a tool that does what it promotes - I want good technology. I want the best.
 
 # DEPRECATED (not using C++)
 ## Why C++?
