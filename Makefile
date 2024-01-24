@@ -40,4 +40,7 @@ prints:
 	echo OBJ
 	echo '$(OBJ)'
 
-.PHONY: all clean
+doc:
+	doxygen doxygen
+
+.PHONY: all clean doc
