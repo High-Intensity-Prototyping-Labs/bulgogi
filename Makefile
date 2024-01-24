@@ -13,7 +13,7 @@ CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -Wall -pedantic -Wextra -Werror -g
 CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g 
 LDFLAGS := -Llib -fsanitize=address
-LDLIBS 	:= -lyaml-cpp
+LDLIBS 	:= -lyaml
 
 all: $(BIN)
 	

@@ -1,9 +1,0 @@
-- There should be a command `bul module rm --all`
-
-- There needs to be a way to add target-dependencies to other targets 
-        - Probably with a `bul target add target1 default`
-
-- It would be frustrating to _only_ want to generate the dirs of 1 module 
-        - But the --create flag passes over the entire project.yaml 
-        - Maybe generate could accept an optional module list 
-        - Otherwise it does all by default
