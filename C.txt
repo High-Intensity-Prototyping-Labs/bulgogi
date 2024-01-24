@@ -1,0 +1,26 @@
+Inferencing Engine:
+        -> Target Hash ( name, type ) = Unique ID
+                -> No more using strings as the identifier.
+                -> Instead a target's name and its type will generate a unique ID.
+                -> Everything will be worked in terms of those IDs.
+        -> Target Usage ( Project, Hash ) = Atom, Lib, Exe, Ambiguous.
+                -> Result of analyzing a project to obtain a target's usage.
+                -> Powered by inference, the worst case is ambiguity.
+                -> 
+
+Other Notes:
+        -> Everything is a target.
+        -> There is no longer a distinction between Module/Library/Executable.
+
+Target Configuration:
+        -> This is what I am aiming for for bulgogi's self-build:
+
+        bulgogi:
+        - cmake
+        - client*
+        - project
+
+        cmake:
+        - project
+
+        -> Notice that the name cmake is re-used. This should be an integral feature.
