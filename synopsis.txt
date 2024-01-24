@@ -1,10 +1,17 @@
 # Bulgogi Synopsis
-# InDev v0.8.0
+# C v0.1.0
 
 # NOTE: Largely inspired by git cli.
 
-# Why C++?
-As far as bulgogi is concerned, what the project needs is a community; an ability to grow in features and be maintainable by many other people. Even if Rust is faster to implement features in (it’s not) and more maintainable (probably is), having access to 1/20th of the developer pool at best and 1/100th of the developer-years of experience available significantly shrinks the pool of interested and capable contributors to the core codebase.
+# ~~Why C++?~~
+~~As far as bulgogi is concerned, what the project needs is a community; an ability to grow in features and be maintainable by many other people. Even if Rust is faster to implement features in (it’s not) and more maintainable (probably is), having access to 1/20th of the developer pool at best and 1/100th of the developer-years of experience available significantly shrinks the pool of interested and capable contributors to the core codebase.~~
+
+# Why C?
+I care about really good technology. Leading all the way up to version InDev v0.8.0, C++ was promising largely thanks to its `std::unordered_map`s and other goodies.
+
+The C++ community also had good libraries to offer, like `CLI11` for the arg parser and `yaml-cpp` for the yaml parsing.
+
+But when
 
 # Why CEX?
 Because given enough time and developers, the gargantuan set of C++ features leads to mind-splintering code. Restricting that to "basically C" is the only sane approach.
