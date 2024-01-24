@@ -3,8 +3,8 @@
  * @brief Custom extensions to the libyaml API.
  */
 
-#ifndef BULGOGI_YAML_EXT_H
-#define BULGOGI_YAML_EXT_H
+#ifndef YAML_EXT_H
+#define YAML_EXT_H
 
 // Standard C Libraries 
 #include <stddef.h>
@@ -22,4 +22,4 @@
  */
 void yaml_print_event(yaml_event_t* event);
 
-#endif // BULGOGI_YAML_EXT_H
+#endif // YAML_EXT_H
