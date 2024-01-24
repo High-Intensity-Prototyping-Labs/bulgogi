@@ -1,27 +1,27 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-InDev v0.8.0
+C v0.1.0
 
 ## Overview
-Bulgogi is a C/C++ build-system orchestrator for CubeSats.
+Bulgogi is a build-system orchestrator written in C.
 
 ## Synopsis
 See [synopsis.txt](./synopsis.txt)
 
 ## Dependencies
 Credit is owed where it is due:
-- [CLIUtils/CLI11](https://github.com/CLIUtils/CLI11) - Command line parser for C++11.
-- [jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp) - A YAML parser and emitter in C++.
-- [pantor/inja](https://github.com/pantor/inja) - A template engine for Modern C++.
-- [nlohmann/json](https://github.com/nlohmann/json) - JSON for Modern C++.
+- [yaml/libyaml](https://github.com/yaml/libyaml) - Canonical source repository for LibYAML.
 
 All license requirements have been satisfied and do not conflict with this project's GPLv3 license.
 
-See `LICENSE.<project>.txt` for dependency licenses and `COPYING` for a copy of this project's license.
+See `LICENSE.<dependency>` for dependency licenses and `COPYING` for a copy of this project's license.
 
 ## Progress
 Currently supported subcommands are:
+
+
+Planned subcommands:
 
 
 ```module add <MODULE> [TARGET]```
@@ -53,8 +53,6 @@ bul clean --all         # Additionally remove generated CMakeLists.txt
 bul clean --all --purge # Permanently deletes all modules (DANGER)
 ```
 
-
-Planned subcommands:
 
 
 ```bul build```
