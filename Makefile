@@ -15,7 +15,7 @@ CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g
 LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
 
-all: $(BIN)
+all: doc $(BIN)
 	
 $(BIN): $(OBJ) | $(BIN_DIR)
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
@@ -41,6 +41,6 @@ prints:
 	echo '$(OBJ)'
 
 doc:
-	doxygen doxygen
+	doxygen doxygen > /dev/null 2> /dev/null
 
 .PHONY: all clean doc
