@@ -18,7 +18,7 @@ LDLIBS 	:= -lyaml
 all: doc $(BIN)
 	
 $(BIN): $(OBJ) | $(BIN_DIR)
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
