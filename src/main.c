@@ -10,6 +10,7 @@
 
 // Project Headers 
 #include "yaml_ext.h"
+#include "engine.h"
 
 // External Dependencies
 #include "yaml.h"
@@ -18,13 +19,17 @@
 #define PROJECT_YAML "project.yaml"
 
 int main(void) {
+        bul_engine_s    engine;
+
         yaml_parser_t   parser;
         yaml_event_t    event;
-        FILE*           file;
+        FILE            *file;
 
         int done  = 0;
         int count = 0;
         int error = 0;
+
+        engine = bul_engine_init();
 
         assert(yaml_parser_initialize(&parser));
 
@@ -41,7 +46,8 @@ int main(void) {
 
                 // Do stuff 
                 yaml_print_event(&event);
-                
+                bul_engine_next_event(&engine, &event);
+
                 // Check if we're done 
                 done = (event.type == YAML_STREAM_END_EVENT);
 
@@ -53,6 +59,10 @@ int main(void) {
 
         yaml_parser_delete(&parser);
         assert(!fclose(file));
+
+        bul_engine_print(&engine);
+
+        bul_engine_free(&engine);
 
         printf("%s (%d events)\n", (error ? "FAILURE" : "SUCCESS"), count);
         return 0;
