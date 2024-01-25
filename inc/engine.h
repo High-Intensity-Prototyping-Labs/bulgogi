@@ -230,12 +230,9 @@ size_t bul_engine_count_exe_deps(bul_engine_s *engine, bul_target_s *target);
  */
 bul_usage_t bul_clean_name(bul_name_t name);
 
-/**
- * @brief Asserts the validity of the finished inferencing state.
- *
- * @param[in] engine Engine context to evaluate.
- * @return NULL if valid, otherwise returns an error message.
+ * @param[in] name Name to evaluate.
+ * @return The usage hint (if any) or BUL_EXE (default).
  */
-char *bul_engine_assert_valid(bul_engine_s *engine);
+bul_usage_t bul_detect_usage(bul_name_t name); 
 
 #endif // BUL_ENGINE_H

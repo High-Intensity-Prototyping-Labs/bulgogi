@@ -90,16 +90,19 @@ bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
 
 bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
         bul_id_t id = 0;
+        bul_usage_t usage = BUL_EXE;
 
         id = engine->size;
         bul_engine_grow(engine);
         engine->names[id] = malloc(strlen(name)+1);
         strcpy(engine->names[id], name);
 
+        usage = bul_detect_usage(name);
+
         bul_target_s target = {
                 .id = id,
                 .name = engine->names[id],
-                .usage = BUL_AMB,
+                .usage = usage,
                 .size = 0,
                 .deps = malloc(sizeof(bul_id_t)),
         };
@@ -259,8 +262,12 @@ char *bul_engine_assert_valid(bul_engine_s *engine) {
                 // TOOD: Set appropriate condtions based on whether target is exe or lib.
                 if(bul_engine_count_exe_deps(engine, target) != 0) {
                         return "Ambiguity detected. Consider adding (*) or (lib) markers.";
+bul_usage_t bul_detect_usage(bul_name_t name) {
+        if(strlen(name) > strlen(BUL_LIB_MK)) {
+                if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
+                        return BUL_LIB;
                 }
         }
 
-        return NULL;
+        return BUL_EXE;
 }
