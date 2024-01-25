@@ -191,7 +191,7 @@ void bul_engine_target_print(bul_engine_s *engine, bul_id_t id, int indent_level
         indent(indent_level); printf("\t.name = %s,\n", target->name);
         indent(indent_level); printf("\t.usage = "); bul_engine_target_usage_print(target); printf(",\n");
         indent(indent_level); printf("\t.size = %lu,\n", target->size);
-        indent(indent_level); printf("}\n");
+        indent(indent_level); printf("}");
 }
 
 void bul_engine_target_usage_print(bul_target_s *target) {
