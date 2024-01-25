@@ -208,26 +208,7 @@ void bul_target_usage_print(bul_target_s *target) {
         }
 }
 
-void bul_engine_resolve_ambiguity(bul_engine_s *engine) {
-        bul_target_s *target = NULL;
-        bul_usage_t hint = BUL_AMB;
-
-        for(size_t tid = 0; tid < engine->size; tid++) {
-                target = &engine->targets[tid];
-
-                hint = bul_clean_name(target->name);
-
-                if(hint != BUL_AMB) {
-                        target->usage = hint;
-                }
-
-                if(target->usage != BUL_AMB) {
-                        // Apply to deps
-                }
-        }
-}
-
-size_t bul_engine_count_target_ambiguity(bul_engine_s *engine, bul_target_s *target) {
+size_t bul_engine_count_exe_deps(bul_engine_s *engine, bul_target_s *target) {
         size_t          count   = 0;
         bul_id_t        dep_id  = 0;
         bul_target_s    *dep    = NULL;
@@ -236,7 +217,7 @@ size_t bul_engine_count_target_ambiguity(bul_engine_s *engine, bul_target_s *tar
                 dep_id = target->deps[x];
                 dep = &engine->targets[dep_id];
 
-                if(dep->usage == BUL_AMB) {
+                if(dep->usage == BUL_EXE) {
                         count++;
                 }
         }
@@ -269,47 +250,14 @@ bul_usage_t bul_clean_name(bul_name_t name) {
         return hint;
 }
 
-void bul_engine_apply_usage_deps(bul_engine_s *engine, bul_target_s *target) {
-        assert(target->usage != BUL_AMB);
-
-        bul_id_t dep_id = 0;
-        bul_target_s *dep = NULL;
-        size_t amb_count = 0;
-
-        if(target->usage == BUL_LIB) {
-                for(size_t x = 0; x < target->size; x++) {
-                        dep_id = target->deps[x];
-                        dep = &engine->targets[dep_id];
-                        dep->usage = BUL_LIB;
-                }
-        } else {
-        /* target->usage == BUL_EXE */
-                amb_count = bul_engine_count_target_ambiguity(engine, target);
-                if(amb_count == 1) {
-                        bul_engine_apply_unique_amb_dep(engine, target, BUL_EXE);
-                }
-                /* Otherwise they must remain ambiguous */
-        }
-}
-
-void bul_engine_apply_unique_amb_dep(bul_engine_s *engine, bul_target_s *target, bul_usage_t usage) {
-        bul_id_t dep_id = 0;
-        bul_target_s *dep = NULL;
-
-        for(size_t x = 0; x < target->size; x++) {
-                dep_id = target->deps[x];
-                dep = &engine->targets[dep_id];
-
-                if(dep->usage == BUL_AMB) {
-                        dep->usage = usage;
-                        break;
-                }
-        }
-}
-
 char *bul_engine_assert_valid(bul_engine_s *engine) {
+        bul_target_s *target = NULL;
+
         for(size_t tid = 0; tid < engine->size; tid++) {
-                if(bul_engine_count_target_ambiguity(engine, &engine->targets[tid]) != 0) {
+                target = &engine->targets[tid];
+
+                // TOOD: Set appropriate condtions based on whether target is exe or lib.
+                if(bul_engine_count_exe_deps(engine, target) != 0) {
                         return "Ambiguity detected. Consider adding (*) or (lib) markers.";
                 }
         }

@@ -209,13 +209,6 @@ void bul_engine_target_print(bul_engine_s *engine, bul_id_t id, int indent_level
 void bul_target_usage_print(bul_target_s *target);
 
 /**
- * @brief Resolves target ambiguity based on inferencing results.
- *
- * @param[in] engine Engine context to use.
- */
-void bul_engine_resolve_ambiguity(bul_engine_s *engine);
-
-/**
  * @brief Returns the target's number of ambiguous deps.
  *
  * ASSUMPTIONS:
@@ -227,7 +220,7 @@ void bul_engine_resolve_ambiguity(bul_engine_s *engine);
  * @param[in] tid ID of the target to check.
  * @return Number of dependencies with usage BUL_AMB.
  */
-size_t bul_engine_count_target_ambiguity(bul_engine_s *engine, bul_target_s *target);
+size_t bul_engine_count_exe_deps(bul_engine_s *engine, bul_target_s *target);
 
 /**
  * @brief Cleans name of special executable or library markers.
@@ -236,31 +229,6 @@ size_t bul_engine_count_target_ambiguity(bul_engine_s *engine, bul_target_s *tar
  * @return Detected usage marker in name if present, BUL_AMB otherwise.
  */
 bul_usage_t bul_clean_name(bul_name_t name);
-
-/**
- * @brief Applies known target usage to its dependencies.
- *
- * ASSUMPTIONS:
- * 1. An inference on an initialized engine has been run.
- * 2. Target points to an initialized target,
- *
- * @param[in] engine Engine context to use.
- * @param[in] target Point to target with known usage to apply to its deps.
- */
-void bul_engine_apply_usage_deps(bul_engine_s *engine, bul_target_s *target);
-
-/**
- * @brief Applies a usage to the first ambiguous dep in a target.
- *
- * ASSUMPTIONS:
- * 1. Deps have been narrowed down to a single unique ambiguous one.
- * 2. The desired usage to apply to the remining ambiguous one is known.
- *
- * @param[in] engine Engine context to use.
- * @param[in] target Target with deps to apply.
- * @param[in] usage Desired usage to apply to dep.
- */
-void bul_engine_apply_unique_amb_dep(bul_engine_s *engine, bul_target_s *target, bul_usage_t usage);
 
 /**
  * @brief Asserts the validity of the finished inferencing state.
