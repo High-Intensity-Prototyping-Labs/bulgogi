@@ -20,15 +20,29 @@
 #define BUL_EXE_MK '*'
 #define BUL_LIB_MK "lib"
 
+/** Target ID Type */
 typedef unsigned int bul_id_t;
+/** Target name type */
 typedef char* bul_name_t;
 
+/** Target usage types */
 typedef enum {
+        /** Target is an executable */
         BUL_EXE,
+        /** Target is a library */
         BUL_LIB,
-        BUL_AMB,
 
 } bul_usage_t;
+
+/** Configuration status types */
+typedef enum {
+        /** Configuration is valid */
+        BUL_VALID,
+        /** Configuration is ambiguous */
+        BUL_AMB,
+        /** Executable found in library */
+        BUL_EXE_LIB,
+} bul_status_t;
 
 /**
  * struct bul_target - Defines a bulgogi target.
@@ -212,7 +226,7 @@ void bul_target_usage_print(bul_target_s *target);
  * @brief Returns the usage hint found in the name (if any).
  *
  * @param[in] name Name to evaluate.
- * @return The usage hint (if any) or BUL_EXE (default).
+ * @return The usage hint (if any) or `BUL_EXE` (default).
  */
 bul_usage_t bul_detect_usage(bul_name_t name); 
 
