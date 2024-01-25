@@ -248,6 +248,7 @@ bul_usage_t bul_clean_name(bul_name_t name) {
         bul_usage_t hint = BUL_AMB;
         size_t name_len = 0;
         size_t lib_len = 0;
+        size_t diff = 0;
 
         name_len = strlen(name);
         lib_len = strlen(BUL_LIB_MK);
@@ -259,7 +260,9 @@ bul_usage_t bul_clean_name(bul_name_t name) {
                 hint = (strncmp(name, BUL_LIB_MK, lib_len) == 0) ? BUL_LIB : BUL_AMB;
                 if(strncmp(name, BUL_LIB_MK, lib_len) == 0) {
                         hint = BUL_LIB;
-                        memmove(&name[0], &name[lib_len], name_len-lib_len);
+                        diff = name_len - lib_len;
+                        memmove(&name[0], &name[lib_len], diff);
+                        name[diff] = '\0';
                 }
         }
 
