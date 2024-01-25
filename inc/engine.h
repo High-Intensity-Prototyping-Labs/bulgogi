@@ -216,4 +216,21 @@ void bul_target_usage_print(bul_target_s *target);
  */
 bul_usage_t bul_detect_usage(bul_name_t name); 
 
+/**
+ * @brief Returns the engine status.
+ *
+ * @param[in] engine Engine context to evaluate.
+ * @return BUL_VALID in case of valid configuration, see `bul_status_t` otherwise.
+ */
+bul_status_t bul_engine_valid(bul_engine_s *engine);
+
+/**
+ * @brief Returns whether the target is valid.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to evaluate.
+ * @return BUL_VALID in case of valid target, see `bul_status_t` otherwise.
+ */
+bul_status_t bul_engine_target_valid(bul_engine_s *engine, bul_target_s *target);
+
 #endif // BUL_ENGINE_H

@@ -220,3 +220,26 @@ bul_usage_t bul_detect_usage(bul_name_t name) {
 
         return BUL_EXE;
 }
+
+bul_status_t bul_engine_valid(bul_engine_s *engine) {
+        for(size_t tid = 0; tid < engine->size; tid++) {
+                
+        }
+}
+
+bul_status_t bul_engine_target_valid(bul_engine_s *engine, bul_target_s *target) {
+        size_t n_exe = 0;
+        bul_id_t dep_id = 0;
+        bul_target_s *dep = NULL;
+
+        if(target->usage == BUL_EXE) {
+                for(size_t x = 0; x < target->size; x++) {
+                        dep_id = target->deps[x];
+                        dep = &engine->targets[dep_id];
+
+                        if(dep->usage == BUL_EXE) {
+                                n_exe++;
+                        }
+                }
+        }
+}
