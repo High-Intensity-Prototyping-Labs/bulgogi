@@ -205,9 +205,6 @@ void bul_target_usage_print(bul_target_s *target) {
         case BUL_LIB:
                 printf("BUL_LIB");
                 break;
-        case BUL_AMB:
-                printf("BUL_AMB");
-                break;
         }
 }
 
