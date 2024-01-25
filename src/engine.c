@@ -19,7 +19,6 @@ bul_engine_s bul_engine_init(void) {
                 .focus = BUL_MAX_ID,
                 .names = malloc(sizeof(bul_name_t)),
                 .targets = malloc(sizeof(bul_target_s)),
-                .deps = malloc(sizeof(bul_id_t*)),
         };
 }
 
@@ -67,17 +66,15 @@ void bul_engine_free(bul_engine_s *engine) {
         free(engine->targets);
         for(size_t x = 0; x < engine->size; x++) {
                 free(engine->names[x]);
-                free(engine->deps[x]);
+                free(engine->targets[x].deps);
         }
         free(engine->names);
-        free(engine->deps);
 }
 
 void bul_engine_grow(bul_engine_s *engine) {
         engine->size++;
         engine->names = realloc(engine->names, (engine->size + 1) * sizeof(bul_name_t));
         engine->targets = realloc(engine->targets, (engine->size + 1) * sizeof(bul_target_s));
-        engine->deps = realloc(engine->deps, (engine->size + 1) * sizeof(bul_id_t*));
 }
 
 bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
@@ -104,10 +101,10 @@ bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
                 .name = engine->names[id],
                 .usage = BUL_EXE,
                 .size = 0,
+                .deps = malloc(sizeof(bul_id_t)),
         };
 
         engine->targets[id] = target;
-        engine->deps[id] = malloc(sizeof(bul_id_t));
 
         return &engine->targets[id];
 }
@@ -122,26 +119,26 @@ void bul_engine_target_add_dep(bul_engine_s *engine, bul_id_t dep_id) {
 
         size_t size = 0;
         bul_target_s *target = NULL;
-        bul_id_t *dep_list = NULL;
+        bul_id_t **dep_list = NULL;
 
         target = &engine->targets[engine->focus];
         size = target->size;
-        dep_list = engine->deps[engine->focus];
+        dep_list = &engine->targets[engine->focus].deps;
 
         bul_engine_target_grow(engine);
-        dep_list[size] = dep_id;
+        (*dep_list)[size] = dep_id;
 }
 
 size_t bul_engine_target_grow(bul_engine_s *engine) {
         bul_target_s *target = NULL;
-        bul_id_t *dep_list = NULL;
+        bul_id_t **dep_list = NULL;
 
         target = &engine->targets[engine->focus];
-        dep_list = engine->deps[target->id];
+        dep_list = &engine->targets[engine->focus].deps;
 
         target->size++;
-        dep_list = realloc(dep_list, (target->size + 1) * sizeof(bul_id_t));
-
+        *dep_list = realloc(*dep_list, (target->size + 1) * sizeof(bul_id_t));
+        
         return target->size;
 }
 
@@ -171,7 +168,7 @@ void bul_engine_print(bul_engine_s *engine) {
                         printf("\n\t\t%s = {", engine->names[x]);
                         for(size_t y = 0; y < engine->targets[x].size; y++) {
                                 printf("\n");
-                                bul_engine_target_print(engine, engine->deps[x][y], 3);
+                                bul_engine_target_print(engine, engine->targets[x].deps[y], 3);
                                 printf(",");
                         }
                         printf("\t\t},\n");

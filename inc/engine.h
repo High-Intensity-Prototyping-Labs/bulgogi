@@ -40,6 +40,7 @@ typedef struct bul_target {
         bul_name_t name;
         bul_usage_t usage;
         size_t size;
+        bul_id_t *deps;
 
 } bul_target_s;
 
@@ -59,7 +60,6 @@ typedef struct bul_engine {
         bul_id_t focus;
         bul_name_t *names;
         bul_target_s *targets;
-        bul_id_t **deps;
 
 } bul_engine_s;
 
