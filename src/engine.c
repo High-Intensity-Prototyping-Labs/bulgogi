@@ -171,7 +171,7 @@ void bul_engine_print(bul_engine_s *engine) {
                                 bul_engine_target_print(engine, engine->targets[x].deps[y], 3);
                                 printf(",");
                         }
-                        printf("\t\t},\n");
+                        printf("\n\t\t},\n");
                 }
                 printf("\t},\n");
         }
