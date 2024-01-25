@@ -41,25 +41,6 @@ Engine Operation:
                 -> Otherwise, generate build files.
                 -> Done.
 
-Dealing with library targets:
-        -> Every library target can either be a module OR an interface.
-        -> If a corresponding directory exists that matches the library name, 
-           it is compiled standalone in that directory.
-        -> Otherwise, it is compiled as an interface libray in the project-level
-           list and bunches other libs together.
-        -> e.g.: My cmake lib happens to be a module in its own right.
-
-Ideas for denoting (forcing) library in project.yaml:
-        -> If executable ambiguity must be resolved with an (*),
-           target libraries for which no targets depend on will also 
-           be ambiguous (and treated like executables).
-        -> A standalone library can be forced by having 'lib' in the name.
-        -> e.g.: If no target needed my cmake module but I wanted it to 
-           compile as a lib, I'd just need to call it libcmake.
-
-Ambiguity Resolution:
-        -> For each target,
-                -> Clean name and apply hint.
-                -> If its usage is known, apply info to deps.
-                -> Case library, the rest are libs.
-                -> Case executable, 1 ambiguous can be resolved.
+Ambiguity Detection:
+        -> Ambiguity occurs when more than 1 executable dependencies are 
+           attached to one target.
