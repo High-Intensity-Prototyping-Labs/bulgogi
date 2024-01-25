@@ -1,11 +1,3 @@
 Bulgogi Laws:
 
-1. Modules are never polymorphic.
-        An executable module in one target is not another's library.
-        Once an executable module, always an executable module.
-        
-2. All targets are representations.
-        An executable can be a combination of modules and target libraries.
-        If a standalone library is desired, it must be a module.
-        All target libraries are virtual in bulgogi (CMake calls them interfaces).
-
+1. Everything is a target.
