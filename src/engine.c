@@ -211,57 +211,6 @@ void bul_target_usage_print(bul_target_s *target) {
         }
 }
 
-size_t bul_engine_count_exe_deps(bul_engine_s *engine, bul_target_s *target) {
-        size_t          count   = 0;
-        bul_id_t        dep_id  = 0;
-        bul_target_s    *dep    = NULL;
-
-        for(size_t x = 0; x < target->size; x++) {
-                dep_id = target->deps[x];
-                dep = &engine->targets[dep_id];
-
-                if(dep->usage == BUL_EXE) {
-                        count++;
-                }
-        }
-
-        return count;
-}
-
-bul_usage_t bul_clean_name(bul_name_t name) {
-        bul_usage_t hint = BUL_AMB;
-        size_t name_len = 0;
-        size_t lib_len = 0;
-        size_t diff = 0;
-
-        name_len = strlen(name);
-        lib_len = strlen(BUL_LIB_MK);
-
-        if(name[name_len-1] == BUL_EXE_MK) {
-                hint = BUL_EXE;
-                name[name_len-1] = '\0';
-        } else if(name_len > lib_len) {
-                hint = (strncmp(name, BUL_LIB_MK, lib_len) == 0) ? BUL_LIB : BUL_AMB;
-                if(strncmp(name, BUL_LIB_MK, lib_len) == 0) {
-                        hint = BUL_LIB;
-                        diff = name_len - lib_len;
-                        memmove(&name[0], &name[lib_len], diff);
-                        name[diff] = '\0';
-                }
-        }
-
-        return hint;
-}
-
-char *bul_engine_assert_valid(bul_engine_s *engine) {
-        bul_target_s *target = NULL;
-
-        for(size_t tid = 0; tid < engine->size; tid++) {
-                target = &engine->targets[tid];
-
-                // TOOD: Set appropriate condtions based on whether target is exe or lib.
-                if(bul_engine_count_exe_deps(engine, target) != 0) {
-                        return "Ambiguity detected. Consider adding (*) or (lib) markers.";
 bul_usage_t bul_detect_usage(bul_name_t name) {
         if(strlen(name) > strlen(BUL_LIB_MK)) {
                 if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {

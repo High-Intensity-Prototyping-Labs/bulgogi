@@ -209,27 +209,8 @@ void bul_engine_target_print(bul_engine_s *engine, bul_id_t id, int indent_level
 void bul_target_usage_print(bul_target_s *target);
 
 /**
- * @brief Returns the target's number of ambiguous deps.
+ * @brief Returns the usage hint found in the name (if any).
  *
- * ASSUMPTIONS:
- * 1. Engine has been initialized.
- * 2. A project configuration has had inference run.
- * 3. A valid tid to an initialized target was provided.
- *
- * @param[in] engine Engine context to use.
- * @param[in] tid ID of the target to check.
- * @return Number of dependencies with usage BUL_AMB.
- */
-size_t bul_engine_count_exe_deps(bul_engine_s *engine, bul_target_s *target);
-
-/**
- * @brief Cleans name of special executable or library markers.
- *
- * @param[in,out] name Name to clean.
- * @return Detected usage marker in name if present, BUL_AMB otherwise.
- */
-bul_usage_t bul_clean_name(bul_name_t name);
-
  * @param[in] name Name to evaluate.
  * @return The usage hint (if any) or BUL_EXE (default).
  */
