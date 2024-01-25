@@ -56,3 +56,10 @@ Ideas for denoting (forcing) library in project.yaml:
         -> A standalone library can be forced by having 'lib' in the name.
         -> e.g.: If no target needed my cmake module but I wanted it to 
            compile as a lib, I'd just need to call it libcmake.
+
+Ambiguity Resolution:
+        -> For each target,
+                -> Clean name and apply hint.
+                -> If its usage is known, apply info to deps.
+                -> Case library, the rest are libs.
+                -> Case executable, 1 ambiguous can be resolved.
