@@ -1,0 +1,58 @@
+Inferencing Engine:
+        -> Target Hash ( name, type ) = Unique ID
+                -> No more using strings as the identifier.
+                -> Instead a target's name and its type will generate a unique ID.
+                -> Everything will be worked in terms of those IDs.
+        -> Target Usage ( Project, Hash ) = Atom, Lib, Exe, Ambiguous.
+                -> Result of analyzing a project to obtain a target's usage.
+                -> Powered by inference, the worst case is ambiguity.
+                -> 
+
+Other Notes:
+        -> Everything is a target.
+        -> There is no longer a distinction between Module/Library/Executable.
+
+Target Configuration:
+        -> This is what I am aiming for for bulgogi's self-build:
+
+        bulgogi:
+        - cmake
+        - client*
+        - project
+
+        cmake:
+        - project
+
+        -> Notice that the name cmake is re-used. This should be an integral feature.
+
+
+Engine Operation:
+        -> For each sequence event,
+                -> Add the previous scalar event as a potential target.
+                -> Add each scalar event in the sequence as potential targets.
+                -> Stop. 
+        -> For each potential target 
+                -> First assume they are executable.
+                -> If the same target re-appears, it becomes a library.
+                -> Stop.
+        -> Review the list of targets 
+                -> All deps of a library becomes libs themselves.
+                -> If a target has more than 1 executable dependency, flag ambiguity.
+                -> Otherwise, generate build files.
+                -> Done.
+
+Dealing with library targets:
+        -> Every library target can either be a module OR an interface.
+        -> If a corresponding directory exists that matches the library name, 
+           it is compiled standalone in that directory.
+        -> Otherwise, it is compiled as an interface libray in the project-level
+           list and bunches other libs together.
+        -> e.g.: My cmake lib happens to be a module in its own right.
+
+Ideas for denoting (forcing) library in project.yaml:
+        -> If executable ambiguity must be resolved with an (*),
+           target libraries for which no targets depend on will also 
+           be ambiguous (and treated like executables).
+        -> A standalone library can be forced by having 'lib' in the name.
+        -> e.g.: If no target needed my cmake module but I wanted it to 
+           compile as a lib, I'd just need to call it libcmake.

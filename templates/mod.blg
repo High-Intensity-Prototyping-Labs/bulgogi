@@ -1,0 +1,252 @@
+cmake_minimum_required(VERSION 3.18)
+
+
+#--------------------------------------------------------------------------
+#  OPTIONS GO HERE
+#--------------------------------------------------------------------------
+option(BUILD_TESTING "[ON/OFF] Build tests in addition to library" OFF)
+option(BUILD_EXAMPLES "[ON/OFF] Build examples in addition to library" OFF)
+
+
+#--------------------------------------------------------------------------
+#  PROJECT INIT
+#--------------------------------------------------------------------------
+project(
+    {{ subdir }}
+    VERSION 1.0
+    DESCRIPTION "CLIENT CREATION API LIBRARY FOR IPC"
+    LANGUAGES C CXX
+)
+
+## for target in targets
+
+set(TARGET_{{ target.name }} "{{ target.name }}") # this is PROJECT_NAME, NOT CMAKE_PROJECT_NAME
+message("CONFIGURING TARGET : ${TARGET_{{ target.name }}}")
+
+if(TARGET ${TARGET_{{ target.name }}})
+    message(FATAL_ERROR "Target ${TARGET_{{ target.name }}} already exists in this project!")
+else()
+## if target.exe
+    add_executable(${TARGET_{{ target.name }}})
+## else
+    add_library(${TARGET_{{ target.name }}})
+## endif
+endif(TARGET ${TARGET_{{ target.name }}})
+
+## endfor
+
+#--------------------------------------------------------------------------
+#  BUILD TYPE CHECK
+#--------------------------------------------------------------------------
+set(SUPPORTED_BUILD_TYPES "")
+list(APPEND SUPPORTED_BUILD_TYPES "Debug")
+list(APPEND SUPPORTED_BUILD_TYPES "Release")
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${SUPPORTED_BUILD_TYPES})
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type chosen by the user at configure time")
+else()
+    if(NOT CMAKE_BUILD_TYPE IN_LIST SUPPORTED_BUILD_TYPES)
+        message("Build type : ${CMAKE_BUILD_TYPE} is not a supported build type.")
+        message("Supported build types are:")
+        foreach(type ${SUPPORTED_BUILD_TYPES})
+            message("- ${type}")
+        endforeach(type ${SUPPORTED_BUILD_TYPES})
+        message(FATAL_ERROR "The configuration script will now exit.")
+    endif(NOT CMAKE_BUILD_TYPE IN_LIST SUPPORTED_BUILD_TYPES)
+endif(NOT CMAKE_BUILD_TYPE)
+
+## for target in targets
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wall")
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wextra")
+    target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-Wshadow")
+    set(BUILD_TESTING ON CACHE BOOL "" FORCE)
+    set(BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
+endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+
+set_property(TARGET ${TARGET_{{ target.name }}} PROPERTY CXX_STANDARD 20)
+
+## endfor
+
+#--------------------------------------------------------------------------
+# DETECT SOURCES RECURSIVELY FROM src FOLDER AND ADD TO BUILD TARGET
+#--------------------------------------------------------------------------
+
+## for target in targets
+
+get_property(${TARGET_{{ target.name }}}_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
+    if(${lang} STREQUAL CXX)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+    elseif(${lang} STREQUAL C)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+    elseif(${lang} STREQUAL ASM)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.asm")
+    else()
+        # language not supported
+    endif()
+    target_sources(${TARGET_{{ target.name }}} PRIVATE ${${TARGET_{{ target.name }}}_${lang}_sources})
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
+
+## endfor
+
+#--------------------------------------------------------------------------
+# DETECT PRIVATE HEADERS RECURSIVELY FROM src FOLDER
+#--------------------------------------------------------------------------
+
+## for target in targets
+
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
+    if(${lang} STREQUAL CXX)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp")
+    elseif(${lang} STREQUAL C)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_private_headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+    elseif(${lang} STREQUAL ASM)
+    
+    else()
+        # language not supported
+    endif()
+
+    set(${TARGET_{{ target.name }}}_${lang}_private_include_directories "")
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_private_headers})
+        get_filename_component(hdr_dir ${hdr} DIRECTORY)
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_private_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_private_headers})
+    list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_private_include_directories)
+    target_include_directories(${TARGET_{{ target.name }}} PRIVATE ${${TARGET_{{ target.name }}}_${lang}_private_include_directories})
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
+
+## endfor
+
+#--------------------------------------------------------------------------
+# DETECT PUBLIC HEADERS RECURSIVELY FROM inc FOLDER
+#--------------------------------------------------------------------------
+
+## for target in targets
+
+foreach(lang ${${TARGET_{{ target.name }}}_languages})
+    if(lang STREQUAL CXX)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_hpp "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.hpp")
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_h "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
+    elseif(lang STREQUAL C)
+        file(GLOB_RECURSE ${TARGET_{{ target.name }}}_${lang}_public_h "${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h")
+    elseif(lang STREQUAL ASM)
+    
+    else()
+        # language not supported
+    endif()
+
+    # Debug 
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_hpp ", " ${TARGET_{{ target.name }}}_${lang}_public_hpp_str)
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_h ", " ${TARGET_{{ target.name }}}_${lang}_public_h_str)
+    message(${TARGET_{{ target.name }}}_${lang}_pulic_hpp_str="${${TARGET_{{ target.name }}}_${lang}_public_hpp_str}")
+    message("")
+    message(${TARGET_{{ target.name }}}_${lang}_pulic_h_str="${${TARGET_{{ target.name }}}_${lang}_public_h_str}")
+    message("")
+    # Enddebug
+
+    set(${TARGET_{{ target.name }}}_${lang}_public_include_directories "")
+
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_hpp})
+        get_filename_component(hdr_dir ${hdr} DIRECTORY)
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_hpp})
+
+    foreach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_h})
+        get_filename_component(hdr_dir ${hdr} DIRECTORY)
+        list(APPEND ${TARGET_{{ target.name }}}_${lang}_public_include_directories ${hdr_dir})
+    endforeach(hdr ${${TARGET_{{ target.name }}}_${lang}_public_h})
+
+    # Debug 
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_include_directories ", " ${TARGET_{{ target.name }}}_${lang}_public_include_directories_str)
+    message("# PRE-TRIM #")
+    message(${TARGET_{{ target.name }}}_${lang}_public_include_directories_str="${${TARGET_{{ target.name }}}_${lang}_public_include_directories_str}")
+    message("")
+    # Enddebug
+
+    list(REMOVE_DUPLICATES ${TARGET_{{ target.name }}}_${lang}_public_include_directories)
+    target_include_directories(${TARGET_{{ target.name }}} PUBLIC ${${TARGET_{{ target.name }}}_${lang}_public_include_directories})
+
+    # Debug 
+    list(JOIN ${TARGET_{{ target.name }}}_${lang}_public_include_directories ", " ${TARGET_{{ target.name }}}_${lang}_public_include_directories_str)
+    message("# POST-TRIM #")
+    message(${TARGET_{{ target.name }}}_${lang}_public_include_directories_str="${${TARGET_{{ target.name }}}_${lang}_public_include_directories_str}")
+    message("")
+    # Enddebug
+endforeach(lang ${${TARGET_{{ target.name }}}_languages})
+
+## endfor
+
+#--------------------------------------------------------------------------
+# SPECIAL AND PROJECT SPECIFIC OPTIONS
+#--------------------------------------------------------------------------
+
+## for target in targets
+
+target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-g")
+
+## endfor
+
+#--------------------------------------------------------------------------
+# LINK AGAINST THE NECESSARY LIBRARIES 
+#--------------------------------------------------------------------------
+# Project libs
+## for target in targets
+## for link in target.links
+target_link_libraries(${TARGET_{{ target.name }}} PUBLIC {{ link }})
+## endfor
+
+## endfor
+
+## for target in targets
+
+#Link against pthread
+find_package(Threads REQUIRED)
+if(Threads_FOUND) 
+    if(WIN32)
+        if(CMAKE_USE_WIN32_THREADS_INIT)
+            target_link_libraries(${TARGET_{{ target.name }}} PUBLIC pthread)
+            target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-lpthread")
+        else()
+            message(FATAL_ERROR "BLAHHH ")
+        endif()
+    elseif(UNIX)
+        if(CMAKE_USE_PTHREADS_INIT)
+            target_link_libraries(${TARGET_{{ target.name }}} PUBLIC pthread)
+            target_compile_options(${TARGET_{{ target.name }}} PUBLIC "-lpthread")
+        else()
+            message(FATAL_ERROR "BLAHHH ")
+        endif()
+    endif()
+else()
+    message(FATAL_ERROR "No threading libraries have been found. Aborting!")
+endif()
+
+## endfor
+
+#--------------------------------------------------------------------------
+# TEST CONFIGURATION
+#--------------------------------------------------------------------------
+if(BUILD_TESTING)
+    enable_testing()
+    include(CTest)
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+        add_subdirectory(tests)
+    elseif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
+        add_subdirectory(test)
+    endif()
+endif(BUILD_TESTING)
+
+
+#--------------------------------------------------------------------------
+# EXAMPLE CONFIGURATION
+#--------------------------------------------------------------------------
+if(BUILD_EXAMPLES)
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+        add_subdirectory(examples)
+    elseif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/example")
+        add_subdirectory(example)
+    endif()
+endif(BUILD_EXAMPLES)

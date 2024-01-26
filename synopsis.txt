@@ -1,13 +1,35 @@
 # Bulgogi Synopsis
-# InDev v0.7.1
+# C v0.1.10
 
 # NOTE: Largely inspired by git cli.
 
-# Why C++?
+# Why C?
+I care about really good technology. 
+
+Leading all the way up to version InDev v0.8.0, C++ was promising largely thanks to its `std::unordered_map`s and other goodies.
+
+The C++ community also had 'nice' libraries to offer, like `CLI11` for the arg parser and `yaml-cpp` for the yaml parsing.
+
+But when a parsing a few lines of yaml and a small CLI set of 5 subcommands grew to generate a 6.65 MB binary, something didn't sit right.
+
+Proof:
+-rwxr-xr-x    1 alex  staff  6657264 24 Jan 17:41 bul
+
+The same kind of bad feeling you get when you made too much cereal and had to throw some out. It feels wasteful.
+
+With this project, there are no corporate deadlines. There are no developer qualms about writing low-level code.
+
+Quite frankly, my annoyance with the C++ compile times alone brings me sufficient joy to want to spend 10x longer writing C code from scratch.
+
+I don't just want a tool that does what it promotes - I want good technology. I want the best.
+
+# DEPRECATED (not using C++)
+## Why C++?
 As far as bulgogi is concerned, what the project needs is a community; an ability to grow in features and be maintainable by many other people. Even if Rust is faster to implement features in (it’s not) and more maintainable (probably is), having access to 1/20th of the developer pool at best and 1/100th of the developer-years of experience available significantly shrinks the pool of interested and capable contributors to the core codebase.
 
 # Why CEX?
 Because given enough time and developers, the gargantuan set of C++ features leads to mind-splintering code. Restricting that to "basically C" is the only sane approach.
+# END DEPRECATED
 
 # Initializes a new bulgogi project in the current dir
 bulgogi init
@@ -160,6 +182,206 @@ deps:
                 Target(target1)
 
 /** Long-form droney bits **/
+# The Re-Introduction of Proxy Libs 
+# ---------------------------------
+# Lo and behold it is revealed that the idea of removing proxy libs came back to bite.
+#
+# I'm grateful that it happened so early-on (pre-bootstrapping) since it's a pretty fund-
+# -amental error. I'd like to elaborate on it.
+#
+# The premise of bulgogi target libraries was that they could be purely interfaces. Just 
+# intermediaries to executables. You can group low-level atomic modules together and form 
+# these larger executables at the top. 
+#
+# That's fine, until you realize that some modules depend on others. And the moment this 
+# happens, the current version of bulgogi begins to treat that higher-level module as a 
+# target lib. In other words, as just an interface.
+#
+# And interfaces don't have source code. They just have other libs linked to them. This 
+# also means no headers. No headers, no includes, no shared APIs.
+#
+# The way to fix this is to give library targets the option to have source code. The  
+# problem is finding in which file or directory they should live. The way that the 
+# templates work at the moment is by globbing sources and headers in a module dir 
+# to form one libmodule (or the executable component of an executable target). 
+# 
+# Without a so-called 'proxy module' as is handled by the executable targets, there 
+# is a need to create random directories (or floating CMakeLists.txt) which just 
+# server to orchestrate these higher-level libraries.
+#
+# So - the inference engine needs an upgrade. It needs to not only be able to pin down 
+# which modules contain the executable component for executable targets, but they also 
+# need to pin down which modules the target lib will 'reside' in.
+#
+# ALTERNATIVELY, you _do_ create those directories for targets. After all, it wouldn't 
+# be so inappropriate since the user _did_ ask for those targets to exist in the 
+# project.yaml. I think the thing I wouldn't accept would be something similar for the 
+# executables (and now that I think about it, it would be an impossible task for the 
+# executables since the main() directives need to be inserted as sources directly.
+#
+# I actually seem to be a bit stuck on this. It may be best to give it a break until things 
+# clear up. I can't tell if this is a problem on the CMake side of things (make the templates 
+# from scratch) or whether it is bulgogi purely. Leaning towards the bulgogi configuration.
+#
+# Ideallistically, for bulgogi's self build, I think the configuration I wish worked was:
+#
+# bulgogi:
+# - client*
+# - cmake
+# - project
+#
+# And for that to work, I think it's CMake that may need to be changed. It almost feels to me 
+# like `cmake` depending on `project` shouldn't matter when they're under the same umbrella...
+#
+# Anyway, like I said, I'll let this simmer.
+
+# Re-thinking the executable marker (*)
+# -------------------------------------
+# I've really preferred the existing trend to always make sane assumptions 
+# whenever possible so long as it simplifies and streamlines the UX.
+#
+# At first, the simplest thing was to say that every target is an executable 
+# unless another target depends on it. This was really beautiful.
+#
+# The problem arose in the CMake configuration: executables needed sources that 
+# contained a `main()` routine. This couldn't easily be worked around as 
+# executable CMake targets are not very portable between other targets.
+#
+# The idea then came to have an executable marker (*) next to dependency names 
+# of the modules that contained the `main()` routines. It would be unobtrusive 
+# and signal that they are special (in fact they are).
+#
+# This would also be a nice visual check for conflicts: if there are more than 1 
+# asterix-denoted entry in an executable target's list, there is a problem. There
+# cannot be 2 `main()` routines.
+# 
+# So the latest issue is that requiring the executable marker has seemed both 
+# redundant (target or library status can already be inferred) and a source of 
+# occasional complication (which could escalate into needing intervention).
+#
+# For example, when the "default" target is created when the target field is 
+# unspecified, this is nice is kick-starting a project with no modules. 
+#
+# But should the generated `project.yaml` _need_ to point out exactly which 
+# module is executable? After all, there is only 1. Even if additional deps 
+# are attached to the default target, they could all be library targets.
+#
+# Ambiguity error: instead of being required by default, the executability 
+# market is *only* required when there is ambiguity. Ambiguity occurs when 
+# an executable target has more than 1 module dependency.
+#
+# Advanced inference: it should also be possible to notice when the same 
+# module is used in other targets as a non-executable. For example, if 
+# any library targets include that suspected module, it could not be 
+# executable. Therefore ambiguity is reduced.
+#
+# In fact, the only time there would be ambiguity is when more than one 
+# executable share at least 2 modules that are not used anywhere else in 
+# the project. This would seem like a special case.
+
+# The need to re-use executable modules 
+# -------------------------------------
+# Suppose I wanted to release multiple variants of the same binary.
+#
+# I wouldn't have separate versions of the same `main()` beholden module.
+#
+# Consider the following targets:
+#
+# default:
+# - module1*
+# - module2
+#
+# default2:
+# - module1*
+# - module2
+# - module7
+# - flags:
+#     - "-Duse_feature3"
+#
+# Ignore the non-existent `- flags:` entry for now. Notice how similar they are 
+# but actually target different binaries? One has a pre-processor flag enabled 
+# which inevitably actually requires different behaviour from the linker. Cool eh?
+
+# The C Lag?
+# ----------
+# After the previously long-winded schpiel on C++ vs C, I've noticed that the lag that 
+# I observed from running my C++ application (possibly in my head) seemed _just_ as bad 
+# as that of my 'hello world' C program that I started just for sake of setting up the 
+# Makefile.
+#
+# To be completely honest, I'm surprised - this is making me think that part of the irr-
+# -ational basis for my grievance over C++ may go unchanged in C.
+#
+# If I don't get that superficial quick-execution from C (but the very cool/small binary
+# fingerprint), will I really care or be much more proud? Will _others_ care? I just 
+# can't answer that.
+#
+# I don't want to be so focused on the _what_ that I lose track of _why_. And I think 
+# this is where _trying_ to start a revolution can be its downfall. 
+#
+# Personally, I have **no** opposition to substituting some modules of the program for C 
+# in the future. I'm not writing an operating system or a bootloader, I can live with 
+# dormant exceptions in the underbelly of the program. And if I so get interested in one 
+# day replacing the whole thing in C, I can. But that slick superficial boost I was looking 
+# for totally imploded in my hello-world test.
+#
+# In the end, data structures like unordered_maps are really handy representations of 
+# things and they aren't at the root of my grievances (for example, I'd just as happily
+# use an uglier / buggier C implementation I'd make myself of the equivalent of a string 
+# lookup map specifically for the purpose of this...or would I?).
+#
+# Let's have some fun with this, either way.
+
+# Taking a moment to reconsider C++
+# ---------------------------------
+# I've become quite cognizent of the bloat that has been introduced from the choice of 
+# using C++. Not so much in the code that I've written myself for the project (although 
+# still worth consideration) but moreso in the external libraries that were supposed to 
+# introduced 'nice' functionality.
+#
+# On the one hand, 'nice' APIs with a lot of defaults built-in have a flatter learning 
+# curve to them. Maybe it reduces the time until comfortable adjustment in half to 1/4 
+# in more extreme cases. But once that hump is overcome, then what?
+#
+# I'm sitting on a +3 MB library dependency which just parses yaml. I'm sure it does a 
+# good job at it - and certainly having the yaml.to<map> one-liner makes life awesome as 
+# I get to move on with the map itself. But is that worth 3 MB?
+#
+# Further, on the topic of C++ exceptions, I got very interested in the idea of disabling 
+# them. After all, any more than an abort() call when something goes wrong is not more or 
+# less preventable than the fancy stack unwinding and often ambiguous exception messages 
+# anyway.
+#
+# This proved to be a bit of a dead-end when the header-only library I was importing to 
+# use for CLI parsing turned out to use the crap out of them. I _could_ rejig the library 
+# not to use try/catch or throw statements, but then isn't that going against the work I
+# originally wanted to prevent?
+#
+# This leads into the idea of building value into a project. What has made things like git 
+# and linux so damn valuable wasn't so much the ends they achieved. Sure, your malloc()s 
+# and your write()s are much needed, but plenty of Unix distributions and variants followed 
+# this pattern (the so-called POSIX standard) and surely _achieved_ what they described.
+#
+# Same goes for other version trackers. Even if mercurial had 100% the same API as git 
+# (which it seems to be pretty similar anyway), git would somehow come out on top.
+#
+# When I think about Minecraft, somehow a game with 100% the same mechanics and visuals,
+# I still feel a bit off about using the non-OG version. As Minecraft is more than a game,
+# it's a game-engine. 
+#
+# Git is more than just a version tracker, it's _part_ of the directory. And it would 
+# only be able to do that if its footprint was small enough to be negligible.
+#
+# The bigger and hunkier a program is, the more setup and involvement it requires and 
+# the easier it is the notice, the less seamless it becomes. A program can never 
+# become essential if it constantly reminds the user and the system of its existence.
+#
+# I don't just want features - that's something C++ and even Python can give me just fine.
+# I want to build the mother of all build-system projects. I need a program which takes 
+# everything I know and puts it into one place so I can springboard off of that point 
+# anytime I start a new project.
+#
+# And unfortunately I know better than to link 3 MB libraries to parse yaml.
 
 # Gotta give up on proxy libraries 
 # --------------------------------
