@@ -47,15 +47,17 @@ typedef enum {
 /**
  * struct bul_target - Defines a bulgogi target.
  *
- * @id - Unique ID for the target (internal representation).
- * @name - Target name as seen in the configuration.
- * @usage - Inferred target usage (see `bul_usage_t`).
  */
 typedef struct bul_target {
+        /** Unique ID for the target (internal representation). */
         bul_id_t id;
+        /** Target name as seen in the configuration. */
         bul_name_t name;
+        /** Inferred target usage (see `bul_usage_t`). */
         bul_usage_t usage;
+        /** Number of targets/names tracked (size of project). */
         size_t size;
+        /** List of dependencies by target ID. (deps[ID] = {IDs}). */
         bul_id_t *deps;
 
 } bul_target_s;
@@ -63,18 +65,17 @@ typedef struct bul_target {
 /**
  * struct bul_engine - Stores inference engine state.
  *
- * @in_seq - Whether or not the parser is currently in a sequence.
- * @size - Number of targets in the project (also = number of names).
- * @focus - ID of the current target in focus (init to BUL_MAX_ID).
- * @names - List of target names arranged by ID. (names[ID] = name).
- * @targets - List of targets arranged by ID. (targets[ID] = target).
- * @deps - List of dependencies by target ID. (deps[ID] = {IDs}).
  */
 typedef struct bul_engine {
+        /** Whether or not the parser is currently in a sequence. */
         bool in_seq;
+        /** Number of targets in the project (also = number of names). */
         size_t size;
+        /** ID of the current target in focus (init to BUL_MAX_ID). */
         bul_id_t focus;
+        /** List of target names arranged by ID. (names[ID] = name). */
         bul_name_t *names;
+        /** List of targets arranged by ID. (targets[ID] = target). */
         bul_target_s *targets;
 
 } bul_engine_s;
