@@ -31,7 +31,10 @@ typedef enum {
         BUL_EXE,
         /** Target is a library */
         BUL_LIB,
-
+        /** Target is a dir */
+        BUL_DIR,
+        /** Target is a file */
+        BUL_FILE,
 } bul_usage_t;
 
 /** Configuration status types */

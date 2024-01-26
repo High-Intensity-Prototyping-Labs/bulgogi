@@ -205,6 +205,12 @@ void bul_target_usage_print(bul_target_s *target) {
         case BUL_LIB:
                 printf("BUL_LIB");
                 break;
+        case BUL_DIR:
+                printf("BUL_DIR");
+                break;
+        case BUL_FILE:
+                printf("BUL_FILE");
+                break;
         }
 }
 
