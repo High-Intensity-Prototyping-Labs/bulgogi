@@ -1,0 +1,21 @@
+git clone git@dalhousie-space-systems-labs/MANTIS-ADCS.git
+git clone git@dalhousie-space-systems-labs/EPS.git
+
+--- project.yaml
+libMANTIS-ADCS:
+- src:
+  - '*.c'
+- inc:
+  - '*.h'
+
+libEPS:
+- src:
+  - '*.c'
+  - '*.h'
+
+core:
+- libMANTIS-ADCS
+- libEPS
+- src:
+  - main.c
+---
