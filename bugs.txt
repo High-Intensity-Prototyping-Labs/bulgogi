@@ -1,0 +1,1 @@
+- Dependencies are not checked for duplicates when added.
