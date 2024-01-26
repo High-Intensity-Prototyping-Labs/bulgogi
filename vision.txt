@@ -10,6 +10,15 @@ bul.new_project('My Project')
 bul.set_version('v1.0.0)
 bul.set_author('Colby Simpson')
 
+bul.add_dir('src', bul.GLOB)
+
+# Project looks like:
+# src 
+#   \_ file.c 
+#   \_ depend.c 
+#   \_ radio.c 
+#   \_ grub.h
+
 bul.build_all()
 ```
 
@@ -20,3 +29,61 @@ It feels like I'm writing CMake...only not. It's everything bulgogi is supposed 
 The community doors swing wide open as well by including Python. Treating Python as a scripting language and doing the analysis in the underbelly.
 
 I've never done this before nor thought of doing this in this way. But I know I need to do it.
+
+There would be 2 separate version lines: the first (and current) would be the engine (C v0.1.10). The second would by the python version (Py v1.0.0) whatever.
+
+C bulgogi does all the thinking. Py bulgogi does all the configuration.
+
+#----------------------------------------------------------------------
+
+YAML:
+The YAML files (project.yaml and rules.yaml) serve as means for _persistence_ across builds.
+
+Bulgogi is meant to work from scratch, first in a repository as setup.py, all of the configuration in the script works to setup the .yamls.
+
+Once setup, a build.py will trigger the cascade of build actions that the configuration implies.
+
+(In other words, bulgogi lives on the system and is 'called-in' by the project configurer).
+
+Python:
+In both cases, Python becomes the CLI. There's no passing around flags and argument schemes. The Python script reaches into the bulgogi ABI and triggers functions the same way a CLI would.
+
+Everything is a target:
+This idea goes much deeper than I realized.
+
+For example, in the rules.yaml scheme, a `dir` type has been added. In reality, it is just like `lib` and `exe` in that bulgogi internal lists them as targets.
+
+Knowing whether target `dir2` or `src` is complete requires all of its dependent targets to be complete as well.
+
+You end up with a build/output log along the lines of:
+
+        Found target 'src'
+        Building target 'src'
+        Found target 'module1'
+        Building target 'module1'
+        Found target 'module2'
+        Building target 'module2'
+        ...
+
+Really the entire build is pulled together by crawling 2 trees in parallel. One is a resetable state machine (rules.yaml) and the other is a todo list (project.yaml).
+
+Other build systems (?):
+CMake is cool, but the way the configuration interfaces works does not limit bulgogi to CMake at all.
+
+In fact, it should be easy for developers to adopt the build system they choose. Bulgogi is flexible build system assistant.
+
+I think you end up with multiple engine extensions like:
+
+        bul_make.c 
+        bul_cmake.c 
+        bul_meson.c 
+        bul_bazel.c 
+        ... 
+
+And on and so. It's like write once build anywhere.
+
+The problem with embedding the build systems into the engine is that it isn't on the 'scripting' layer.
+
+Putting a pin on this for now.
+
+
