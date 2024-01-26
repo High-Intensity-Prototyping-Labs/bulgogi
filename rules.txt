@@ -1,0 +1,27 @@
+* - Means anything (wildcard)
+** - Means anything (recursive)
+.. - Vinculum (repeats till exhaustion)
+exe - Refers to an executable
+lib - Refers to a library
+dir - Refers to a directory
+#abc - Defines a macro (?)
+
+The Anything Goes:
+*:
+- **
+
+The Simpleton:
+exe:
+- exe
+- lib..
+
+lib:
+- lib..
+
+Typical:
+#main:
+- exe
+- #dep
+
+#dep:
+- lib
