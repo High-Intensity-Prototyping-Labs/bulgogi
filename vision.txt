@@ -1,0 +1,22 @@
+bulgogi's core is to be written in C. This includes the inference engine and rule validation.
+
+On top of this, projects are configured in Python. Running on top of the engine, you get stuff like:
+
+```py 
+# build.py 
+import bulgogi as bul 
+
+bul.new_project('My Project')
+bul.set_version('v1.0.0)
+bul.set_author('Colby Simpson')
+
+bul.build_all()
+```
+
+There's something about this that seems so fucking sick.
+
+It feels like I'm writing CMake...only not. It's everything bulgogi is supposed to be.
+
+The community doors swing wide open as well by including Python. Treating Python as a scripting language and doing the analysis in the underbelly.
+
+I've never done this before nor thought of doing this in this way. But I know I need to do it.
