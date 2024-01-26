@@ -1,7 +1,16 @@
-bulgogi:
-- client*
-- cmake
-- project
+MANTIS-ADCS:
+- src:
+  - '*.c'
+- inc:
+  - '*.h'
 
-cmake:
-- project
+EPS:
+- src:
+  - '*'
+
+core:
+- MANTIS-ADCS 
+- EPS
+- client:
+    - src:
+      - main.c
