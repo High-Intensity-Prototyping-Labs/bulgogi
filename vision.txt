@@ -86,4 +86,63 @@ The problem with embedding the build systems into the engine is that it isn't on
 
 Putting a pin on this for now.
 
+#--------------------------------------------------------------------------------
 
+Lazy evulation:
+What if the filesystem and the project.yaml working in tandem _didn't_ mean checking the filesystem at all.
+
+What if the check was only done at build time (or another build system's config 'generate' stage)?
+
+The engine could concentrate on parsing / building the relations without trapping constantly to talk to the FS.
+
+The rules could validate the 'optimistic' project structure without knowing whether all of the files are there.
+
+Then the build files are generated, it would be reasonable for an error to occur. Or if the files are missing, to make them.
+
+Everything is a target...everything is a dir:
+I think I may have overlooked the tandem relationship between targets and directories.
+
+My first attempt at coding the 'FS layer' into the engine involved adding 2 new usage types (BUL_DIR and BUL_FILE) but I think it could be the wrong call.
+
+The original version of the engine (without dir support) actually read the new configuration format quite nicely. This makes me think it doesn't need such a major overhaul.
+
+The main problem, I've noticed, is that the re-apparation of the common 'src', 'inc', 'include' etc names would confuse the parser.
+
+Also, project.yaml was never intended to feed inputs into the project. It was meant to define outputs and their relationships.
+But I know this to be wrong because every one of the entries in the project.yaml (except those which conformed to a particular pattern) were directory names.
+
+Meta-programming:
+I should have known this would have been tricky to think about because this is programming a meta-programming system for a meta-build system.
+
+But I think I've now just realized the importance of rules.yaml. It's not just a way to validate a project configuration, it _defines_ and distinguishes targets, dirs, inputs and outputs from each other.
+
+The original version of bulgogi stuck to a single, hard-coded pattern implicitly. That's what allowed for the project.yaml to intermingle output targets with directory names without needing to search the filesystem.
+
+By using rules.yaml, entirely new meanings can be derived from the free-form schema in project.yaml.
+
+--- The Implicit C v0.1.10 rules.yaml
+
+lib:
+- dir..
+- lib..
+
+exe:
+- dir
+- lib..
+
+---
+
+Some notation may need to be changed. The basic idea is there: rules.yaml is the _interpretation_ for project.yaml using patterns.
+
+And because of this, the filesystem does not need to be checked. Pf a directory is missing for a particular target, there's a problem. 
+
+Python CLI:
+I admit that I'm still not 100% sure where the Python script comes in re project.yaml and rules.yaml. Perhaps a setup.py could be involved in setting those up.
+
+What I do know is that the build.py would work marvelously in running `bul.build()` as this would let the engine do the heavy lifting from a Python call.
+
+I like to think that shipping a project with a `setup.py` and `build.py` script to-go and only needing bulgogi to be installed as a pip module or something would be pretty great as far as lean setups go.
+
+It transcends the whole build system problem that everybody hates since it uses a completely independent and general purpose scription language as the high-level interface.
+
+It doesn't have an interface per se, the scripting language is the interface. It feels similar to me to how it isn't a build system per se but does build build system configurations.
