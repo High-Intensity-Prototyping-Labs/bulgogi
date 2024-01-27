@@ -4,24 +4,22 @@
 exe - Refers to an executable
 lib - Refers to a library
 dir - Refers to a directory
-#abc - Defines a macro (?)
+abc - Defines a macro (anything else)
 
-The Anything Goes:
-*:
-- **
+# Note on (!) Prohibitive Patterns: everything is prohibited unless mentioned (conservative).
 
-The Simpleton:
+--- Implicit C v0.10.0 Pattern:
 exe:
 - exe
 - lib..
+- dir..
 
 lib:
 - lib..
+- dir..
+---
 
-Typical:
-#main:
-- exe
-- #dep
-
-#dep:
-- lib
+--- The Anything Goes:
+'*':
+- '**'
+---
