@@ -1,0 +1,45 @@
+# Excluding wildcard feature, strict naming only.
+
+--- # rules.yaml
+lib..:
+- lib..
+- dir..
+
+exe..:
+- lib..
+- dir..
+- exedir
+---
+
+--- # project.yaml (AMBIGUOUS!!)
+core:
+- MANTIS-ADCS
+- EPS
+- src
+---
+
+--- # project.yaml (Resolve 1)
+core:
+- dir: MANTIS-ADCS
+- dir: EPS
+- exedir: src
+---
+
+--- # project.yaml (Resolve 2)
+core:
+- adcs 
+- eps 
+- src 
+
+adcs:
+- MANTIS-ADCS 
+
+eps:
+- EPS
+---
+
+--- # builder
+for target in project.layer[0]:
+  for dep in target:
+    if is_dir(dep):
+      
