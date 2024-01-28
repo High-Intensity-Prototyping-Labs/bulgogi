@@ -8,18 +8,22 @@ abc - Defines a macro (anything else)
 
 # Note on (!) Prohibitive Patterns: everything is prohibited unless mentioned (conservative).
 
---- Implicit C v0.10.0 Pattern:
-exe:
-- exe
-- lib..
-- dir..
-
+--- # Implicit C v0.1.10 Pattern:
 lib:
 - lib..
-- dir..
+- mod..
+
+exe:
+- lib..
+- mod..
+- exemod..
 ---
 
---- The Anything Goes:
+--- # Associated C v0.1.10 Project 
+
+---
+
+--- # The Anything Goes:
 '*':
 - '**'
 ---

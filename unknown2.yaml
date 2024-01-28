@@ -1,0 +1,21 @@
+git clone git@dalhousie-space-systems-labs/MANTIS-ADCS.git
+git clone git@dalhousie-space-systems-labs/EPS.git
+mkdir src && touch src/main.c
+
+--- project.yaml
+core:
+- MANTIS-ADCS 
+- EPS
+- src
+ - main.c
+---
+
+--- rules.yaml
+exe:
+- lib..
+- dir
+  - fmain
+
+lib:
+- dir:
+  - '*'
