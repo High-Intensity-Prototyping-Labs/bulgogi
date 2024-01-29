@@ -1,5 +1,5 @@
 # Bulgogi Synopsis
-# C v0.1.10
+# C v0.1.12
 
 # NOTE: Largely inspired by git cli.
 
