@@ -29,6 +29,12 @@ typedef enum {
 
 } bul_usage_t;
 
+typedef enum {
+        BUL_VALID,
+        BUL_AMB,
+        BUL_MISSING_EXE,
+} bul_valid_t;
+
 /**
  * struct bul_target - Defines a bulgogi target.
  *
@@ -214,5 +220,42 @@ void bul_target_usage_print(bul_target_s *target);
  * @return The usage hint (if any) or BUL_EXE (default).
  */
 bul_usage_t bul_detect_usage(bul_name_t name); 
+
+/**
+ * @brief Validates whether engine rules are broken.
+ *
+ * @param[in] engine Engine context to use.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
+ */
+bul_valid_t bul_engine_valid(bul_engine_s *engine);
+
+/**
+ * @brief Validates a targets by evaluating its dependencies.
+ *
+ * NOTE: A target with no dependencies is always considered valid.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to evaluate.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
+ */
+bul_valid_t bul_engine_valid_target(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Counts a target's number of executable deps.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target's exe deps to count.
+ * @return Number of exe deps counted.
+ */
+size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Prints an engine validation message.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to highlight in message.
+ * @param[in] status Engine validation status to report.
+ */
+void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status);
 
 #endif // BUL_ENGINE_H

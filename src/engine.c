@@ -217,3 +217,70 @@ bul_usage_t bul_detect_usage(bul_name_t name) {
 
         return BUL_EXE;
 }
+
+bul_valid_t bul_engine_valid(bul_engine_s *engine) {
+        bul_target_s *target = NULL;
+        bul_valid_t valid = BUL_VALID;
+
+        for(size_t x = 0; x < engine->size; x++) {
+                target = &engine->targets[x];
+                valid = bul_engine_valid_target(engine, target);
+                if(valid != BUL_VALID) {
+                        bul_engine_print_invalid(engine, target, valid);
+                        break;
+                }
+        }
+
+        return valid;
+}
+
+bul_valid_t bul_engine_valid_target(bul_engine_s *engine, bul_target_s *target) {
+        size_t exe_cnt = 0;
+        bul_valid_t valid = BUL_VALID;
+
+        if(target->usage == BUL_EXE && target->size > 0) {
+                exe_cnt = bul_engine_target_cnt_exe(engine, target);
+
+                if(exe_cnt > 1) {
+                        valid = BUL_AMB;
+                } else if(exe_cnt < 1) {
+                        valid = BUL_MISSING_EXE;
+                } else {
+                        valid = BUL_VALID;
+                }
+        }
+
+        return valid;
+}
+
+size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target) {
+        bul_target_s *dep = NULL;
+        bul_id_t dep_id = 0;
+        size_t cnt = 0;
+
+        for(size_t x = 0; x < target->size; x++) {
+                dep_id = target->deps[x];
+                dep = &engine->targets[dep_id];
+
+                if(dep->usage == BUL_EXE) {
+                        cnt++;
+                }
+        }
+
+        return cnt;
+}
+
+void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status) {
+        (void)engine;
+        switch(status) {
+        case BUL_VALID:
+                printf("Project configuration is valid.\n");
+                break;
+        case BUL_AMB:
+                printf("Target (%s) is ambiguous. Consider adding dep hints (lib) or (*).\n", target->name);
+                break;
+        case BUL_MISSING_EXE:
+                printf("Target (%s) is missing an executable component.\n", target->name);
+                break;
+        }
+}
