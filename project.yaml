@@ -1,5 +1,5 @@
 bulgogi:
-- client*
+- client
 - cmake
 - project
 
