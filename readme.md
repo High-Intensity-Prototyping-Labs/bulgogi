@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-C v0.1.12
+C v0.1.13
 
 ## Overview
 Bulgogi is a build-system orchestrator written in C.
