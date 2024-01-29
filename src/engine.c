@@ -210,6 +210,19 @@ void bul_target_usage_print(bul_target_s *target) {
 
 bul_usage_t bul_detect_usage(bul_name_t name) {
         bul_usage_t usage = BUL_EXE;
+        bul_hint_t hint = BUL_HINT_NONE;
+
+        hint = bul_detect_hint(name);
+
+        if(hint == BUL_HINT_LIB) {
+                usage = BUL_LIB;
+        }
+
+        return usage;
+}
+
+bul_hint_t bul_detect_hint(bul_name_t name) {
+        bul_hint_t hint = BUL_HINT_NONE;
 
         size_t name_len = 0;
         size_t exe_len = 0;
@@ -221,17 +234,17 @@ bul_usage_t bul_detect_usage(bul_name_t name) {
 
         if(name_len > exe_len) {
                 if(strncmp(&name[name_len-1], BUL_EXE_MK, exe_len) == 0) {
-                        usage = BUL_EXE;
+                        hint = BUL_HINT_EXE;
                 }
         }
 
         if(name_len > lib_len) {
                 if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
-                        usage = BUL_LIB;
+                        hint = BUL_HINT_LIB;
                 }
         }
 
-        return usage;
+        return hint;
 }
 
 bul_valid_t bul_engine_valid(bul_engine_s *engine) {
@@ -299,4 +312,21 @@ void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_va
                 printf("Target (%s) is missing an executable component.\n", target->name);
                 break;
         }
+}
+
+bul_name_t bul_name_clean(bul_name_t name) {
+        size_t begin = 0;
+        size_t end = 0;
+        bul_hint_t hint = BUL_HINT_NONE;
+
+        hint = bul_detect_hint(name);
+        end = strlen(name);
+
+        if(hint == BUL_HINT_EXE) {
+                end -= strlen(BUL_EXE_MK);
+        } else if(hint == BUL_HINT_LIB) {
+                begin = strlen(BUL_LIB_MK);
+        }
+
+        return strndup(&name[begin], end);
 }
