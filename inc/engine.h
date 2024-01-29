@@ -26,7 +26,6 @@ typedef char* bul_name_t;
 typedef enum {
         BUL_EXE,
         BUL_LIB,
-        BUL_AMB,
 
 } bul_usage_t;
 
