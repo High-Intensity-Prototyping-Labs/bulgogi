@@ -17,7 +17,7 @@
 
 // Settings 
 #define BUL_MAX_ID UINT_MAX
-#define BUL_EXE_MK '*'
+#define BUL_EXE_MK "*"
 #define BUL_LIB_MK "lib"
 
 typedef unsigned int bul_id_t;

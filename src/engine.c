@@ -209,13 +209,29 @@ void bul_target_usage_print(bul_target_s *target) {
 }
 
 bul_usage_t bul_detect_usage(bul_name_t name) {
-        if(strlen(name) > strlen(BUL_LIB_MK)) {
-                if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
-                        return BUL_LIB;
+        bul_usage_t usage = BUL_EXE;
+
+        size_t name_len = 0;
+        size_t exe_len = 0;
+        size_t lib_len = 0;
+
+        name_len = strlen(name);
+        exe_len = strlen(BUL_EXE_MK);
+        lib_len = strlen(BUL_LIB_MK);
+
+        if(name_len > exe_len) {
+                if(strncmp(&name[name_len-1], BUL_EXE_MK, exe_len) == 0) {
+                        usage = BUL_EXE;
                 }
         }
 
-        return BUL_EXE;
+        if(name_len > lib_len) {
+                if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
+                        usage = BUL_LIB;
+                }
+        }
+
+        return usage;
 }
 
 bul_valid_t bul_engine_valid(bul_engine_s *engine) {
