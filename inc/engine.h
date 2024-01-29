@@ -266,6 +266,6 @@ size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target);
  */
 void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status);
 
-bul_name_t bul_name_clean(bul_name_t name);
+bul_name_t bul_clean_name(bul_name_t name);
 
 #endif // BUL_ENGINE_H

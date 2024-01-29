@@ -78,11 +78,17 @@ void bul_engine_grow(bul_engine_s *engine) {
 }
 
 bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
+        bul_name_t clean_name = NULL;
+
+        clean_name = bul_clean_name(name);
+
         for(size_t x = 0; x < engine->size; x++) {
-                if(strcmp(engine->names[x], name) == 0) {
+                if(strcmp(engine->names[x], clean_name) == 0) {
                         return &engine->targets[x];
                 }
         }
+
+        free(clean_name);
 
         // Target not found
         return NULL;
@@ -94,8 +100,7 @@ bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
 
         id = engine->size;
         bul_engine_grow(engine);
-        engine->names[id] = malloc(strlen(name)+1);
-        strcpy(engine->names[id], name);
+        engine->names[id] = bul_clean_name(name);
 
         usage = bul_detect_usage(name);
 
@@ -314,7 +319,7 @@ void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_va
         }
 }
 
-bul_name_t bul_name_clean(bul_name_t name) {
+bul_name_t bul_clean_name(bul_name_t name) {
         size_t begin = 0;
         size_t end = 0;
         bul_hint_t hint = BUL_HINT_NONE;
