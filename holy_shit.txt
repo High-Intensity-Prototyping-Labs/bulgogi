@@ -1,0 +1,20 @@
+Bulgogi will have a .git equivalent repository (known as .bulgogi or .bul).
+
+Why?
+
+Because it can make **any** project conform to a single, homogenous project structure.
+
+Code hardly takes up disk space, that's not a concern.
+
+The setup.py script is what bridges/translates all of the custom directory layouts of an existing project into the compatible one.
+
+Once re-arranged/copied over/translated, the C engine takes over. Following the project.yaml (which works regardless of the dir structure), it can rage on according to the hardcoded format and compile away.
+
+It also doesn't matter that the setup script is written in python since most of the work is FS I/O. Or maybe I'm wrong here.
+
+Same idea goes for the build.py. Scan/check for any changes or new files (as directed in the script) and runs bul build.
+
+In essence, the bulgogi C core is a fixed, stubborn but devilishly fast dependency resolver / build system template generator.
+The Python layer is a user-configuration interface which bridges **any** project configuration to fit the bulgogi monolithic paradigm.
+
+Instead of trying to make every build system fit to any kind of project, you make 1 build system which any project adapts to.
