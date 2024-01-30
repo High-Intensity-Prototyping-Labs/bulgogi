@@ -140,6 +140,31 @@ target1:	# target1.out
 # Bottom line: targets marked as executable dependencies are treated as
 # normal target-libraries
 
+
+###########################################################
+#
+# The .bul folder 
+#
+###########################################################
+# 
+# Herein lies the homogenizer of build projects. Rather than to make a build system 
+# which can be bent to conform any build layout, optimize for a single build system 
+# layout in which all projects are transposed in virtual form.
+#
+# The setup.py script must do the following things:
+#       1. Allow the user to conveniently identify and arrange source and header files.
+#       2. Copy relevant resources and paths to the corresponding .bul directory.
+#       3. Produce a project.yaml file which satisfies the desired build outputs.
+#
+# Together, the bulgogi engine can be called upon for the rapid generation and calling of 
+# an existing build system and its required build files to produce the desired targets.
+#
+# After the first setup is run, successive project builds must be done with build.py. It 
+# shall perform the following:
+#       1. Allow for the detection in any underlying changes in the project codebase.
+#       2. Update .bul such that it mirrors the required project files for building.
+#       3. Call upon the underlying build system to execute the build sequence.
+
 /** Long-form droney bits **/
 # The Re-Introduction of Proxy Libs 
 # ---------------------------------
