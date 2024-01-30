@@ -1,8 +1,7 @@
-MANTIS-ADCS:
-- src:
-  - '*.c'
-- inc:
-  - '*.h'
+bulgogi:
+- client
+- cmake
+- project
 
 EPS:
 - src:

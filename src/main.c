@@ -20,6 +20,7 @@
 
 int main(void) {
         bul_engine_s    engine;
+        bul_valid_t     valid;
 
         yaml_parser_t   parser;
         yaml_event_t    event;
@@ -62,8 +63,11 @@ int main(void) {
 
         bul_engine_print(&engine);
 
+        valid = bul_engine_valid(&engine);
+
         bul_engine_free(&engine);
 
         printf("%s (%d events)\n", (error ? "FAILURE" : "SUCCESS"), count);
+        printf("PROJECT IS %s\n", (valid == BUL_VALID) ? "VALID" : "INVALID");
         return 0;
 }

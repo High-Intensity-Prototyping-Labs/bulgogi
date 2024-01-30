@@ -1,5 +1,5 @@
 # Bulgogi Synopsis
-# C v0.1.10
+# C v0.1.14
 
 # NOTE: Largely inspired by git cli.
 
@@ -22,14 +22,6 @@ With this project, there are no corporate deadlines. There are no developer qual
 Quite frankly, my annoyance with the C++ compile times alone brings me sufficient joy to want to spend 10x longer writing C code from scratch.
 
 I don't just want a tool that does what it promotes - I want good technology. I want the best.
-
-# DEPRECATED (not using C++)
-## Why C++?
-As far as bulgogi is concerned, what the project needs is a community; an ability to grow in features and be maintainable by many other people. Even if Rust is faster to implement features in (it’s not) and more maintainable (probably is), having access to 1/20th of the developer pool at best and 1/100th of the developer-years of experience available significantly shrinks the pool of interested and capable contributors to the core codebase.
-
-# Why CEX?
-Because given enough time and developers, the gargantuan set of C++ features leads to mind-splintering code. Restricting that to "basically C" is the only sane approach.
-# END DEPRECATED
 
 # Initializes a new bulgogi project in the current dir
 bulgogi init
@@ -148,38 +140,30 @@ target1:	# target1.out
 # Bottom line: targets marked as executable dependencies are treated as
 # normal target-libraries
 
-# HashMaps
-targets:
-        default: 
-                kind: Executable 
-        target1:
-                kind: Library 
-        target2:
-                kind: Executable 
 
-modules:
-        module1:
-                kind: Executable
-        module2:
-                kind: Normal
-        module3:
-                kind: Normal 
-        module4:
-                kind: Normal
-        module5:
-                kind: Executable
-
-deps:
-        default:
-                Module(module1)
-                Module(module2)
-        target1:
-                Module(module3)
-                Module(module4)
-        target2:
-                Module(module3)
-                Module(module5)
-                Target(target1)
+###########################################################
+#
+# The .bul folder 
+#
+###########################################################
+# 
+# Herein lies the homogenizer of build projects. Rather than to make a build system 
+# which can be bent to conform any build layout, optimize for a single build system 
+# layout in which all projects are transposed in virtual form.
+#
+# The setup.py script must do the following things:
+#       1. Allow the user to conveniently identify and arrange source and header files.
+#       2. Copy relevant resources and paths to the corresponding .bul directory.
+#       3. Produce a project.yaml file which satisfies the desired build outputs.
+#
+# Together, the bulgogi engine can be called upon for the rapid generation and calling of 
+# an existing build system and its required build files to produce the desired targets.
+#
+# After the first setup is run, successive project builds must be done with build.py. It 
+# shall perform the following:
+#       1. Allow for the detection in any underlying changes in the project codebase.
+#       2. Update .bul such that it mirrors the required project files for building.
+#       3. Call upon the underlying build system to execute the build sequence.
 
 /** Long-form droney bits **/
 # The Re-Introduction of Proxy Libs 

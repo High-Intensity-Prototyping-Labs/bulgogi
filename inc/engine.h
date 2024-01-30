@@ -17,7 +17,7 @@
 
 // Settings 
 #define BUL_MAX_ID UINT_MAX
-#define BUL_EXE_MK '*'
+#define BUL_EXE_MK "*"
 #define BUL_LIB_MK "lib"
 
 /** Target ID Type */
@@ -31,21 +31,20 @@ typedef enum {
         BUL_EXE,
         /** Target is a library */
         BUL_LIB,
-        /** Target is a dir */
-        BUL_DIR,
-        /** Target is a file */
-        BUL_FILE,
+
 } bul_usage_t;
 
-/** Configuration status types */
 typedef enum {
-        /** Configuration is valid */
+        BUL_HINT_EXE,
+        BUL_HINT_LIB,
+        BUL_HINT_NONE,
+} bul_hint_t;
+
+typedef enum {
         BUL_VALID,
-        /** Configuration is ambiguous */
         BUL_AMB,
-        /** Executable found in library */
-        BUL_EXE_LIB,
-} bul_status_t;
+        BUL_MISSING_EXE,
+} bul_valid_t;
 
 /**
  * struct bul_target - Defines a bulgogi target.
@@ -234,21 +233,45 @@ void bul_target_usage_print(bul_target_s *target);
  */
 bul_usage_t bul_detect_usage(bul_name_t name); 
 
-/**
- * @brief Returns the engine status.
- *
- * @param[in] engine Engine context to evaluate.
- * @return BUL_VALID in case of valid configuration, see `bul_status_t` otherwise.
- */
-bul_status_t bul_engine_valid(bul_engine_s *engine);
+bul_hint_t bul_detect_hint(bul_name_t name);
 
 /**
- * @brief Returns whether the target is valid.
+ * @brief Validates whether engine rules are broken.
+ *
+ * @param[in] engine Engine context to use.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
+ */
+bul_valid_t bul_engine_valid(bul_engine_s *engine);
+
+/**
+ * @brief Validates a targets by evaluating its dependencies.
+ *
+ * NOTE: A target with no dependencies is always considered valid.
  *
  * @param[in] engine Engine context to use.
  * @param[in] target Target to evaluate.
- * @return BUL_VALID in case of valid target, see `bul_status_t` otherwise.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
  */
-bul_status_t bul_engine_target_valid(bul_engine_s *engine, bul_target_s *target);
+bul_valid_t bul_engine_valid_target(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Counts a target's number of executable deps.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target's exe deps to count.
+ * @return Number of exe deps counted.
+ */
+size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Prints an engine validation message.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to highlight in message.
+ * @param[in] status Engine validation status to report.
+ */
+void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status);
+
+bul_name_t bul_clean_name(bul_name_t name);
 
 #endif // BUL_ENGINE_H

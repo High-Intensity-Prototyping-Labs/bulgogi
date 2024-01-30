@@ -78,11 +78,17 @@ void bul_engine_grow(bul_engine_s *engine) {
 }
 
 bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
+        bul_name_t clean_name = NULL;
+
+        clean_name = bul_clean_name(name);
+
         for(size_t x = 0; x < engine->size; x++) {
-                if(strcmp(engine->names[x], name) == 0) {
+                if(strcmp(engine->names[x], clean_name) == 0) {
                         return &engine->targets[x];
                 }
         }
+
+        free(clean_name);
 
         // Target not found
         return NULL;
@@ -94,8 +100,7 @@ bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
 
         id = engine->size;
         bul_engine_grow(engine);
-        engine->names[id] = malloc(strlen(name)+1);
-        strcpy(engine->names[id], name);
+        engine->names[id] = bul_clean_name(name);
 
         usage = bul_detect_usage(name);
 
@@ -205,23 +210,130 @@ void bul_target_usage_print(bul_target_s *target) {
         case BUL_LIB:
                 printf("BUL_LIB");
                 break;
-        case BUL_DIR:
-                printf("BUL_DIR");
-                break;
-        case BUL_FILE:
-                printf("BUL_FILE");
-                break;
         }
 }
 
 bul_usage_t bul_detect_usage(bul_name_t name) {
-        if(strlen(name) > strlen(BUL_LIB_MK)) {
-                if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
-                        return BUL_LIB;
+        bul_usage_t usage = BUL_EXE;
+        bul_hint_t hint = BUL_HINT_NONE;
+
+        hint = bul_detect_hint(name);
+
+        if(hint == BUL_HINT_LIB) {
+                usage = BUL_LIB;
+        }
+
+        return usage;
+}
+
+bul_hint_t bul_detect_hint(bul_name_t name) {
+        bul_hint_t hint = BUL_HINT_NONE;
+
+        size_t name_len = 0;
+        size_t exe_len = 0;
+        size_t lib_len = 0;
+
+        name_len = strlen(name);
+        exe_len = strlen(BUL_EXE_MK);
+        lib_len = strlen(BUL_LIB_MK);
+
+        if(name_len > exe_len) {
+                if(strncmp(&name[name_len-1], BUL_EXE_MK, exe_len) == 0) {
+                        hint = BUL_HINT_EXE;
                 }
         }
 
-        return BUL_EXE;
+        if(name_len > lib_len) {
+                if(strncmp(name, BUL_LIB_MK, strlen(BUL_LIB_MK)) == 0) {
+                        hint = BUL_HINT_LIB;
+                }
+        }
+
+        return hint;
+}
+
+bul_valid_t bul_engine_valid(bul_engine_s *engine) {
+        bul_target_s *target = NULL;
+        bul_valid_t valid = BUL_VALID;
+
+        for(size_t x = 0; x < engine->size; x++) {
+                target = &engine->targets[x];
+                valid = bul_engine_valid_target(engine, target);
+                if(valid != BUL_VALID) {
+                        bul_engine_print_invalid(engine, target, valid);
+                        break;
+                }
+        }
+
+        return valid;
+}
+
+bul_valid_t bul_engine_valid_target(bul_engine_s *engine, bul_target_s *target) {
+        size_t exe_cnt = 0;
+        bul_valid_t valid = BUL_VALID;
+
+        if(target->usage == BUL_EXE && target->size > 0) {
+                exe_cnt = bul_engine_target_cnt_exe(engine, target);
+
+                if(exe_cnt > 1) {
+                        valid = BUL_AMB;
+                } else if(exe_cnt < 1) {
+                        valid = BUL_MISSING_EXE;
+                } else {
+                        valid = BUL_VALID;
+                }
+        }
+
+        return valid;
+}
+
+size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target) {
+        bul_target_s *dep = NULL;
+        bul_id_t dep_id = 0;
+        size_t cnt = 0;
+
+        for(size_t x = 0; x < target->size; x++) {
+                dep_id = target->deps[x];
+                dep = &engine->targets[dep_id];
+
+                if(dep->usage == BUL_EXE) {
+                        cnt++;
+                }
+        }
+
+        return cnt;
+}
+
+void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status) {
+        (void)engine;
+        switch(status) {
+        case BUL_VALID:
+                printf("Project configuration is valid.\n");
+                break;
+        case BUL_AMB:
+                printf("Target (%s) is ambiguous. Consider adding dep hints (lib) or (*).\n", target->name);
+                break;
+        case BUL_MISSING_EXE:
+                printf("Target (%s) is missing an executable component.\n", target->name);
+                break;
+        }
+}
+
+bul_name_t bul_clean_name(bul_name_t name) {
+        size_t begin = 0;
+        size_t end = 0;
+        bul_hint_t hint = BUL_HINT_NONE;
+
+        hint = bul_detect_hint(name);
+        end = strlen(name);
+
+        if(hint == BUL_HINT_EXE) {
+                end -= strlen(BUL_EXE_MK);
+        } else if(hint == BUL_HINT_LIB) {
+                begin = strlen(BUL_LIB_MK);
+        }
+
+        return strndup(&name[begin], end);
 }
 
 bul_status_t bul_engine_valid(bul_engine_s *engine);

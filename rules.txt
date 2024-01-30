@@ -1,29 +1,3 @@
-* - Means anything (wildcard)
-** - Means anything (recursive)
-.. - Vinculum (repeats till exhaustion)
-exe - Refers to an executable
-lib - Refers to a library
-dir - Refers to a directory
-abc - Defines a macro (anything else)
-
-# Note on (!) Prohibitive Patterns: everything is prohibited unless mentioned (conservative).
-
---- # Implicit C v0.1.10 Pattern:
-lib:
-- lib..
-- mod..
-
-exe:
-- lib..
-- mod..
-- exemod..
----
-
---- # Associated C v0.1.10 Project 
-
----
-
---- # The Anything Goes:
-'*':
-- '**'
----
+1. Every target starts as an exe.
+2. A second apparition makes it into a lib.
+3. No exe can depend on more than 1 exe.
