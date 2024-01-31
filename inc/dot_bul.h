@@ -12,6 +12,9 @@
 // Settings 
 #define DOT_BUL ".bul"
 
+/** Global engine context */
+extern bul_engine_s engine;
+
 /**
  * @brief Initializes the bulgogi directory.
  *

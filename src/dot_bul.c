@@ -12,6 +12,9 @@
 #include "fs.h"
 #include "engine.h"
 
+// Global engine state 
+bul_engine_s engine;
+
 void bul_dot_init(void) {
         bul_fs_status_t stat;
         if((stat = bul_fs_mkdir(DOT_BUL)) != BUL_FS_OK) {
