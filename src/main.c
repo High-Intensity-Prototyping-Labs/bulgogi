@@ -48,9 +48,15 @@ static void load_and_print_project(void) {
         printf("PROJECT IS %s\n", (valid == BUL_VALID) ? "VALID" : "INVALID");
 }
 
-static void test_dot_bul_features(char *argv[]) {
+static bul_id_t test_dot_bul_features(char *argv[]) {
         printf("Creating target (%s)\n", argv[2]);
-        bul_dot_add_target(argv[2]);
+        return bul_dot_add_target(argv[2], BUL_LIB);
+}
+
+static void test_longer_dot_bul_features(char *argv[]) {
+        bul_id_t id = test_dot_bul_features(argv);
+        bul_dot_add_sources(id, argv[3]);
+
 }
 
 static void some_subcommand(char *argv[]) {
@@ -60,6 +66,9 @@ static void some_subcommand(char *argv[]) {
         } else if(strcmp(argv[1], "add") == 0) {
                 printf("Missing a target name\n");
                 printf("Try: bul add <TARGET>\n");
+        } else if(strcmp(argv[1], "add_sources") == 0) {
+                printf("Missing a pattern\n");
+                printf("Try: bul add_sources <TARGET> <PATTERN>\n");
         } else {
                 printf("Not exactly a subcommand...\n");
         }
@@ -72,6 +81,8 @@ int main(int argc, char *argv[]) {
                 some_subcommand(argv);
         } else if(argc == 3) {
                 test_dot_bul_features(argv);
+        } else if(argc == 4) {
+                test_longer_dot_bul_features(argv);
         } else {
                 printf("Lovely day, but I don't recognize that number of args.\n");
         }
