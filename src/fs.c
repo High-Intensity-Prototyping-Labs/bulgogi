@@ -84,7 +84,6 @@ bul_fs_pattern_t bul_fs_detect_pattern(bul_fs_path_t path) {
 }
 
 bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, bul_fs_pattern_s *pattern) {
-        size_t window = 0;
         bul_fs_pattern_t res = BUL_PAT_NONE;
 
         for(size_t x = 0; (x+pattern->len-1) < path_len; x++) {
