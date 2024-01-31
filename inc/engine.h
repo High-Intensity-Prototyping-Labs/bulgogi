@@ -284,4 +284,17 @@ void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_va
  */
 bul_name_t bul_clean_name(bul_name_t name);
 
+/**
+ * @brief Adds the hint to the target name (opposite of `bul_clean_name`).
+ *
+ * WARNING:
+ * This function uses the `strdup()` method which requires the returned 
+ * name to be `free()`'d.
+ *
+ * @param[in] name Target name to add the hint to.
+ * @param[in] usage Usage hint to add.
+ * @return Target name with hint added.
+ */
+bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage);
+
 #endif // BUL_ENGINE_H

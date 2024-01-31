@@ -335,3 +335,28 @@ bul_name_t bul_clean_name(bul_name_t name) {
 
         return strndup(&name[begin], end);
 }
+
+bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage) {
+        bul_name_t hint_name = NULL;
+        size_t padding = 0;
+        char *first = NULL;
+        char *second = NULL;
+
+        switch(usage) {
+        case BUL_LIB:
+                padding = strlen(BUL_LIB_MK);
+                first = BUL_LIB_MK;
+                second = name;
+                break;
+        case BUL_EXE:
+                padding = strlen(BUL_EXE_MK);
+                first = name;
+                second = BUL_EXE_MK;
+                break;
+        }
+
+        hint_name = malloc(strlen(name)+padding+1);
+        sprintf(hint_name, "%s%s", first, second);
+
+        return hint_name;
+}
