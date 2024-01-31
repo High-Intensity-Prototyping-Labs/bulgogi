@@ -272,6 +272,16 @@ size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target);
  */
 void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status);
 
+/**
+ * @brief Removes the hint from the target name.
+ *
+ * WARNING:
+ * This function uses the `strdup()` method which requires the returned 
+ * name to be `free()`'d.
+ *
+ * @param[in] name Target name to clean.
+ * @return Target name without hints.
+ */
 bul_name_t bul_clean_name(bul_name_t name);
 
 #endif // BUL_ENGINE_H
