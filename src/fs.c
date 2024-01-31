@@ -152,3 +152,15 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
         return files;
 }
 
+void bul_fs_free_files(bul_fs_path_t *files) {
+        bul_fs_path_t file = NULL;
+
+        file = files[0];
+        while(file != NULL) {
+                free(file);
+                file++;
+        }
+        
+        free(files);
+}
+

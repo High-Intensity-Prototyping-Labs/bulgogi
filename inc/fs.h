@@ -157,4 +157,15 @@ size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len);
  */
 bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern);
 
+/**
+ * @brief Frees a list of file paths returned by `bul_fs_search_files`.
+ *
+ * ASSUMPTIONS:
+ * 1. The `files` pointer has been initialized.
+ * 2. The list of `files` are null-terminated.
+ *
+ * @param[in] files List of file paths to free.
+ */
+void bul_fs_free_files(bul_fs_path_t *files);
+
 #endif // BUL_FS_H
