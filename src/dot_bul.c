@@ -68,11 +68,14 @@ void bul_dot_add_sources(bul_id_t target, bul_fs_path_t path) {
 
         files = bul_fs_search_files(path, pattern);
 
-        printf("files:\n");
-        for(int x = 0; files[x] != NULL; x++) {
-                printf("\t%s\n", files[x]);
-        }
-        printf("\n");
+        if(files) {
+                // DEBUG
+                printf("files:\n");
+                for(int x = 0; files[x] != NULL; x++) {
+                        printf("\t%s\n", files[x]);
+                }
+                printf("\n");
 
-        bul_fs_free_files(files);
+                bul_fs_free_files(files);
+        }
 }
