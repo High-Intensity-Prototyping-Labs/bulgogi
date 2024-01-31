@@ -11,6 +11,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
+// Project headers 
+#include "bul_fs.h"
+#include "yaml.h"
+
 // Note: Allocates enough room for size + 1 values
 bul_engine_s bul_engine_init(void) {
         return (bul_engine_s) {
@@ -359,4 +363,39 @@ bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage) {
         sprintf(hint_name, "%s%s", first, second);
 
         return hint_name;
+}
+
+ bul_fs_status_t bul_engine_load_file(bul_engine_s *engine, const char *file_name) {
+        yaml_parser_t   parser;
+        yaml_event_t    event;
+        FILE            *file;
+
+        int done        = 0;
+        int error       = 0;
+
+        yaml_parser_initialize(&parser);
+
+        file = fopen(file_name, "rb");
+        if(!file) {
+                return BUL_FS_ERR;
+        }
+
+        yaml_parser_set_input_file(&parser, file);
+
+        while(!done && !error) {
+                if(!yaml_parser_parse(&parser, &event)) {
+                        error = 1;
+                        continue;
+                }
+
+                bul_engine_next_event(engine, &event);
+
+                done = (event.type == YAML_STREAM_END_EVENT);
+                yaml_event_delete(&event);
+        }
+
+        yaml_parser_delete(&parser);
+        fclose(file);
+
+        return BUL_FS_OK;
 }

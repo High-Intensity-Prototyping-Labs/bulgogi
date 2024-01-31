@@ -15,6 +15,9 @@
 // External Dependencies 
 #include "yaml.h"
 
+// Project headers 
+#include "bul_fs.h"
+
 // Settings 
 #define BUL_MAX_ID UINT_MAX
 #define BUL_EXE_MK "*"
@@ -296,5 +299,14 @@ bul_name_t bul_clean_name(bul_name_t name);
  * @return Target name with hint added.
  */
 bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage);
+
+/**
+ * @brief Loads an engine context from file.
+ *
+ * @param[in] engine Engine context to load into.
+ * @param[in] file_name YAML file to read.
+ * @return `BUL_VALID` in case of valid project, see `bul_valid_t` otherwise.
+ */
+bul_fs_status_t bul_engine_from_file(bul_engine_s *engine, const char *file_name);
 
 #endif // BUL_ENGINE_H
