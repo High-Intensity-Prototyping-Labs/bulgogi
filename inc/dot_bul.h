@@ -16,7 +16,11 @@
 extern bul_engine_s engine;
 
 /**
- * @brief Initializes the bulgogi directory.
+ * @brief Initializes the bulgogi directory and the context engine.
+ *
+ * ASSUMPTIONS:
+ * 1. The global engine context has not been initialized already.
+ *      a. This could cause a memory leak if done repeatedly in the same session.
  *
  */
 void bul_dot_init(void);
@@ -34,6 +38,8 @@ void bul_dot_init(void);
  * LIB as some target may be linked (depend on) a target which 
  * was originally labelled as EXE, for example.
  *
+ * ASSUMPTIONS:
+ * 1. The engine is assumed to have been initialized.
  *
  * @param[in] name Clean name of the target to add.
  * @param[in] usage Target usage (type from user POV).
