@@ -335,7 +335,3 @@ bul_name_t bul_clean_name(bul_name_t name) {
 
         return strndup(&name[begin], end);
 }
-
-bul_status_t bul_engine_valid(bul_engine_s *engine);
-        
-bul_status_t bul_engine_target_valid(bul_engine_s *engine, bul_target_s *target);
