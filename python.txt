@@ -51,7 +51,7 @@ target2.add_headers('arduCAM/v3/header/*.hpp')
 bul.add_target('target1', bul.LIB)
 bul.add_target('target2', bul.LIB)
 
-bul.link('target2', 'target1')
+bul.add_target_dep('target2', 'target1')
 
 bul.add_sources('target1', 'MANTIS-ADCS/src/*.c')
 bul.add_headers('target1', 'MANTIS-ADCS/inc/*.h')
@@ -59,3 +59,22 @@ bul.add_headers('target1', 'MANTIS-ADCS/inc/*.h')
 bul.add_sources('target2', 'arduCAM/v3/source/*.cpp')
 bul.add_headers('target2', 'arduCAM/v3/header/*.hpp')
 # Opinion: More concise but remains bulgogi-centric.
+...
+
+# Option 3.5 
+target1 = bul.add_target('target1', bul.LIB)
+target2 = bul.add_target('target2', bul.LIB)
+
+bul.add_target_dep(target2, target1)
+
+bul.add_sources(target1, 'MANTIS-ADCS/src/*.c')
+bul.add_headers(target1, 'MANTIS-ADCS/inc/*.h')
+
+bul.add_sources(target2, 'arduCAM/v3/source/*.cpp')
+bul.add_headers(target2, 'arduCAM/v3/header/*.hpp')
+
+# Opinion: Similar to 3, but the target IDs are returned.
+# Still elegant in the low-level sense, but prevents constant name-lookups.
+# Refusing to accept name lookups also prevents linking targets which don't exist.
+
+...
