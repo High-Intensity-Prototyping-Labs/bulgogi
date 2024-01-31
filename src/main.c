@@ -11,6 +11,7 @@
 
 // Project Headers 
 #include "bul_fs.h"
+#include "bul_dot_bul.h"
 #include "yaml_ext.h"
 #include "engine.h"
 
@@ -20,7 +21,7 @@
 // Settings 
 #define PROJECT_YAML "project.yaml"
 
-int main(void) {
+static void load_and_print_project(void) {
         bul_engine_s    engine;
         bul_valid_t     valid;
         bul_fs_status_t status;
@@ -44,5 +45,21 @@ int main(void) {
         bul_engine_free(&engine);
 
         printf("PROJECT IS %s\n", (valid == BUL_VALID) ? "VALID" : "INVALID");
+}
+
+static void test_dot_bul_features(char *argv[]) {
+        printf("Creating target (%s)\n", argv[1]);
+        bul_dot_add_target(argv[1], BUL_LIB);
+}
+
+int main(int argc, char *argv[]) {
+        if(argc == 1) {
+                load_and_print_project();
+        } else if(argc == 2) {
+                test_dot_bul_features(argv);
+        } else {
+                printf("Lovely day, but I don't recognize that number of args.\n");
+        }
+
         return 0;
 }
