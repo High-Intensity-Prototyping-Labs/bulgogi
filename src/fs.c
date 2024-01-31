@@ -153,12 +153,12 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
 }
 
 void bul_fs_free_files(bul_fs_path_t *files) {
-        bul_fs_path_t file = NULL;
+        bul_fs_path_t *file_p = NULL;
 
-        file = files[0];
-        while(file != NULL) {
-                free(file);
-                file++;
+        file_p = &files[0];
+        while(*file_p != NULL) {
+                free(*file_p);
+                file_p++;
         }
         
         free(files);
