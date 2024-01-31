@@ -115,4 +115,21 @@ bul_fs_pattern_t bul_fs_detect_pattern(bul_fs_path_t path);
  */
 bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, bul_fs_pattern_s *pattern);
 
+/**
+ * @brief Returns a reference to the portion of the path which contains the file extension.
+ *
+ * ASSUMPTIONS:
+ * 1. The path is null-terminated.
+ * 2. The path contains a file extension.
+ *      a. This means the detect pattern must correspond to any `_EXT` type.
+ *
+ * NOTE:
+ * The path returned is actually a reference to a location in the provided 
+ * path. Therefore they are 'quantum-linked' together.
+ *
+ * @param[in] path Path containing file extension.
+ * @return Path which acts as the file extension. Failure to find extension results in 0-length NULL-terminated path.
+ */
+bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path);
+
 #endif // BUL_FS_H

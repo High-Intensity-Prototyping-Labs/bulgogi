@@ -95,3 +95,18 @@ bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, b
 
         return res;
 }
+
+bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path) {
+        size_t path_len = 0;
+        size_t ext_index = 0;
+
+        path_len = strlen(path);
+        ext_index = bul_fs_get_pattern_ext_index(path, path_len);
+
+        if(ext_index == 0) {
+                return &path[path_len];
+        } else {
+                return &path[ext_index+1];
+        }
+}
+
