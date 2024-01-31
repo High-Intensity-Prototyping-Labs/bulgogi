@@ -12,6 +12,7 @@
 // Settings 
 #define DEFAULT_FS_MODE 0777
 #define DEFAULT_FS_SEP "/"
+#define DEFAULT_FS_SEP_CHAR '/'
 
 /** Generic FS path type */
 typedef char* bul_fs_path_t;
@@ -167,5 +168,28 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
  * @param[in] files List of file paths to free.
  */
 void bul_fs_free_files(bul_fs_path_t *files);
+
+/**
+ * @brief Returns the index of the parent path segment end.
+ *
+ * WARNING:
+ * Paths ending in a path separator (`'/'`) will yield a parent length 
+ * that includes the null-terminator. When working with this value, it 
+ * cannot be assumed that the bounds of the string are strictly within. 
+ *
+ * ASSUMPTIONS:
+ * 1. Path are separated according to `DEFAULT_FS_SEP`.
+ *
+ * The parent path segment is considered to be all of the directories leading 
+ * up to the child - the last file or directory of the path.
+ *
+ * If the path refers to a single file or directory, then the index points 
+ * to the null-terminator of the original path.
+ *
+ * @param[in] path Path to evaluate.
+ * @param[in] path_len Length of `path`.
+ * @return Index of the parent path segment end. Will return `path_len` if no parent found.
+ */
+size_t bul_fs_path_get_parent_len(bul_fs_path_t path, size_t path_len);
 
 #endif // BUL_FS_H

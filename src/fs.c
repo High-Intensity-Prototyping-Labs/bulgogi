@@ -164,3 +164,20 @@ void bul_fs_free_files(bul_fs_path_t *files) {
         free(files);
 }
 
+size_t bul_fs_path_get_parent_len(bul_fs_path_t path, size_t path_len) {
+        size_t len = 0;
+
+        for(size_t x = path_len-1; 0 <= x; x--) {
+                if(path[x] == DEFAULT_FS_SEP_CHAR) {
+                        len = x+1;
+                        break;
+                }
+        }
+
+        /** '/' = 1 
+         * '/..' = 1 
+         * '../' = path_len 
+         * not found = 0 */
+
+        return len;
+}
