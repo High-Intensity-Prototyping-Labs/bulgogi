@@ -7,8 +7,10 @@
 // Standard C Liraries
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 // Project Headers 
+#include "bul_fs.h"
 #include "yaml_ext.h"
 #include "engine.h"
 
@@ -21,45 +23,19 @@
 int main(void) {
         bul_engine_s    engine;
         bul_valid_t     valid;
-
-        yaml_parser_t   parser;
-        yaml_event_t    event;
-        FILE            *file;
-
-        int done  = 0;
-        int count = 0;
-        int error = 0;
+        bul_fs_status_t status;
 
         engine = bul_engine_init();
 
-        assert(yaml_parser_initialize(&parser));
-
-        file = fopen(PROJECT_YAML, "rb");
-        assert(file);
-
-        yaml_parser_set_input_file(&parser, file);
-
-        while(!done && !error) {
-                if(!yaml_parser_parse(&parser, &event)) {
-                        error = 1;
-                        continue;
+        status = bul_engine_from_file(&engine, PROJECT_YAML);
+        if(status != BUL_FS_OK) {
+                if(status == BUL_FS_ERR) {
+                        perror("Unable to load project.yaml.");
+                } else {
+                        printf("Unknown error.\n");
                 }
-
-                // Do stuff 
-                yaml_print_event(&event);
-                bul_engine_next_event(&engine, &event);
-
-                // Check if we're done 
-                done = (event.type == YAML_STREAM_END_EVENT);
-
-                // Need to delete the event every time
-                yaml_event_delete(&event);
-
-                count++;
+                exit(EXIT_FAILURE);
         }
-
-        yaml_parser_delete(&parser);
-        assert(!fclose(file));
 
         bul_engine_print(&engine);
 
@@ -67,7 +43,6 @@ int main(void) {
 
         bul_engine_free(&engine);
 
-        printf("%s (%d events)\n", (error ? "FAILURE" : "SUCCESS"), count);
         printf("PROJECT IS %s\n", (valid == BUL_VALID) ? "VALID" : "INVALID");
         return 0;
 }
