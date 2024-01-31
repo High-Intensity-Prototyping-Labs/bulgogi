@@ -21,12 +21,15 @@ void bul_dot_init(void) {
                 perror("Failed to create bulgogi directory");
                 return;
         }
+
+        engine = bul_engine_init();
 }
 
-void bul_dot_add_target(bul_name_t name) {
+void bul_dot_add_target(bul_name_t name, bul_usage_t usage) {
         bul_fs_path_t path = NULL;
         bul_fs_status_t res = BUL_FS_OK;
-        
+        bul_name_t hint_name = NULL;
+
         path = bul_fs_join(DOT_BUL, name);
 
         res = bul_fs_touch(path);
@@ -34,6 +37,10 @@ void bul_dot_add_target(bul_name_t name) {
                 perror("Failed to create target file in bulgogi directory");
                 goto cleanup;
         }
+        
+        hint_name = bul_hint_name(name, usage);
+        (void)bul_engine_target_add(&engine, hint_name);
+        free(hint_name);
 
 cleanup:
         free(path);
