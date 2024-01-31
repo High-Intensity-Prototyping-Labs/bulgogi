@@ -12,7 +12,7 @@
 #include <assert.h>
 
 // Project headers 
-#include "bul_fs.h"
+#include "fs.h"
 #include "yaml.h"
 
 // Note: Allocates enough room for size + 1 values

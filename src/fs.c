@@ -3,7 +3,7 @@
  * @brief Handles the FS operations for bulgogi.
  */
 
-#include "bul_fs.h"
+#include "fs.h"
 
 // Standard C Libraries
 #include <sys/errno.h>

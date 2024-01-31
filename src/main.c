@@ -10,8 +10,8 @@
 #include <stdlib.h>
 
 // Project Headers 
-#include "bul_fs.h"
-#include "bul_dot_bul.h"
+#include "fs.h"
+#include "dot_bul.h"
 #include "yaml_ext.h"
 #include "engine.h"
 
@@ -49,7 +49,7 @@ static void load_and_print_project(void) {
 
 static void test_dot_bul_features(char *argv[]) {
         printf("Creating target (%s)\n", argv[1]);
-        bul_dot_add_target(argv[1], BUL_LIB);
+        bul_dot_add_target(argv[1]);
 }
 
 int main(int argc, char *argv[]) {

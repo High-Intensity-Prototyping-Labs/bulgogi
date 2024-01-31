@@ -3,13 +3,13 @@
  * @brief Manages the .bul directory in the project
  */
 
-#include "bul_dot_bul.h"
+#include "dot_bul.h"
 
 // Standard C Libraries
 #include <stdio.h>
 
 // Project headers 
-#include "bul_fs.h"
+#include "fs.h"
 #include "engine.h"
 
 void bul_dot_init(void) {
