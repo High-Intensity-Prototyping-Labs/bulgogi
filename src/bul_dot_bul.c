@@ -11,7 +11,7 @@
 // Project headers 
 #include "bul_fs.h"
 
-void bul_dot_init() {
+void bul_dot_init(void) {
         bul_fs_status_t stat;
         if((stat = bul_fs_mkdir(DOT_BUL)) != BUL_FS_OK) {
                 perror("Failed to create bulgogi directory");

@@ -9,6 +9,10 @@
 // Settings 
 #define DOT_BUL ".bul"
 
+/**
+ * @brief Initializes the bulgogi directory.
+ *
+ */
 void bul_dot_init(void);
 
 #endif // BUL_DOT_BUL_H
