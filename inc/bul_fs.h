@@ -48,4 +48,20 @@ bul_fs_status_t bul_fs_mkdir(bul_fs_path_t path);
  */
 bul_fs_path_t bul_fs_join(bul_fs_path_t a, bul_fs_path_t b);
 
+/**
+ * @brief Touches a file (see `touch` in GNU coreutils).
+ *
+ * NOTE:
+ * Without `O_TRUNC` it was not possible to update file timestamp
+ * using `open` or `fopen`. It was preferrable to cut the timestamp 
+ * update feature of `touch` in favor of simplicity.
+ *
+ * Therefore: this is different from the GNU `touch` in that an 
+ * existing file will not have its timestamp updated.
+ *
+ * @param[in] file Path to the file to touch.
+ * @return `BUL_FS_OK` case success, see `bul_fs_status_t` otherwise.
+ */
+bul_fs_status_t bul_fs_touch(bul_fs_path_t file);
+
 #endif // BUL_FS_H

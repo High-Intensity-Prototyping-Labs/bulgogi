@@ -39,3 +39,17 @@ bul_fs_path_t bul_fs_join(bul_fs_path_t a, bul_fs_path_t b) {
 
         return joint;
 }
+
+bul_fs_status_t bul_fs_touch(bul_fs_path_t file) {
+        FILE *fp = NULL;
+
+        fp = fopen(file, "a");  // use "a" to create if not exists.
+                                // avoids truncating with "w".
+        if(!fp) {
+                return BUL_FS_ERR;
+        }
+
+        fclose(fp);
+
+        return BUL_FS_OK;
+}
