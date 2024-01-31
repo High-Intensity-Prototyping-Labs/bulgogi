@@ -41,4 +41,16 @@ void bul_dot_init(void);
  */
 bul_id_t bul_dot_add_target(bul_name_t name, bul_usage_t usage);
 
+/**
+ * @brief Adds dep to the specified target by ID.
+ *
+ * ASSUMPTIONS:
+ * 1. The engine is assumed to have been initialized.
+ * 2. Both `target` and `dep` must exist as valid targets in the engine.
+ *
+ * @param[in] target ID of the target to add `dep` to.
+ * @param[in] dep ID of the dep to add to `target`.
+ */
+void bul_dot_add_target_dep(bul_id_t target, bul_id_t dep);
+
 #endif // BUL_DOT_BUL_H
