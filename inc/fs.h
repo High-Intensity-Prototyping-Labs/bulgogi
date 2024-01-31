@@ -192,4 +192,15 @@ void bul_fs_free_files(bul_fs_path_t *files);
  */
 size_t bul_fs_path_get_parent_len(bul_fs_path_t path, size_t path_len);
 
+/**
+ * @brief Returns the start index of the child segment of the path.
+ *
+ * See `bul_fs_path_get_parent_len` for details on parent vs child segment.
+ *
+ * @param[in] path Path to evaluate.
+ * @param[in] path_len Length of `path`.
+ * @return Index of the start position in `path` of the child segment.
+ */
+size_t bul_fs_path_get_child_index(bul_fs_path_t path, size_t path_len);
+
 #endif // BUL_FS_H

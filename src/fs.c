@@ -181,3 +181,7 @@ size_t bul_fs_path_get_parent_len(bul_fs_path_t path, size_t path_len) {
 
         return len;
 }
+
+size_t bul_fs_path_get_child_index(bul_fs_path_t path, size_t path_len) {
+        return bul_fs_path_get_parent_len(path, path_len);
+}
