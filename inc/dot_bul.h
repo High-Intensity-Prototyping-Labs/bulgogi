@@ -37,9 +37,8 @@ void bul_dot_init(void);
  *
  * @param[in] name Clean name of the target to add.
  * @param[in] usage Target usage (type from user POV).
+ * @return ID of the added target or `UINT_MAX` in case of failure.
  */
-void bul_dot_add_target(bul_name_t name, bul_usage_t usage);
-
-
+bul_id_t bul_dot_add_target(bul_name_t name, bul_usage_t usage);
 
 #endif // BUL_DOT_BUL_H

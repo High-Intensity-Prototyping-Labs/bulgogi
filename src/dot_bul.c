@@ -6,6 +6,7 @@
 #include "dot_bul.h"
 
 // Standard C Libraries
+#include <limits.h>
 #include <stdio.h>
 
 // Project headers 
@@ -25,10 +26,12 @@ void bul_dot_init(void) {
         engine = bul_engine_init();
 }
 
-void bul_dot_add_target(bul_name_t name, bul_usage_t usage) {
+bul_id_t bul_dot_add_target(bul_name_t name, bul_usage_t usage) {
         bul_fs_path_t path = NULL;
         bul_fs_status_t res = BUL_FS_OK;
         bul_name_t hint_name = NULL;
+        bul_target_s *target = NULL;
+        bul_id_t id = UINT_MAX;
 
         path = bul_fs_join(DOT_BUL, name);
 
@@ -39,9 +42,14 @@ void bul_dot_add_target(bul_name_t name, bul_usage_t usage) {
         }
         
         hint_name = bul_hint_name(name, usage);
-        (void)bul_engine_target_add(&engine, hint_name);
+
+        target = bul_engine_target_add(&engine, hint_name);
+        id = target->id;
+
         free(hint_name);
 
 cleanup:
         free(path);
+
+        return id;
 }
