@@ -8,6 +8,7 @@
 
 // Project headers 
 #include "engine.h"
+#include "fs.h"
 
 // Settings 
 #define DOT_BUL ".bul"
@@ -58,5 +59,19 @@ bul_id_t bul_dot_add_target(bul_name_t name, bul_usage_t usage);
  * @param[in] dep ID of the dep to add to `target`.
  */
 void bul_dot_add_target_dep(bul_id_t target, bul_id_t dep);
+
+/**
+ * @brief Adds sources to a target according to a path pattern.
+ *
+ * PATTERNS:
+ * - `*` - Will match any file at the directory level.
+ * - `*.%` - Will match any file with the extension `%` (can be any extension).
+ * - `**` - Will match any file at the directory level and recursively to exhaustion.
+ * - `**.%` - Will match any file with the extension `%` at the directory level and recursively to exhaustion.
+ *
+ * @param[in] target ID of target to associate sources to.
+ * @param[in] path Path pattern of source files to associate to `target`.
+ */
+void bul_dot_add_sources(bul_id_t target, bul_fs_path_t path);
 
 #endif // BUL_DOT_BUL_H

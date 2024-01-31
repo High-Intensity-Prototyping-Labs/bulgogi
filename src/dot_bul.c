@@ -58,3 +58,7 @@ void bul_dot_add_target_dep(bul_id_t target, bul_id_t dep) {
         engine.focus = target;
         bul_engine_target_add_dep(&engine, dep);
 }
+
+void bul_dot_add_sources(bul_id_t target, bul_fs_path_t path) {
+        
+}
