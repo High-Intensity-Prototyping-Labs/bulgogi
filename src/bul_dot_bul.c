@@ -20,10 +20,8 @@ void bul_dot_init(void) {
         }
 }
 
-void bul_dot_add_target(bul_name_t name, bul_usage_t usage) {
-        FILE *fp = NULL;
+void bul_dot_add_target(bul_name_t name) {
         bul_fs_path_t path = NULL;
-        bul_name_t hint_name = NULL;
         bul_fs_status_t res = BUL_FS_OK;
         
         path = bul_fs_join(DOT_BUL, name);
