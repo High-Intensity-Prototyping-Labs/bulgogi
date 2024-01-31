@@ -164,6 +164,12 @@ target1:	# target1.out
 #       1. Allow for the detection in any underlying changes in the project codebase.
 #       2. Update .bul such that it mirrors the required project files for building.
 #       3. Call upon the underlying build system to execute the build sequence.
+###########################################################
+#
+# Python API
+#
+###########################################################
+# 
 
 /** Long-form droney bits **/
 # The Re-Introduction of Proxy Libs 
