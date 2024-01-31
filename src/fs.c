@@ -13,6 +13,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+bul_fs_pattern_s bul_fs_pattern_table[] = {
+        {"*", 1, BUL_PAT_WILD},
+        {"*.", 2, BUL_PAT_WILD_EXT},
+        {"**", 2, BUL_PAT_WILD_RECURSE},
+        {"**.", 3, BUL_PAT_WILD_RECURSE_EXT},
+        {NULL, 0, 0},
+};
 
 bul_fs_status_t bul_fs_mkdir(bul_fs_path_t path) {
         int res = 0;

@@ -38,13 +38,7 @@ typedef struct bul_fs_pattern {
 } bul_fs_pattern_s;
 
 /** Table defining pattern symbols and lengths */
-bul_fs_pattern_s bul_fs_pattern_table[] = {
-        {"*", 1, BUL_PAT_WILD},
-        {"*.", 2, BUL_PAT_WILD_EXT},
-        {"**", 2, BUL_PAT_WILD_RECURSE},
-        {"**.", 3, BUL_PAT_WILD_RECURSE_EXT},
-        {NULL, 0, 0},
-};
+extern bul_fs_pattern_s bul_fs_pattern_table[];
 
 typedef enum {
         /** Filesystem operation OK */
