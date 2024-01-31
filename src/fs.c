@@ -29,12 +29,14 @@ bul_fs_status_t bul_fs_mkdir(bul_fs_path_t path) {
 bul_fs_path_t bul_fs_join(bul_fs_path_t a, bul_fs_path_t b) {
         size_t alen = 0;
         size_t blen = 0;
+        size_t slen = 0;
         bul_fs_path_t joint = NULL;
 
         alen = strlen(a);
         blen = strlen(b);
+        slen = strlen(DEFAULT_FS_SEP);
 
-        joint = malloc(alen + blen + 1);
+        joint = malloc(alen + blen + slen + 1);
         sprintf(joint, "%s%s%s", a, DEFAULT_FS_SEP, b);
 
         return joint;
