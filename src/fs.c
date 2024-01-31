@@ -55,3 +55,37 @@ bul_fs_status_t bul_fs_touch(bul_fs_path_t file) {
 
         return BUL_FS_OK;
 }
+
+bul_fs_pattern_t bul_fs_detect_pattern(bul_fs_path_t path) {
+        size_t path_len = 0;
+        bul_fs_pattern_s *pattern = NULL;
+        bul_fs_pattern_t res = BUL_PAT_NONE;
+
+        path_len = strlen(path);
+
+        pattern = &bul_fs_pattern_table[0];
+
+        while(pattern->len != 0) {
+                res = bul_fs_detect_pattern_of(path, path_len, pattern);
+                /* Trying every pattern because `**` could overrule `**.` */
+
+                pattern++;
+        /* pattern->len == 0 || res != BUL_PAT_NONE */
+        }
+
+        return res;
+}
+
+bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, bul_fs_pattern_s *pattern) {
+        size_t window = 0;
+        bul_fs_pattern_t res = BUL_PAT_NONE;
+
+        for(size_t x = 0; (x+pattern->len-1) < path_len; x++) {
+                if(strncmp(&path[x], pattern->sym, pattern->len) == 0) {
+                        res = pattern->pat;
+                        break;
+                }
+        }
+
+        return res;
+}

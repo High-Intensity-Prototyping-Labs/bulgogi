@@ -6,11 +6,45 @@
 #ifndef BUL_FS_H
 #define BUL_FS_H
 
+// Standard C Libraries 
+#include <stddef.h>
+
 // Settings 
 #define DEFAULT_FS_MODE 0777
 #define DEFAULT_FS_SEP "/"
 
+/** Generic FS path type */
 typedef char* bul_fs_path_t;
+
+/** Type for filesystem patterns */
+typedef enum {
+        /** Normal path (no pattern) */
+        BUL_PAT_NONE,
+        /** `*` - Wildcard */
+        BUL_PAT_WILD,
+        /** `*.c` - Wildcard with file extension */
+        BUL_PAT_WILD_EXT,
+        /** `**` - Recursive wildcard */
+        BUL_PAT_WILD_RECURSE,
+        /** `**.h` - Recursive wildcard with file extension */
+        BUL_PAT_WILD_RECURSE_EXT,
+} bul_fs_pattern_t;
+
+/** Pattern struct */
+typedef struct bul_fs_pattern {
+        char    *sym;
+        size_t  len;
+        bul_fs_pattern_t pat;
+} bul_fs_pattern_s;
+
+/** Table defining pattern symbols and lengths */
+bul_fs_pattern_s bul_fs_pattern_table[] = {
+        {"*", 1, BUL_PAT_WILD},
+        {"*.", 2, BUL_PAT_WILD_EXT},
+        {"**", 2, BUL_PAT_WILD_RECURSE},
+        {"**.", 3, BUL_PAT_WILD_RECURSE_EXT},
+        {NULL, 0, 0},
+};
 
 typedef enum {
         /** Filesystem operation OK */
@@ -63,5 +97,28 @@ bul_fs_path_t bul_fs_join(bul_fs_path_t a, bul_fs_path_t b);
  * @return `BUL_FS_OK` case success, see `bul_fs_status_t` otherwise.
  */
 bul_fs_status_t bul_fs_touch(bul_fs_path_t file);
+
+/**
+ * @brief Detects a pattern in a file path.
+ *
+ * ASSUMPTIONS:
+ * 1. The path is null-terminated.
+ * 2. All patterns in the `bul_fs_pattern_table` have lengths of at least 1.
+ * 3. The `bul_fs_pattern_table` terminates with an entry of length 0.
+ *
+ * @param[in] path Path containing the pattern to detect.
+ * @return Detect pattern as defined in `bul_fs_pattern_t`.
+ */
+bul_fs_pattern_t bul_fs_detect_pattern(bul_fs_path_t path);
+
+/**
+ * @brief Detects a specific pattern in a path from an entry of the `bul_fs_pattern_table`.
+ *
+ * @param[in] path Path to evaluate.
+ * @param[in] path_len Length of the path to evaluate.
+ * @param[in] pattern Pointer to entry in the `bul_fs_pattern_table` to use.
+ * @return `BUL_PAT_NONE` or the pattern in `pattern` if detected.
+ */
+bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, bul_fs_pattern_s *pattern);
 
 #endif // BUL_FS_H
