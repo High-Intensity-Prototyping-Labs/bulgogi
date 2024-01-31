@@ -13,6 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <glob.h>
+
 bul_fs_pattern_s bul_fs_pattern_table[] = {
         {"*", 1, BUL_PAT_WILD},
         {"*.", 2, BUL_PAT_WILD_EXT},
@@ -119,5 +121,34 @@ size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len) {
 
         // Could not find ext
         return 0;
+}
+
+bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern) {
+        bul_fs_path_t *files = NULL;
+
+        glob_t globbuf;
+
+        switch(pattern) {
+        case BUL_PAT_WILD_RECURSE_EXT:
+                printf("The BUL_PAT_WILD_RECURSE_EXT pattern type has not been implemented yet.\n");
+                printf("Called from bul_fs_search_files() function.\n");
+                /* This type ought to successively call glob until directories exhausted */
+                /* The main caveat is that the directory structure needs to be preserved as they go deeper */
+                break;
+        default:
+                glob(path, GLOB_NOSORT | GLOB_TILDE, NULL, &globbuf);
+                break;
+
+        }
+
+        files = malloc((globbuf.gl_pathc+1) * sizeof(bul_fs_path_t));
+        for(size_t x = 0; x < globbuf.gl_pathc; x++) {
+                files[x] = strdup(globbuf.gl_pathv[x]);
+        }
+        files[globbuf.gl_pathc] = NULL;
+
+        globfree(&globbuf);
+
+        return files;
 }
 

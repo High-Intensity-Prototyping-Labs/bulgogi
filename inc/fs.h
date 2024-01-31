@@ -141,4 +141,20 @@ bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path);
  */
 size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len);
 
+/**
+ * @brief Returns a list of matching file paths based on pattern.
+ *
+ * WARNING:
+ * This function dynamically allocates memory when a non-NULL value is 
+ * returned. Be sure to `free()` the memory when it is no longer used.
+ *
+ * ASSUMPTIONS:
+ * 1. The `pattern` type is anything but `BUL_PAT_NONE`.
+ *
+ * @param[in] path Path containing pattern to search.
+ * @param[in] pattern Pattern type (see `bul_fs_detect_pattern()`).
+ * @return `NULL` if no matching files found or a NULL-terminated list of file paths.
+ */
+bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern);
+
 #endif // BUL_FS_H
