@@ -1,0 +1,11 @@
+- There is nothing that the Python API can do that the engine cannot do.
+- Python serves as a scripting interface for the engine, both in terms of configuring and building projects.
+- The setup.py script:
+        - Produces project.yaml and all .bul/** files localizing sources and headers.
+        - Checks for any dependencies needed.
+        - Applies patches/etc.
+- The build.py script:
+        - Calls the build engine to build the project.
+        - Checks for any changes/updates to the underlying structure.
+
+** Again, all of these operations are done _through_ the engine. There may be a CLI one day, but for now this will be a Python API.
