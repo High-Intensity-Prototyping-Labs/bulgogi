@@ -365,7 +365,7 @@ bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage) {
         return hint_name;
 }
 
- bul_fs_status_t bul_engine_load_file(bul_engine_s *engine, const char *file_name) {
+ bul_fs_status_t bul_engine_from_file(bul_engine_s *engine, const char *file_name) {
         yaml_parser_t   parser;
         yaml_event_t    event;
         FILE            *file;
