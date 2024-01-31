@@ -158,6 +158,11 @@ bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name);
  * 1. The `engine` context is initialized.
  * 2. The target `name` is non-NULL.
  *
+ * NOTE:
+ * This function creates its own dynamically allocated copy of
+ * the passed `name`. It is therefore not necessary to preserve it 
+ * after a successful call.
+ *
  * @param[in] engine Engine context to use.
  * @param[in] name Name of target to add.
  * @return Pointer to newly added target or `NULL` if failed to add.
