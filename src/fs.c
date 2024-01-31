@@ -134,7 +134,7 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
                 printf("Called from bul_fs_search_files() function.\n");
                 /* This type ought to successively call glob until directories exhausted */
                 /* The main caveat is that the directory structure needs to be preserved as they go deeper */
-                break;
+                return NULL;
         default:
                 glob(path, GLOB_NOSORT | GLOB_TILDE, NULL, &globbuf);
                 break;
