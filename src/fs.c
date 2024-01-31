@@ -110,3 +110,14 @@ bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path) {
         }
 }
 
+size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len) {
+        for(size_t x = path_len-1; 0 <= x; x--) {
+                if(path[x] == '.') {
+                        return x;
+                }
+        }
+
+        // Could not find ext
+        return 0;
+}
+

@@ -132,4 +132,13 @@ bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, b
  */
 bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path);
 
+/**
+ * @brief Returns the index of the '.' of the path's file extension.
+ *
+ * @param[in] path Path containing a file extension.
+ * @param[in] path_len Path length.
+ * @return Index of the file extension '.' or `0` if none found.
+ */
+size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len);
+
 #endif // BUL_FS_H
