@@ -24,9 +24,22 @@ void bul_dot_init(void);
 /**
  * @brief Adds a target tracker to the bulgogi directory.
  *
+ * NOTE:
+ * This function uses target name hints to signal the intended 
+ * usage of the target. Because of built-in target rules, there 
+ * is no guarantee that the user-configured dependency tree is 
+ * valid according to the desired hints.
+ *
+ * This may cause dependencies initially added as EXE to become 
+ * LIB as some target may be linked (depend on) a target which 
+ * was originally labelled as EXE, for example.
+ *
+ *
  * @param[in] name Clean name of the target to add.
  * @param[in] usage Target usage (type from user POV).
  */
 void bul_dot_add_target(bul_name_t name, bul_usage_t usage);
+
+
 
 #endif // BUL_DOT_BUL_H
