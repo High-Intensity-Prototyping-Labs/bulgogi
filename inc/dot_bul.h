@@ -1,5 +1,5 @@
 /**
- * @file bul_dot_dul.h
+ * @file dot_bul.h
  * @brief Manages the .bul directory in the project
  */
 
