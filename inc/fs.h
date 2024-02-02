@@ -46,6 +46,8 @@ typedef enum {
         BUL_FS_OK,
         /** Filesystem error, errno available */
         BUL_FS_ERR,
+        /** Filesystem warning, errno available (typically non-fatal) */
+        BUL_FS_WARN,
         /** Filesystem error, no errno available */
         BUL_FS_NO_ERRNO,
         /** Filesystem error, unknown */

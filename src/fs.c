@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <glob.h>
+#include <errno.h>
 
 bul_fs_pattern_s bul_fs_pattern_table[] = {
         {"*", 1, BUL_PAT_WILD},
@@ -29,7 +30,12 @@ bul_fs_status_t bul_fs_mkdir(bul_fs_path_t path) {
         res = mkdir(path, DEFAULT_FS_MODE);
 
         if(res == -1) {
-                return BUL_FS_ERR;
+                switch(errno) {
+                case EEXIST:
+                        return BUL_FS_WARN;
+                default:
+                        return BUL_FS_ERR;
+                }
         } else {
                 return BUL_FS_OK;
         }
