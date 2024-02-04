@@ -212,3 +212,10 @@ Ambiguity encountered. Consider resolving with an executable indicator (*).
 When this happens, an executable indicator (`*`) must be used to flag the module-dependency which contains the required executable component for the target to be executable.
 
 Note that once a module is declared to be executable at one point in the project, it _must_ be treated the same way throughout the entire project. Otherwise you may be faced with undefined behaviour.
+
+# License 
+<a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank">
+    <img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png" width="88" height="31"/>
+</a>
+<br/>
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/High-Intensity-Prototyping-Labs/bulgogi">bulgogi</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/amellalalex">Alex Amellal</a> is licensed under <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0</a></p>
