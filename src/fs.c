@@ -1,5 +1,5 @@
 /**
- * @file bul_fs.h
+ * @file fs.c
  * @brief Handles the FS operations for bulgogi.
  */
 
