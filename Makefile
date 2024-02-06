@@ -20,7 +20,10 @@ LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
 
 all: doc $(BIN) $(LIB) 
-	
+
+debug: CPPFLAGS += -DDEBUG
+debug: doc $(BIN) $(LIB)
+
 $(BIN): $(OBJ) | $(BIN_DIR)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
@@ -59,4 +62,5 @@ prints:
 doc:
 	doxygen doxygen > /dev/null 2> /dev/null
 
-.PHONY: all clean clean_deps doc
+
+.PHONY: all clean clean_deps doc debug
