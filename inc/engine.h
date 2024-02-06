@@ -314,13 +314,4 @@ bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage);
  */
 bul_fs_status_t bul_engine_from_file(bul_engine_s *engine, const char *file_name);
 
-/**
- * @brief Writes an engine context to file.
- *
- * @param[in] engine Engine context to write.
- * @param[in] file_name YAML file to write to.
- * @return `BUL_VALID` in case of valid write, see `bul_valid_t` otherwise.
- */
-bul_fs_status_t bul_engine_to_file(bul_engine_s *engine, const char *file_name);
-
 #endif // BUL_ENGINE_H
