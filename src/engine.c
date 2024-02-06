@@ -399,3 +399,44 @@ bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage) {
 
         return BUL_FS_OK;
 }
+
+bul_fs_status_t bul_engine_to_file(bul_engine_s *engine, const char *file_name) {
+        bul_fs_status_t status = BUL_FS_OK;
+
+        yaml_emitter_t emitter;
+        yaml_event_t event;
+
+        FILE *file = NULL;
+
+        yaml_emitter_initialize(&emitter);
+
+        file = fopen(file_name, "wb");
+        if(!file) {
+                status = BUL_FS_ERR;
+                goto cleanup;
+        }
+
+        yaml_emitter_set_output_file(&emitter, file);
+
+        /* Begin emission */
+        yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING);
+        if(!yaml_emitter_emit(&emitter, &event)) {
+                status = BUL_FS_UNKNOWN;
+                goto error;
+        }
+
+        /* More events */
+
+        /* End emission */
+        yaml_stream_end_event_initialize(&event, )
+
+        fclose(file);
+
+error:
+        yaml_event_delete(&event);
+
+cleanup:
+        yaml_emitter_delete(&emitter);
+
+        return status;
+}
