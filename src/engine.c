@@ -14,6 +14,7 @@
 // Project headers 
 #include "fs.h"
 #include "yaml.h"
+#include "yaml_ext.h"
 
 // Note: Allocates enough room for size + 1 values
 bul_engine_s bul_engine_init(void) {
@@ -414,6 +415,10 @@ bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage) {
                 }
 
                 bul_engine_next_event(engine, &event);
+
+#ifdef DEBUG
+                yaml_print_event(&event);
+#endif
 
                 done = (event.type == YAML_STREAM_END_EVENT);
                 yaml_event_delete(&event);

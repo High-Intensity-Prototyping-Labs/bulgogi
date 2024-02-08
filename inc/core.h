@@ -77,7 +77,6 @@ void bul_core_next_event(bul_core_s *core, yaml_event_t *event);
  * @brief Processes a YAML event of type `YAML_DOCUMENT_START_EVENT`.
  *
  * @param[in] core Core context to use.
- * @param[in] event Event of type `YAML_DOCUMENT_START_EVENT`.
  */
 void bul_core_document_start(bul_core_s *core);
 
@@ -85,9 +84,30 @@ void bul_core_document_start(bul_core_s *core);
  * @brief Processes a YAML event of type `YAML_DOCUMENT_END_EVENT`.
  *
  * @param[in] core Core context to use.
- * @param[in] event Event of type `YAML_DOCUMENT_END_EVENT`.
  */
 void bul_core_document_end(bul_core_s *core);
+
+/**
+ * @brief Processes a YAML event of type `YAML_MAPPING_START_EVENT`.
+ *
+ * @param[in] core Core context to use.
+ */
+void bul_core_mapping_start(bul_core_s *core);
+
+/**
+ * @brief Processes a YAML event of type `YAML_MAPPING_END_EVENT`.
+ *
+ * @param[in] core Core context to use.
+ */
+void bul_core_mapping_end(bul_core_s *core);
+
+/**
+ * @brief Processes a YAML event of type `YAML_SCALAR_EVENT`.
+ *
+ * @param[in] core Core context to use.
+ * @param[in] event Event of type `YAML_SCALAR_EVENT`.
+ */
+void bul_core_scalar(bul_core_s *core, yaml_event_t *event);
 
 /**
  * @brief Grows the stack if needed.
@@ -142,8 +162,9 @@ bul_target_s bul_target_init(bul_id_t id, char *name);
 /**
  * @brief Adds a child target to `target`.
  *
- * @param[in] target Target to add the child to.
- * @param[in] child_id ID of the to add.
+ * @param[in] core Core context to use.
+ * @param[in] target_id ID of the target to add the dep to.
+ * @param[in] dep_id ID of the dep to add.
  */
 void bul_target_add_dep(bul_target_s *target, bul_id_t dep_id);
 

@@ -32,6 +32,15 @@ void bul_core_next_event(bul_core_s *core, yaml_event_t *event) {
         case YAML_DOCUMENT_END_EVENT:
                 bul_core_document_end(core);
                 break;
+        case YAML_MAPPING_START_EVENT:
+                bul_core_mapping_start(core);
+                break;
+        case YAML_MAPPING_END_EVENT:
+                bul_core_mapping_end(core);
+                break;
+        case YAML_SCALAR_EVENT:
+                bul_core_scalar(core, event);
+                break;
         default:
                 break;
         }
@@ -43,14 +52,42 @@ void bul_core_document_start(bul_core_s *core) {
         // Add document as a target.
         id = bul_core_target_add(core, BUL_DOC_NAME);
 
-        // Set scope and update level 
+        // Set scope
         core->stack[core->level] = id;
-        core->level++;
-        bul_core_stack_grow_if(core);
+        /* Waiting for MAPPING to update level */
 }
 
 void bul_core_document_end(bul_core_s *core) {
         core->level--;
+}
+
+void bul_core_mapping_start(bul_core_s *core) {
+        core->level++;
+        bul_core_stack_grow_if(core);
+}
+
+void bul_core_mapping_end(bul_core_s *core) {
+        core->level--;
+}
+
+void bul_core_scalar(bul_core_s *core, yaml_event_t *event) {
+        char *name = NULL;
+        bul_id_t id = BUL_MAX_ID;
+        bul_id_t parent_id = BUL_MAX_ID;
+        bul_target_s *parent = NULL;
+
+        name = (char*)event->data.scalar.value;
+
+        id = bul_core_target_add(core, name);
+
+        core->stack[core->level] = id;
+
+        if(core->level > 0) {
+                parent_id = core->stack[core->level-1];
+                /* Parent is the previous entry in the stack */
+                parent = &core->targets[parent_id];
+                bul_target_add_dep(parent, id);
+        }
 }
 
 void bul_core_stack_grow_if(bul_core_s *core) {
