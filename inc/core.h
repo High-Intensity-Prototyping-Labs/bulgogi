@@ -31,6 +31,8 @@ struct bul_target {
 typedef struct bul_target bul_target_s;
 
 struct bul_core {
+        /** Sequence depth counter */
+        size_t seq;
         /** Number of targets stored */
         size_t size;
         /** Current recursion depth */
