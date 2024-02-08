@@ -118,6 +118,45 @@ bul_id_t bul_core_target_add(bul_core_s *core, char *name) {
         return id;
 }
 
+bul_target_s *bul_core_target_find(bul_core_s *core, char *name) {
+        bul_target_s *match = NULL;
+
+        /* Global Search */
+        if(core->level == 0) {
+                size_t x = 0;
+
+                for(x = 0; x < core->size; x++) {
+                        if(strcmp(core->targets[x].name, name) == 0) {
+                                match = &core->targets[x];
+                                break;
+                        }
+                }
+        /* Scope-bound Search */
+        } else {
+                size_t x = 0;
+
+                bul_target_s *dep = NULL;
+                bul_target_s *scope = NULL;
+                bul_id_t dep_id = BUL_MAX_ID;
+                bul_id_t scope_id = BUL_MAX_ID;
+
+                scope_id = core->stack[core->level - 1];
+                scope = &core->targets[scope_id];
+
+                for(x = 0; x < scope->size; x++) {
+                        dep_id = scope->deps[x];
+                        dep = &core->targets[dep_id];
+
+                        if(strcmp(dep->name, name) == 0) {
+                                match = dep;
+                                break;
+                        }
+                }
+        }
+
+        return match;
+}
+
 void bul_core_free(bul_core_s *core) {
         free(core->targets);
 }

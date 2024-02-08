@@ -141,6 +141,19 @@ void bul_core_grow(bul_core_s *core);
 bul_id_t bul_core_target_add(bul_core_s *core, char *name);
 
 /**
+ * @brief Searches for target with matching name within the current scope.
+ *
+ * The current scope is defined by the target ID situated at `core->level - 1` in `core->stack`.
+ * Dependencies of the target scope are scanned non-recursively for a match.
+ * If the `core->level` is 0, the scope is global meaning any `core->target[N]` can match.
+ *
+ * @param[in] core Core context to use.
+ * @param[in] name Name of the target to find.
+ * @return Pointer to the first match or `NULL` in case of no match.
+ */
+bul_target_s *bul_core_target_find(bul_core_s *core, char *name);
+
+/**
  * @brief Frees an initialized core struct.
  *
  * @param[in] core Core struct to initialize.
