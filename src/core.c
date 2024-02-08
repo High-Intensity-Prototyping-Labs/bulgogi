@@ -224,13 +224,18 @@ void bul_core_print(bul_core_s *core) {
         printf("\t.maxlvl = %lu\n", core->maxlvl);
         printf("\t.stack = {\n");
         /* print stack */
-        for(x = 0; x < core->maxlvl; x++) {
+        for(x = 0; x <= core->maxlvl; x++) {
                 id = core->stack[x];
                 printf("\t\t");
                 if(x == core->level) {
                         printf("(*level) => ");
                 }
-                printf("core->stack[%lu] => %s,\n", x, core->targets[id].name);
+                if(x == core->maxlvl) {
+                        name = "NULL";
+                } else {
+                        name = core->targets[id].name;
+                }
+                printf("core->stack[%lu] => %s,\n", x, name);
         }
         printf("\t},\n");
         printf("\t.targets = {\n");
