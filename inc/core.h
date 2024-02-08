@@ -188,4 +188,20 @@ void bul_target_add_dep(bul_target_s *target, bul_id_t dep_id);
  */
 void bul_target_grow(bul_target_s *target);
 
+/**
+ * @brief Prints the core in human-readable format to `stdout`.
+ *
+ * @param[in] core Core context to print.
+ */
+void bul_core_print(bul_core_s *core);
+
+/**
+ * @brief Prints the target specified by ID in human-readable format to `stdout`.
+ *
+ * @param[in] core Core context to use.
+ * @param[in] target_id ID of the target to print.
+ * @param[in] indent_level Level of indentation to use (baseline).
+ */
+void bul_core_print_target(bul_core_s *core, bul_id_t target_id, size_t indent_level);
+
 #endif // BUL_CORE_H

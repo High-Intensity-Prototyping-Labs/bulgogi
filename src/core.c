@@ -4,10 +4,11 @@
  */
 
 #include "core.h"
-#include <malloc/_malloc.h>
-#include <string.h>
 
 // Standard C Libraries 
+#include <malloc/_malloc.h>
+#include <stdio.h>
+#include <string.h>
 
 bul_core_s bul_core_init(void) {
         bul_core_s core = {
@@ -197,4 +198,65 @@ void bul_target_grow(bul_target_s *target) {
         target->size++;
         target->deps = realloc(target->deps, (target->size+1) * sizeof(bul_id_t));
         /* target capacity is size+1 */
+}
+
+void bul_core_print(bul_core_s *core) {
+        size_t x = 0;
+        bul_id_t id = 0;
+        
+        printf("bul_core_s {\n");
+        printf("\t.size = %lu\n", core->size);
+        printf("\t.level = %lu\n", core->level);
+        printf("\t.maxlvl = %lu\n", core->maxlvl);
+        printf("\t.stack = {\n");
+        /* print stack */
+        for(x = 0; x < core->maxlvl; x++) {
+                id = core->stack[x];
+                printf("\t\t");
+                if(x == core->level) {
+                        printf("(*level) => ");
+                }
+                printf("core->targets[%u] => %s,\n", id, core->targets[id].name);
+        }
+        printf("\t},\n");
+        printf("\t.targets = {\n");
+        /* print targets */
+        for(x = 0; x < core->size; x++) {
+                bul_core_print_target(core, x, 2);
+        }
+        printf("\t}\n");
+        printf("}\n");
+}
+
+static inline void indent(size_t level) {
+        for(; level != 0; level--) {
+                printf("\t");
+        }
+}
+
+void bul_core_print_target(bul_core_s *core, bul_id_t target_id, size_t indent_level) {
+        bul_target_s *target = NULL;
+
+        target = &core->targets[target_id];
+
+        indent(indent_level); printf("bul_target_s {\n");
+        indent(indent_level); printf("\t.id = %u\n", target->id);
+        indent(indent_level); printf("\t.size = %lu\n", target->size);
+        indent(indent_level); printf("\t.name = %s\n", target->name);
+        indent(indent_level); printf("\t.deps = {\n");
+        /* print deps */
+        {
+                size_t x = 0;
+                bul_id_t dep_id = 0;
+                bul_target_s *dep = NULL;
+
+                for(x = 0; x < target->size; x++) {
+                        dep_id = target->deps[x];
+                        dep = &core->targets[dep_id];
+
+                        indent(indent_level); printf("\t\tcore->targets[%u] => %s,\n", dep_id, dep->name);
+                }
+        }
+        indent(indent_level); printf("\t}\n");
+        indent(indent_level); printf("}\n");
 }
