@@ -79,7 +79,7 @@ void bul_core_next_event(bul_core_s *core, yaml_event_t *event);
  * @param[in] core Core context to use.
  * @param[in] event Event of type `YAML_DOCUMENT_START_EVENT`.
  */
-void bul_core_document_start(bul_core_s *core, yaml_event_t *event);
+void bul_core_document_start(bul_core_s *core);
 
 /**
  * @brief Processes a YAML event of type `YAML_DOCUMENT_END_EVENT`.
@@ -87,7 +87,7 @@ void bul_core_document_start(bul_core_s *core, yaml_event_t *event);
  * @param[in] core Core context to use.
  * @param[in] event Event of type `YAML_DOCUMENT_END_EVENT`.
  */
-void bul_core_document_end(bul_core_s *core, yaml_event_t *event);
+void bul_core_document_end(bul_core_s *core);
 
 /**
  * @brief Grows the stack if needed.

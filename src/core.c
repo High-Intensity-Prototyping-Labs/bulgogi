@@ -30,17 +30,17 @@ bul_core_s bul_core_init(void) {
 void bul_core_next_event(bul_core_s *core, yaml_event_t *event) {
         switch(event->type) {
         case YAML_DOCUMENT_START_EVENT:
-                bul_core_document_start(core, event);
+                bul_core_document_start(core);
                 break;
         case YAML_DOCUMENT_END_EVENT:
-                bul_core_document_end(core, event);
+                bul_core_document_end(core);
                 break;
         default:
                 break;
         }
 }
 
-void bul_core_document_start(bul_core_s *core, yaml_event_t *event) {
+void bul_core_document_start(bul_core_s *core) {
         bul_id_t id = 0;
 
         // Add document as a target.
@@ -52,7 +52,7 @@ void bul_core_document_start(bul_core_s *core, yaml_event_t *event) {
         bul_core_stack_grow_if(core);
 }
 
-void bul_core_document_end(bul_core_s *core, yaml_event_t *event) {
+void bul_core_document_end(bul_core_s *core) {
         core->level--;
 }
 
