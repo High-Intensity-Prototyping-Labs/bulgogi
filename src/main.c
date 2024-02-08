@@ -10,8 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG
-
 #ifndef DEBUG
 // Project Headers 
 #include "fs.h"
@@ -103,7 +101,10 @@ int main(int argc, char *argv[]) {
 
         int done = 0;
         int error = 0;
-        
+ 
+        (void)argc;
+        (void)argv;
+
         yaml_parser_initialize(&parser);
 
         file = fopen(PROJECT_YAML, "rb");
