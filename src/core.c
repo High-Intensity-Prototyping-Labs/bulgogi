@@ -234,7 +234,7 @@ void bul_core_print(bul_core_s *core) {
         printf("}\n");
 }
 
-static inline void indent(size_t level) {
+static void indent(size_t level) {
         for(; level != 0; level--) {
                 printf("\t");
         }
