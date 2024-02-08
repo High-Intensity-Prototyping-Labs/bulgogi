@@ -12,7 +12,6 @@
 
 bul_core_s bul_core_init(void) {
         bul_core_s core = {
-                .seq = 0,
                 .size = 0,
                 .level = 0,
                 .maxlvl = 0,
@@ -39,12 +38,6 @@ void bul_core_next_event(bul_core_s *core, yaml_event_t *event) {
                 break;
         case YAML_MAPPING_END_EVENT:
                 bul_core_mapping_end(core);
-                break;
-        case YAML_SEQUENCE_START_EVENT:
-                core->seq += 1;
-                break;
-        case YAML_SEQUENCE_END_EVENT:
-                core->seq -= 1;
                 break;
         case YAML_SCALAR_EVENT:
                 bul_core_scalar(core, event);
@@ -218,7 +211,6 @@ void bul_core_print(bul_core_s *core) {
         bul_id_t id = 0;
         
         printf("bul_core_s {\n");
-        printf("\t.seq = %lu\n", core->seq);
         printf("\t.size = %lu\n", core->size);
         printf("\t.level = %lu\n", core->level);
         printf("\t.maxlvl = %lu\n", core->maxlvl);
