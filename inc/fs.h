@@ -28,7 +28,7 @@ typedef enum {
         /** `**` - Recursive wildcard */
         BUL_PAT_WILD_RECURSE,
         /** `**.h` - Recursive wildcard with file extension */
-        BUL_PAT_WILD_RECURSE_EXT,
+        BUL_PAT_WILD_RECURSE_EXT
 } bul_fs_pattern_t;
 
 /** Pattern struct */
@@ -51,7 +51,7 @@ typedef enum {
         /** Filesystem error, no errno available */
         BUL_FS_NO_ERRNO,
         /** Filesystem error, unknown */
-        BUL_FS_UNKNOWN,
+        BUL_FS_UNKNOWN
 } bul_fs_status_t;
 
 /**
