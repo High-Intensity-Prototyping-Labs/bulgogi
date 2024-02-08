@@ -75,10 +75,17 @@ void bul_core_scalar(bul_core_s *core, yaml_event_t *event) {
         bul_id_t id = BUL_MAX_ID;
         bul_id_t parent_id = BUL_MAX_ID;
         bul_target_s *parent = NULL;
+        bul_target_s *target = NULL;
 
         name = (char*)event->data.scalar.value;
 
-        id = bul_core_target_add(core, name);
+        if((target = bul_core_target_find(core, name))) {
+        /* Matching target found in scope */
+                id = target->id;
+        } else {
+        /* No existing target in scope */
+                id = bul_core_target_add(core, name);
+        }
 
         core->stack[core->level] = id;
 
