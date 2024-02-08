@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
         (void)argc;
         (void)argv;
 
+        core = bul_core_init();
+
         yaml_parser_initialize(&parser);
 
         file = fopen(PROJECT_YAML, "rb");
