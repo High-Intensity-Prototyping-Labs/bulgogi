@@ -230,7 +230,7 @@ void bul_core_print(bul_core_s *core) {
                 if(x == core->level) {
                         printf("(*level) => ");
                 }
-                printf("core->targets[%u] => %s,\n", id, core->targets[id].name);
+                printf("core->stack[%lu] => %s,\n", x, core->targets[id].name);
         }
         printf("\t},\n");
         printf("\t.targets = {\n");
