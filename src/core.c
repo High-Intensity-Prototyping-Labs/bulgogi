@@ -10,19 +10,16 @@
 // Standard C Libraries 
 
 bul_core_s bul_core_init(void) {
-        bul_id_t *stack = NULL;
-        bul_target_s *targets = NULL;
-
-        stack = malloc(sizeof(bul_id_t));
-        targets = malloc(sizeof(bul_core_s));
-
         bul_core_s core = {
                 .size = 0,
                 .level = 0,
                 .maxlvl = 0,
-                .stack = stack,
-                .targets = targets,
+                .stack = NULL,
+                .targets = NULL,
         };
+
+        core.stack = malloc(sizeof(bul_id_t));
+        core.targets = malloc(sizeof(bul_core_s));
 
         return core;
 }
@@ -89,18 +86,16 @@ void bul_core_free(bul_core_s *core) {
 }
 
 bul_target_s bul_target_init(bul_id_t id, char *name) {
-        char *dup = NULL;
-        bul_id_t *deps = NULL;
-
-        dup = strdup(name);
-        deps = malloc(sizeof(bul_id_t));
-
         bul_target_s target = {
-                .id = id,
-                .name = dup,
+                .id = BUL_MAX_ID,
+                .name = NULL,
                 .size = 0,
-                .deps = deps,
+                .deps = NULL,
         };
+
+        target.id = id;
+        target.name = strdup(name);
+        target.deps = malloc(sizeof(bul_id_t));
 
         return target;
 }
