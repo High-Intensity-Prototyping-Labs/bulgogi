@@ -10,15 +10,17 @@
 // Standard C Libraries 
 
 bul_core_s bul_core_init(void) {
+        bul_id_t *stack = NULL;
         bul_target_s *targets = NULL;
 
+        stack = malloc(sizeof(bul_id_t));
         targets = malloc(sizeof(bul_core_s));
 
         bul_core_s core = {
                 .size = 0,
                 .level = 0,
-                .prevs = BUL_MAX_ID,
-                .scope = BUL_MAX_ID,
+                .maxlvl = 0,
+                .stack = stack,
                 .targets = targets,
         };
 
@@ -45,14 +47,21 @@ void bul_core_document_start(bul_core_s *core, yaml_event_t *event) {
         id = bul_core_target_add(core, BUL_DOC_NAME);
 
         // Set scope and update level 
-        core->prevs = core->scope;
-        core->scope = id;
+        core->stack[core->level] = id;
         core->level++;
+        bul_core_stack_grow_if(core);
 }
 
 void bul_core_document_end(bul_core_s *core, yaml_event_t *event) {
-        core->scope = core->prevs;
         core->level--;
+}
+
+void bul_core_stack_grow_if(bul_core_s *core) {
+        if(core->level > core->maxlvl) {
+                core->stack = realloc(core->stack, (core->level+1) * sizeof(bul_id_t));
+                /* capacity is level+1 */
+                core->maxlvl = core->level;
+        }
 }
 
 void bul_core_grow(bul_core_s *core) {
@@ -72,11 +81,6 @@ bul_id_t bul_core_target_add(bul_core_s *core, char *name) {
 
         core->targets[id] = target;
 
-        if(core->level > 0) {
-                // Add to scope
-                bul_target_add_child(core->targets + core->scope, id);
-        }
-
         return id;
 }
 
@@ -85,34 +89,34 @@ void bul_core_free(bul_core_s *core) {
 }
 
 bul_target_s bul_target_init(bul_id_t id, char *name) {
-        char *name_dup = NULL;
-        bul_id_t *children = NULL;
+        char *dup = NULL;
+        bul_id_t *deps = NULL;
 
-        name_dup = strdup(name);
-        children = malloc(sizeof(bul_id_t));
+        dup = strdup(name);
+        deps = malloc(sizeof(bul_id_t));
 
         bul_target_s target = {
                 .id = id,
-                .name = name_dup,
+                .name = dup,
                 .size = 0,
-                .children = NULL,
+                .deps = deps,
         };
 
         return target;
 }
 
-void bul_target_add_child(bul_target_s *target, bul_id_t child_id) {
-        bul_id_t child_num = 0;
+void bul_target_add_dep(bul_target_s *target, bul_id_t dep_id) {
+        bul_id_t dep_num = 0;
 
-        child_num = target->size;
+        dep_num = target->size;
 
         bul_target_grow(target);
         
-        target->children[child_num] = child_id;
+        target->deps[dep_num] = dep_id;
 }
 
 void bul_target_grow(bul_target_s *target) {
         target->size++;
-        target->children = realloc(target->children, (target->size+1) * sizeof(bul_id_t));
+        target->deps = realloc(target->deps, (target->size+1) * sizeof(bul_id_t));
         /* target capacity is size+1 */
 }

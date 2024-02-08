@@ -19,18 +19,27 @@
 typedef unsigned int bul_id_t;
 
 struct bul_target {
+        /** Unique target ID */
         bul_id_t id;
+        /** Number of children */
         size_t   size;
+        /** Target name (unique in scope) */
         char     *name;
-        bul_id_t *children;
+        /** Target deps */
+        bul_id_t *deps;
 };
 typedef struct bul_target bul_target_s;
 
 struct bul_core {
+        /** Number of targets stored */
         size_t size;
+        /** Current recursion depth */
         size_t level;
-        bul_id_t scope;
-        bul_id_t *parents;
+        /** Largest `level` recorded */
+        size_t maxlvl;
+        /** Recursion stack for traversing levels */
+        bul_id_t *stack;
+        /** Array of targets stored by ID */
         bul_target_s *targets;
 };
 typedef struct bul_core bul_core_s;
@@ -81,6 +90,18 @@ void bul_core_document_start(bul_core_s *core, yaml_event_t *event);
 void bul_core_document_end(bul_core_s *core, yaml_event_t *event);
 
 /**
+ * @brief Grows the stack if needed.
+ *
+ * NOTE: This does not affect the current `level` value, mainly for semantic purposes.
+ *
+ * The decision to grow the stack is based on the `maxlvl` value.
+ * If the `level` value is greater than `maxlvl`, the stack will be `realloc`'d to fit.
+ *
+ * @param[in] core Core context to use.
+ */
+void bul_core_stack_grow_if(bul_core_s *core);
+
+/**
  * @brief Increases the size of the core's capacity by 1.
  *
  * @param[in] core Core context to grow.
@@ -124,7 +145,7 @@ bul_target_s bul_target_init(bul_id_t id, char *name);
  * @param[in] target Target to add the child to.
  * @param[in] child_id ID of the to add.
  */
-void bul_target_add_child(bul_target_s *target, bul_id_t child_id);
+void bul_target_add_dep(bul_target_s *target, bul_id_t dep_id);
 
 /**
  * @brief Grows the child capacity of the target by 1.
