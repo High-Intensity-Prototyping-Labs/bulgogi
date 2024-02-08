@@ -17,22 +17,27 @@
 
 // Note: Allocates enough room for size + 1 values
 bul_engine_s bul_engine_init(void) {
-        return (bul_engine_s) {
-                .in_seq = false,
+
+        bul_engine_s engine = {
+                .in_seq = 0,
                 .size = 0,
                 .focus = BUL_MAX_ID,
-                .names = malloc(sizeof(bul_name_t)),
-                .targets = malloc(sizeof(bul_target_s)),
+                .names = NULL,
+                .targets = NULL,
         };
+        engine.names = malloc(sizeof(bul_name_t));
+        engine.targets = malloc(sizeof(bul_target_s));
+
+        return engine;
 }
 
 void bul_engine_next_event(bul_engine_s *engine, yaml_event_t *event) {
         switch(event->type) {
         case YAML_SEQUENCE_START_EVENT:
-                engine->in_seq = true;
+                engine->in_seq = 1;
                 break;
         case YAML_SEQUENCE_END_EVENT:
-                engine->in_seq = false;
+                engine->in_seq = 0;
                 break;
         case YAML_SCALAR_EVENT:
                 bul_engine_process_scalar(engine, event);
@@ -67,8 +72,10 @@ void bul_engine_process_scalar(bul_engine_s *engine, yaml_event_t *event) {
 }
 
 void bul_engine_free(bul_engine_s *engine) {
+        size_t x = 0;
+
         free(engine->targets);
-        for(size_t x = 0; x < engine->size; x++) {
+        for(x = 0; x < engine->size; x++) {
                 free(engine->names[x]);
                 free(engine->targets[x].deps);
         }
@@ -86,11 +93,14 @@ bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
 
         clean_name = bul_clean_name(name);
 
-        for(size_t x = 0; x < engine->size; x++) {
+        {/* Scope begin */
+        size_t x = 0;
+        for(x = 0; x < engine->size; x++) {
                 if(strcmp(engine->names[x], clean_name) == 0) {
                         return &engine->targets[x];
                 }
         }
+        }/* Scope end */
 
         free(clean_name);
 
@@ -101,6 +111,13 @@ bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name) {
 bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
         bul_id_t id = 0;
         bul_usage_t usage = BUL_EXE;
+        bul_target_s target = {
+                .id = 0,
+                .name = NULL,
+                .usage = BUL_EXE,
+                .size = 0,
+                .deps = NULL,
+        };
 
         id = engine->size;
         bul_engine_grow(engine);
@@ -108,13 +125,10 @@ bul_target_s *bul_engine_target_add(bul_engine_s *engine, bul_name_t name) {
 
         usage = bul_detect_usage(name);
 
-        bul_target_s target = {
-                .id = id,
-                .name = engine->names[id],
-                .usage = usage,
-                .size = 0,
-                .deps = malloc(sizeof(bul_id_t)),
-        };
+        target.id = id;
+        target.name = engine->names[id];
+        target.usage = usage;
+        target.deps = malloc(sizeof(bul_id_t));
 
         engine->targets[id] = target;
 
@@ -127,11 +141,11 @@ void bul_engine_target_update(bul_engine_s *engine, bul_target_s *target) {
 }
 
 void bul_engine_target_add_dep(bul_engine_s *engine, bul_id_t dep_id) {
-        assert(engine->focus < BUL_MAX_ID);
-
         size_t size = 0;
         bul_target_s *target = NULL;
         bul_id_t **dep_list = NULL;
+
+        assert(engine->focus < BUL_MAX_ID);
 
         target = &engine->targets[engine->focus];
         size = target->size;
@@ -160,25 +174,28 @@ void bul_engine_print(bul_engine_s *engine) {
         if(engine == NULL) {
                 printf("\tNULL\n");
         } else {
+                size_t x = 0;
+                size_t y = 0;
+
                 printf("\t.in_seq = %d,\n", engine->in_seq);
                 printf("\t.size = %lu,\n", engine->size);
                 printf("\t.focus = %u,\n", engine->focus);
                 printf("\t.names = {");
-                for(size_t x = 0; x < engine->size; x++) {
+                for(x = 0; x < engine->size; x++) {
                         printf("\n\t\t%s,", engine->names[x]);
                 }
                 printf("\t},\n");
                 printf("\t.targets = {");
-                for(size_t x = 0; x < engine->size; x++) {
+                for(x = 0; x < engine->size; x++) {
                         printf("\n");
                         bul_engine_target_print(engine, x, 2);
                         printf(",");
                 }
                 printf("\t},\n");
                 printf("\t.deps = {");
-                for(size_t x = 0; x < engine->size; x++) {
+                for(x = 0; x < engine->size; x++) {
                         printf("\n\t\t%s = {", engine->names[x]);
-                        for(size_t y = 0; y < engine->targets[x].size; y++) {
+                        for(y = 0; y < engine->targets[x].size; y++) {
                                 printf("\n");
                                 bul_engine_target_print(engine, engine->targets[x].deps[y], 3);
                                 printf(",");
@@ -191,7 +208,13 @@ void bul_engine_print(bul_engine_s *engine) {
         printf("}\n");
 }
 
-static void indent(int lvl) { for(int x = 0; x < lvl; x++) { printf("\t"); } }
+static void indent(int lvl) { 
+        int x = 0;
+
+        for(x = 0; x < lvl; x++) { 
+                printf("\t"); 
+        } 
+}
 
 void bul_engine_target_print(bul_engine_s *engine, bul_id_t id, int indent_level) {
         bul_target_s *target = NULL;
@@ -259,8 +282,9 @@ bul_hint_t bul_detect_hint(bul_name_t name) {
 bul_valid_t bul_engine_valid(bul_engine_s *engine) {
         bul_target_s *target = NULL;
         bul_valid_t valid = BUL_VALID;
-
-        for(size_t x = 0; x < engine->size; x++) {
+        size_t x = 0;
+        
+        for(x = 0; x < engine->size; x++) {
                 target = &engine->targets[x];
                 valid = bul_engine_valid_target(engine, target);
                 if(valid != BUL_VALID) {
@@ -295,8 +319,9 @@ size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target) {
         bul_target_s *dep = NULL;
         bul_id_t dep_id = 0;
         size_t cnt = 0;
+        size_t x = 0;
 
-        for(size_t x = 0; x < target->size; x++) {
+        for(x = 0; x < target->size; x++) {
                 dep_id = target->deps[x];
                 dep = &engine->targets[dep_id];
 

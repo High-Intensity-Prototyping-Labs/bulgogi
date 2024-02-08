@@ -8,7 +8,6 @@
 #define BUL_ENGINE_H
 
 // Standard C Libraries 
-#include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
 
@@ -33,20 +32,20 @@ typedef enum {
         /** Target is an executable */
         BUL_EXE,
         /** Target is a library */
-        BUL_LIB,
+        BUL_LIB
 
 } bul_usage_t;
 
 typedef enum {
         BUL_HINT_EXE,
         BUL_HINT_LIB,
-        BUL_HINT_NONE,
+        BUL_HINT_NONE
 } bul_hint_t;
 
 typedef enum {
         BUL_VALID,
         BUL_AMB,
-        BUL_MISSING_EXE,
+        BUL_MISSING_EXE
 } bul_valid_t;
 
 /**
@@ -73,7 +72,7 @@ typedef struct bul_target {
  */
 typedef struct bul_engine {
         /** Whether or not the parser is currently in a sequence. */
-        bool in_seq;
+        int in_seq;
         /** Number of targets in the project (also = number of names). */
         size_t size;
         /** ID of the current target in focus (init to BUL_MAX_ID). */

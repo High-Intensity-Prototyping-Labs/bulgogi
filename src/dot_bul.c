@@ -62,6 +62,9 @@ void bul_dot_add_target_dep(bul_id_t target, bul_id_t dep) {
 void bul_dot_add_sources(bul_id_t target, bul_fs_path_t path) {
         bul_fs_pattern_t pattern = BUL_PAT_NONE;
         bul_fs_path_t *files = NULL;
+        
+        int x = 0;
+        
         (void)target;
 
         pattern = bul_fs_detect_pattern(path);
@@ -71,7 +74,7 @@ void bul_dot_add_sources(bul_id_t target, bul_fs_path_t path) {
         if(files) {
                 // DEBUG
                 printf("files:\n");
-                for(int x = 0; files[x] != NULL; x++) {
+                for(x = 0; files[x] != NULL; x++) {
                         printf("\t%s\n", files[x]);
                 }
                 printf("\n");

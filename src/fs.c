@@ -93,8 +93,9 @@ bul_fs_pattern_t bul_fs_detect_pattern(bul_fs_path_t path) {
 
 bul_fs_pattern_t bul_fs_detect_pattern_of(bul_fs_path_t path, size_t path_len, bul_fs_pattern_s *pattern) {
         bul_fs_pattern_t res = BUL_PAT_NONE;
+        size_t x = 0;
 
-        for(size_t x = 0; (x+pattern->len-1) < path_len; x++) {
+        for(x = 0; (x+pattern->len-1) < path_len; x++) {
                 if(strncmp(&path[x], pattern->sym, pattern->len) == 0) {
                         res = pattern->pat;
                         break;
@@ -119,7 +120,9 @@ bul_fs_path_t bul_fs_get_pattern_ext(bul_fs_path_t path) {
 }
 
 size_t bul_fs_get_pattern_ext_index(bul_fs_path_t path, size_t path_len) {
-        for(size_t x = path_len-1; 0 <= x; x--) {
+        size_t x = 0;
+
+        for(x = path_len-1; 0 <= x; x--) {
                 if(path[x] == '.') {
                         return x;
                 }
@@ -133,6 +136,8 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
         bul_fs_path_t *files = NULL;
 
         glob_t globbuf;
+
+        size_t x = 0;
 
         switch(pattern) {
         case BUL_PAT_WILD_RECURSE_EXT:
@@ -148,7 +153,7 @@ bul_fs_path_t *bul_fs_search_files(bul_fs_path_t path, bul_fs_pattern_t pattern)
         }
 
         files = malloc((globbuf.gl_pathc+1) * sizeof(bul_fs_path_t));
-        for(size_t x = 0; x < globbuf.gl_pathc; x++) {
+        for(x = 0; x < globbuf.gl_pathc; x++) {
                 files[x] = strdup(globbuf.gl_pathv[x]);
         }
         files[globbuf.gl_pathc] = NULL;
@@ -172,8 +177,9 @@ void bul_fs_free_files(bul_fs_path_t *files) {
 
 size_t bul_fs_path_get_parent_len(bul_fs_path_t path, size_t path_len) {
         size_t len = 0;
+        size_t x = 0;
 
-        for(size_t x = path_len-1; 0 <= x; x--) {
+        for(x = path_len-1; 0 <= x; x--) {
                 if(path[x] == DEFAULT_FS_SEP_CHAR) {
                         len = x+1;
                         break;
