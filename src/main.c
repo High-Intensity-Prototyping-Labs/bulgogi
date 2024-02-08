@@ -126,6 +126,10 @@ int main(int argc, char *argv[]) {
         yaml_parser_delete(&parser);
         fclose(file);
 
+        bul_core_print(&core);
+
+        bul_core_free(&core);
+
 #endif // DEBUG
 
         return 0;
