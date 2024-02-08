@@ -209,6 +209,7 @@ void bul_target_grow(bul_target_s *target) {
 void bul_core_print(bul_core_s *core) {
         size_t x = 0;
         bul_id_t id = 0;
+        char *name = NULL;
         
         printf("bul_core_s {\n");
         printf("\t.size = %lu\n", core->size);
