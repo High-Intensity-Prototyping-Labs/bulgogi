@@ -10,11 +10,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEBUG
+
+#ifndef DEBUG
 // Project Headers 
 #include "fs.h"
 #include "dot_bul.h"
 #include "yaml_ext.h"
 #include "engine.h"
+#else
+#include "core.h"
+#endif
 
 // External Dependencies
 #include "yaml.h"
@@ -22,6 +28,7 @@
 // Settings 
 #define PROJECT_YAML "project.yaml"
 
+#ifndef DEBUG
 static void load_and_print_project(void) {
         bul_engine_s    engine;
         bul_valid_t     valid;
@@ -73,8 +80,10 @@ static void some_subcommand(char *argv[]) {
                 printf("Not exactly a subcommand...\n");
         }
 }
+#endif
 
 int main(int argc, char *argv[]) {
+#ifndef DEBUG
         if(argc == 1) {
                 load_and_print_project();
         } else if(argc == 2) {
@@ -86,6 +95,38 @@ int main(int argc, char *argv[]) {
         } else {
                 printf("Lovely day, but I don't recognize that number of args.\n");
         }
+#else 
+        bul_core_s    core;
+        yaml_parser_t parser;
+        yaml_event_t  event;
+        FILE          *file;
+
+        int done = 0;
+        int error = 0;
+        
+        yaml_parser_initialize(&parser);
+
+        file = fopen(PROJECT_YAML, "rb");
+        assert(file);
+
+        yaml_parser_set_input_file(&parser, file);
+
+        while(!done && !error) {
+                if(!yaml_parser_parse(&parser, &event)) {
+                        error = 1;
+                        continue;
+                }
+
+                bul_core_next_event(&core, &event);
+
+                done = (event.type == YAML_STREAM_END_EVENT);
+                yaml_event_delete(&event);
+        }
+
+        yaml_parser_delete(&parser);
+        fclose(file);
+
+#endif // DEBUG
 
         return 0;
 }
