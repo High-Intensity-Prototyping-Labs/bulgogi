@@ -1,4 +1,4 @@
 Bulgogi Laws:
 
 1. Everything is a target.
-2. EXEs appear once, LIBs twice, DIRs any.
+2. No forward declarations.
