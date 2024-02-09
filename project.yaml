@@ -1,32 +1,11 @@
-target1:
-  - module1:
-    - src:
-      - 'module1/src/*.c'
-    - inc:
-      - 'module1/inc/**.h'
-  - module2:
-    - src:
-      - 'module2/src/*.c'
-    - inc:
-      - 'module2/inc/**.h'
-  - module3:
-      src: 'module3/module3.c'
+-
+  pets:
+  - Cat
+  - Dog
+  - Goldfish
 
-target2:
-  - module3:
-    - src:
-      - 'module3/src/*.c'
-    - inc:
-      - 'module3/inc/**.h'
-  - module4:
-    - src:
-      - 'module4/src/*.c'
-    - inc:
-      - 'module4/inc/**.h'
-
-executable:
-- dep:
-  - target1 
-  - target2 
-- src:
-    - 'src/main.c'
+-
+  friends:
+  - julia
+  - jason
+  - babu
