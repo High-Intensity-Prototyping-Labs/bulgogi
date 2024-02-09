@@ -11,7 +11,7 @@ SRC := $(wildcard $(addsuffix *.cpp, $(SRC_DIR)/))
 SRC += $(wildcard $(addsuffix *.c, $(SRC_DIR)/))
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SRC)))
 OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
-LIB := $(LIB_DIR)/libyaml.a
+LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 
 CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
@@ -40,6 +40,9 @@ $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
 	cd $(GIT_YAML) && ./bootstrap && ./configure --with-pic
 	$(MAKE) -C $(GIT_YAML) 
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
+
+$(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
+	$(AR) rc $(LIB_DIR)/libbul.a $^
 
 $(GIT_YAML):
 	git submodule init $(GIT_YAML)

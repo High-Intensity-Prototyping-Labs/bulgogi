@@ -16,3 +16,4 @@ build
 html
 latex
 lib/libyaml.a
+lib
