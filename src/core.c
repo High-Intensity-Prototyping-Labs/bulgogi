@@ -12,6 +12,7 @@
 
 bul_core_s bul_core_init(void) {
         bul_core_s core = {
+                .map = 0,
                 .size = 0,
                 .level = 0,
                 .maxlvl = 0,
@@ -53,9 +54,10 @@ void bul_core_document_start(bul_core_s *core) {
         // Add document as a target.
         id = bul_core_target_add(core, BUL_DOC_NAME);
 
-        // Set scope
+        // Set scope and update level
         core->stack[core->level] = id;
-        /* Waiting for MAPPING to update level */
+        core->level++;
+        bul_core_stack_grow_if(core);
 }
 
 void bul_core_document_end(bul_core_s *core) {
@@ -63,8 +65,8 @@ void bul_core_document_end(bul_core_s *core) {
 }
 
 void bul_core_mapping_start(bul_core_s *core) {
-        core->level++;
-        bul_core_stack_grow_if(core);
+        core->map = 1;
+        /* Defers level increase to next scalar event */
 }
 
 void bul_core_mapping_end(bul_core_s *core) {
@@ -88,13 +90,19 @@ void bul_core_scalar(bul_core_s *core, yaml_event_t *event) {
                 id = bul_core_target_add(core, name);
         }
 
-        core->stack[core->level] = id;
-
         if(core->level > 0) {
                 parent_id = core->stack[core->level-1];
                 /* Parent is the previous entry in the stack */
                 parent = &core->targets[parent_id];
                 bul_target_add_dep(parent, id);
+        }
+
+        if(core->map) {
+                core->stack[core->level] = id;
+                core->level++;
+                bul_core_stack_grow_if(core);
+
+                core->map = 0;
         }
 }
 
@@ -212,6 +220,7 @@ void bul_core_print(bul_core_s *core) {
         char *name = NULL;
         
         printf("bul_core_s {\n");
+        printf("\t.map = %d\n", core->map);
         printf("\t.size = %lu\n", core->size);
         printf("\t.level = %lu\n", core->level);
         printf("\t.maxlvl = %lu\n", core->maxlvl);
