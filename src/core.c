@@ -158,6 +158,7 @@ bul_target_s *bul_core_target_find(bul_core_s *core, char *name) {
 
                 scope_id = core->stack[core->level - 1];
                 scope = &core->targets[scope_id];
+                /* AKA parent */
 
                 for(x = 0; x < scope->size; x++) {
                         dep_id = scope->deps[x];
