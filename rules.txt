@@ -1,3 +1,0 @@
-1. Every target starts as an exe.
-2. A second apparition makes it into a lib.
-3. No exe can depend on more than 1 exe.
