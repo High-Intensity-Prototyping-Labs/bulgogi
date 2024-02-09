@@ -16,6 +16,9 @@ All license requirements have been satisfied and do not conflict with this proje
 
 See `LICENSE.<dependency>` for dependency licenses and `COPYING` for a copy of this project's license.
 
+## Synopsis
+See [SYNOPSIS.md](/SYNOPSIS.md).
+
 ## Documentation
 To generate the doxygen documentation, run:
 ```
