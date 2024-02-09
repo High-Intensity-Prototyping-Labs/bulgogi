@@ -175,12 +175,10 @@ bul_target_s *bul_core_target_find(bul_core_s *core, char *name) {
 }
 
 void bul_core_free(bul_core_s *core) {
-        size_t x = 0;
-        
-        for(x = 0; x < core->size; x++) {
-                free(core->targets[x].name);
-                free(core->targets[x].deps);
         free(core->stack);
+        for(; core->size != 0; core->size--) {
+                free(core->targets[core->size-1].name);
+                free(core->targets[core->size-1].deps);
         }
         free(core->targets);
 }
