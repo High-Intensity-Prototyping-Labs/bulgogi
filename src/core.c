@@ -281,3 +281,33 @@ void bul_core_print_target(bul_core_s *core, bul_id_t target_id, size_t indent_l
         indent(indent_level); printf("\t}\n");
         indent(indent_level); printf("}\n");
 }
+
+bul_core_s bul_core_from_file(FILE *file) {
+        bul_core_s    core;
+        yaml_parser_t parser;
+        yaml_event_t  event;
+
+        int done = 0;
+        int error = 0;
+ 
+        core = bul_core_init();
+
+        yaml_parser_initialize(&parser);
+        yaml_parser_set_input_file(&parser, file);
+
+        while(!done && !error) {
+                if(!yaml_parser_parse(&parser, &event)) {
+                        error = 1;
+                        continue;
+                }
+
+                bul_core_next_event(&core, &event);
+
+                done = (event.type == YAML_STREAM_END_EVENT);
+                yaml_event_delete(&event);
+        }
+
+        yaml_parser_delete(&parser);
+
+        return core;
+}

@@ -4,7 +4,7 @@
 C v0.2.2
 
 ## Overview
-Bulgogi is a build target engine library.
+Bulgogi is a YAML parser for project build configurations.
 
 Projects like [bulc](https://github.com/High-Intensity-Prototyping-Labs/bulc) use it to generate build files.
 

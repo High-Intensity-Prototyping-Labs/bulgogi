@@ -1,3 +1,5 @@
+LIBTOOL := libtool
+
 SRC_DIR := src
 INC_DIR := inc
 OBJ_DIR := obj
@@ -20,6 +22,7 @@ LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
 
 all: doc $(BIN) $(LIB) 
+libs: $(LIB)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
@@ -42,7 +45,7 @@ $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
 $(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
-	$(AR) rc $(LIB_DIR)/libbul.a $^
+	$(LIBTOOL) -static -o $@ $^
 
 $(GIT_YAML):
 	git submodule init $(GIT_YAML)
@@ -66,4 +69,4 @@ doc:
 	doxygen doxygen > /dev/null 2> /dev/null
 
 
-.PHONY: all clean clean_deps doc debug
+.PHONY: all clean clean_deps doc debug libs

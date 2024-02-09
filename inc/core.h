@@ -206,4 +206,12 @@ void bul_core_print(bul_core_s *core);
  */
 void bul_core_print_target(bul_core_s *core, bul_id_t target_id, size_t indent_level);
 
+/**
+ * @brief Loads and initializes a core from a YAML file.
+ *
+ * @param[in] file Open filestream to read from (`"rb"` mode).
+ * @return Loaded and initialized core from YAML file.
+ */
+bul_core_s bul_core_from_file(FILE *file);
+
 #endif // BUL_CORE_H
