@@ -95,46 +95,13 @@ int main(int argc, char *argv[]) {
                 printf("Lovely day, but I don't recognize that number of args.\n");
         }
 #else 
-        bul_core_s    core;
-        yaml_parser_t parser;
-        yaml_event_t  event;
-        FILE          *file;
-
-        int done = 0;
-        int error = 0;
- 
-        (void)argc;
-        (void)argv;
-
-        core = bul_core_init();
-
-        yaml_parser_initialize(&parser);
+        bul_core_s core;
+        FILE *file = NULL;
 
         file = fopen(PROJECT_YAML, "rb");
         assert(file);
 
-        yaml_parser_set_input_file(&parser, file);
-
-        while(!done && !error) {
-                if(!yaml_parser_parse(&parser, &event)) {
-                        error = 1;
-                        continue;
-                }
-
-                bul_core_next_event(&core, &event);
-#ifdef DEBUG2
-                printf("---\n");
-                yaml_print_event(&event);
-                printf("\n");
-                bul_core_print(&core);
-                printf("---\n");
-#endif
-                done = (event.type == YAML_STREAM_END_EVENT);
-                yaml_event_delete(&event);
-        }
-
-        yaml_parser_delete(&parser);
-        fclose(file);
+        core = bul_core_from_file(file);
 
         bul_core_print(&core);
 
