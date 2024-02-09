@@ -52,6 +52,18 @@ Bulgogi also understands references to other targets.
 ---
 ```
 
+As above, so below.
+
+```yaml 
+---
+- target2:
+  - target1:
+    - dep1
+    - dep2
+    - dep3
+---
+```
+
 ## Scope 
 All target dependencies are privately scoped.
 
