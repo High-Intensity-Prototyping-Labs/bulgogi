@@ -1,0 +1,85 @@
+Bulgogi will have a .git equivalent repository (known as .bulgogi or .bul).
+
+Why?
+
+Because it can make **any** project conform to a single, homogenous project structure.
+
+Code hardly takes up disk space, that's not a concern.
+
+The setup.py script is what bridges/translates all of the custom directory layouts of an existing project into the compatible one.
+
+Once re-arranged/copied over/translated, the C engine takes over. Following the project.yaml (which works regardless of the dir structure), it can rage on according to the hardcoded format and compile away.
+
+It also doesn't matter that the setup script is written in python since most of the work is FS I/O. Or maybe I'm wrong here.
+
+Same idea goes for the build.py. Scan/check for any changes or new files (as directed in the script) and runs bul build.
+
+In essence, the bulgogi C core is a fixed, stubborn but devilishly fast dependency resolver / build system template generator.
+The Python layer is a user-configuration interface which bridges **any** project configuration to fit the bulgogi monolithic paradigm.
+
+Instead of trying to make every build system fit to any kind of project, you make 1 build system which any project adapts to.
+
+#------
+
+You can't just copy an entire source base into an adjacent directory.
+
+Would I have the balls to do that and build the linux kernel? Not a chance.
+
+I'm not sure how I feel about making redundant copies of files or using Python. We'll see in the morning.
+
+#------
+
+git ignore .bul
+
+.bul 
+    \_ target1.yaml 
+    \_ target2.yaml 
+    \_ ...
+    \_ build
+
+--- # target1.yaml 
+src:
+- 'MANTIS-ADCS/src/job.c'
+- 'MANTIS-ADCS/src/clear.c'
+- 'MANTIS-ADCS/src/indv.c'
+- 'MANTIS-ADCS/src/clr.c'
+...
+inc:
+- 'MANTIS-ADCS/inc/adcs.h'
+- 'MANTIS-ADCS/inc/adcs_util.h'
+- 'MANTIS-ADCS/inc/adcs_inv.h'
+- 'MANTIS-ADCS/inc/ext/ext.h'
+...
+pri:
+- 'MANTIS-ADCS/src/priv_uti.h'
+---
+
+# setup.py 
+import bulgogi as bul 
+
+bul.new_project('mantis-core')
+bul.set_version('v1.0.0')
+
+target1 = bul.new_target('target1', bul.LIB)
+target1.add_sources('MANTIS-ADCS/src/*.c')
+target1.add_headers('MANTIS-ADCS/inc/**.h')
+target1.add_private('MANTIS-ADCS/src/*.h')
+
+...
+
+bul.setup()
+# end of setup.py
+
+--- # project.yaml 
+libtarget2:
+- libtarget1
+---
+
+# build.py 
+import bulgogi as bul 
+
+# Perform any setup/patches needed
+...
+
+bul.build_all()
+# end of build.py

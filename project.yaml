@@ -1,7 +1,43 @@
-bulgogi:
-- client*
-- cmake
-- project
+- module1:
+  - src:
+    - 'module1/src/*.c'
+  - inc:
+    - 'module1/inc/**.h'
 
-cmake:
-- project
+- module2:
+  - src:
+    - 'module2/src/*.c'
+  - inc:
+    - 'module2/inc/**.h'
+
+- module3:
+  - src:
+    - 'module3/src/*.c'
+  - inc:
+    - 'module3/inc/**.h'
+
+- module4:
+  - src:
+    - 'module4/src/*.c'
+  - inc:
+    - 'module4/inc/**.h'
+
+- target1:
+  - dep:
+    - module1
+    - module2
+  - src:
+    - 'libtarget1/src/*.c'
+
+- target2:
+  - dep:
+    - module3
+    - module4
+  - src: 'src/target2.c'
+
+- executable:
+  - dep:
+    - target1
+    - target2
+  - src:
+    - 'src/main.c'

@@ -8,38 +8,60 @@
 #define BUL_ENGINE_H
 
 // Standard C Libraries 
-#include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
 
 // External Dependencies 
 #include "yaml.h"
 
+// Project headers 
+#include "fs.h"
+
 // Settings 
 #define BUL_MAX_ID UINT_MAX
+#define BUL_EXE_MK "*"
+#define BUL_LIB_MK "lib"
 
+/** Target ID Type */
 typedef unsigned int bul_id_t;
+/** Target name type */
 typedef char* bul_name_t;
 
+/** Target usage types */
 typedef enum {
+        /** Target is an executable */
         BUL_EXE,
-        BUL_LIB,
-        BUL_AMB,
+        /** Target is a library */
+        BUL_LIB
 
 } bul_usage_t;
+
+typedef enum {
+        BUL_HINT_EXE,
+        BUL_HINT_LIB,
+        BUL_HINT_NONE
+} bul_hint_t;
+
+typedef enum {
+        BUL_VALID,
+        BUL_AMB,
+        BUL_MISSING_EXE
+} bul_valid_t;
 
 /**
  * struct bul_target - Defines a bulgogi target.
  *
- * @id - Unique ID for the target (internal representation).
- * @name - Target name as seen in the configuration.
- * @usage - Inferred target usage (see `bul_usage_t`).
  */
 typedef struct bul_target {
+        /** Unique ID for the target (internal representation). */
         bul_id_t id;
+        /** Target name as seen in the configuration. */
         bul_name_t name;
+        /** Inferred target usage (see `bul_usage_t`). */
         bul_usage_t usage;
+        /** Number of targets/names tracked (size of project). */
         size_t size;
+        /** List of dependencies by target ID. (deps[ID] = {IDs}). */
         bul_id_t *deps;
 
 } bul_target_s;
@@ -47,18 +69,17 @@ typedef struct bul_target {
 /**
  * struct bul_engine - Stores inference engine state.
  *
- * @in_seq - Whether or not the parser is currently in a sequence.
- * @size - Number of targets in the project (also = number of names).
- * @focus - ID of the current target in focus (init to BUL_MAX_ID).
- * @names - List of target names arranged by ID. (names[ID] = name).
- * @targets - List of targets arranged by ID. (targets[ID] = target).
- * @deps - List of dependencies by target ID. (deps[ID] = {IDs}).
  */
 typedef struct bul_engine {
-        bool in_seq;
+        /** Whether or not the parser is currently in a sequence. */
+        int in_seq;
+        /** Number of targets in the project (also = number of names). */
         size_t size;
+        /** ID of the current target in focus (init to BUL_MAX_ID). */
         bul_id_t focus;
+        /** List of target names arranged by ID. (names[ID] = name). */
         bul_name_t *names;
+        /** List of targets arranged by ID. (targets[ID] = target). */
         bul_target_s *targets;
 
 } bul_engine_s;
@@ -136,6 +157,11 @@ bul_target_s *bul_engine_target_find(bul_engine_s *engine, bul_name_t name);
  * 1. The `engine` context is initialized.
  * 2. The target `name` is non-NULL.
  *
+ * NOTE:
+ * This function creates its own dynamically allocated copy of
+ * the passed `name`. It is therefore not necessary to preserve it 
+ * after a successful call.
+ *
  * @param[in] engine Engine context to use.
  * @param[in] name Name of target to add.
  * @return Pointer to newly added target or `NULL` if failed to add.
@@ -204,6 +230,87 @@ void bul_engine_target_print(bul_engine_s *engine, bul_id_t id, int indent_level
  *
  * @param[in] target Pointer to the target whose usage is to be printed.
  */
-void bul_engine_target_usage_print(bul_target_s *target);
+void bul_target_usage_print(bul_target_s *target);
+
+/**
+ * @brief Returns the usage hint found in the name (if any).
+ *
+ * @param[in] name Name to evaluate.
+ * @return The usage hint (if any) or `BUL_EXE` (default).
+ */
+bul_usage_t bul_detect_usage(bul_name_t name); 
+
+bul_hint_t bul_detect_hint(bul_name_t name);
+
+/**
+ * @brief Validates whether engine rules are broken.
+ *
+ * @param[in] engine Engine context to use.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
+ */
+bul_valid_t bul_engine_valid(bul_engine_s *engine);
+
+/**
+ * @brief Validates a targets by evaluating its dependencies.
+ *
+ * NOTE: A target with no dependencies is always considered valid.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to evaluate.
+ * @return BUL_VALID in case valid, see `bul_valid_t` otherwise.
+ */
+bul_valid_t bul_engine_valid_target(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Counts a target's number of executable deps.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target's exe deps to count.
+ * @return Number of exe deps counted.
+ */
+size_t bul_engine_target_cnt_exe(bul_engine_s *engine, bul_target_s *target);
+
+/**
+ * @brief Prints an engine validation message.
+ *
+ * @param[in] engine Engine context to use.
+ * @param[in] target Target to highlight in message.
+ * @param[in] status Engine validation status to report.
+ */
+void bul_engine_print_invalid(bul_engine_s *engine, bul_target_s *target, bul_valid_t status);
+
+/**
+ * @brief Removes the hint from the target name.
+ *
+ * WARNING:
+ * This function uses the `strdup()` method which requires the returned 
+ * name to be `free()`'d.
+ *
+ * @param[in] name Target name to clean.
+ * @return Target name without hints.
+ */
+bul_name_t bul_clean_name(bul_name_t name);
+
+/**
+ * @brief Adds the hint to the target name (opposite of `bul_clean_name`).
+ *
+ * WARNING:
+ * This function uses the `strdup()` method which requires the returned 
+ * name to be `free()`'d.
+ *
+ * @param[in] name Target name to add the hint to.
+ * @param[in] usage Usage hint to add.
+ * @return Target name with hint added.
+ */
+bul_name_t bul_hint_name(bul_name_t name, bul_usage_t usage);
+
+/**
+ * @brief Loads an engine context from file.
+ *
+ * @param[in] engine Engine context to load into.
+ * @param[in] file_name YAML file to read.
+ * @return `BUL_VALID` in case of valid project, see `bul_valid_t` otherwise.
+ */
+bul_fs_status_t bul_engine_from_file(bul_engine_s *engine, const char *file_name);
 
 #endif // BUL_ENGINE_H

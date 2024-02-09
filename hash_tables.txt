@@ -1,0 +1,9 @@
+The 3 properties which comprise rules.yaml patterns (countability, uniqueness and type [fundamental/relational]) can be determined just by scanning symbols in a yaml tree.
+
+The values of those properties can serve as the indices in a hash table with rule/pattern/fundamental type they align to.
+
+For example, a symbol with an unlimited count, is shareable and appears at the root level (layer 1) must be a lib.
+
+Cases in which this 'hash table' accessor leads to more than 1 rule/pattern means ambiguity.
+
+Rule schemes must be designed such that scanning over symbols and classifying them by these properties does not lead to ambiguity.
