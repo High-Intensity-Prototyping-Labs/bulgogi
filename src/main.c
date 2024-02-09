@@ -18,6 +18,7 @@
 #include "engine.h"
 #else
 #include "core.h"
+#include "yaml_ext.h"
 #endif
 
 // External Dependencies
