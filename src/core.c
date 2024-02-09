@@ -156,7 +156,7 @@ bul_target_s *bul_core_target_find(bul_core_s *core, char *name) {
                 bul_id_t dep_id = BUL_MAX_ID;
                 bul_id_t scope_id = BUL_MAX_ID;
 
-                scope_id = core->stack[core->level - 1];
+                scope_id = core->stack[0];
                 scope = &core->targets[scope_id];
                 /* AKA parent */
 
