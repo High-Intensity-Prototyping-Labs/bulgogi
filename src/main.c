@@ -122,13 +122,13 @@ int main(int argc, char *argv[]) {
                 }
 
                 bul_core_next_event(&core, &event);
-
+#ifdef DEBUG2
                 printf("---\n");
                 yaml_print_event(&event);
                 printf("\n");
                 bul_core_print(&core);
                 printf("---\n");
-
+#endif
                 done = (event.type == YAML_STREAM_END_EVENT);
                 yaml_event_delete(&event);
         }
