@@ -98,6 +98,9 @@ int main(int argc, char *argv[]) {
         bul_core_s core;
         FILE *file = NULL;
 
+        (void)argc;
+        (void)argv;
+
         file = fopen(PROJECT_YAML, "rb");
         assert(file);
 
