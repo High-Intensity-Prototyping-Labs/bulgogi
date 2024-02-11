@@ -6,8 +6,8 @@
 #include "core.h"
 
 // Standard C Libraries 
-#include <malloc/_malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 bul_core_s bul_core_init(void) {
