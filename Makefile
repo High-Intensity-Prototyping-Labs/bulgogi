@@ -14,13 +14,15 @@ OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 
 CPPFLAGS:= -I$(INC_DIR)
-CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -Werror -fPIC
+CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
 CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g 
 LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
 
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
+cibuildwheel: CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
+cibuildwheel: $(LIB)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
@@ -67,4 +69,4 @@ doc:
 	doxygen doxygen > /dev/null 2> /dev/null
 
 
-.PHONY: all clean clean_deps doc debug libs
+.PHONY: all clean clean_deps doc debug libs cibuildwheel
