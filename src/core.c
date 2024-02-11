@@ -298,7 +298,7 @@ void bul_core_from_file(bul_core_s *core, FILE *file) {
                         continue;
                 }
 
-                bul_core_next_event(&core, &event);
+                bul_core_next_event(core, &event);
 
                 done = (event.type == YAML_STREAM_END_EVENT);
                 yaml_event_delete(&event);
