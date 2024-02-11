@@ -1,5 +1,3 @@
-LIBTOOL := libtool
-
 SRC_DIR := src
 INC_DIR := inc
 OBJ_DIR := obj
@@ -45,14 +43,14 @@ $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
 $(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
-	$(LIBTOOL) -static -o $@ $^
+	$(AR) -crs $@ $^
 
 $(GIT_YAML):
 	git submodule init $(GIT_YAML)
 	git submodule update $(GIT_YAML)
 
 clean:
-	@$(RM) -rv $(BIN) $(OBJ) $(OBJ_DIR)
+	@$(RM) -rv $(BIN) $(OBJ) $(OBJ_DIR) $(LIB_DIR)
 
 clean_deps:
 	@$(RM) -rv $(LIB) $(GIT_YAML)
