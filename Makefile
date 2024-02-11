@@ -16,7 +16,7 @@ OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 
 CPPFLAGS:= -I$(INC_DIR)
-CFLAGS := -std=c99 -O2 -Wall -pedantic -Wextra -Werror
+CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -Werror
 CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g 
 LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
