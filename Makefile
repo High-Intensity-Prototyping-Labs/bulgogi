@@ -44,6 +44,11 @@ $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
 	$(MAKE) -C $(GIT_YAML) 
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
+$(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
+	cd $(GIT_YAML) && ./bootstrap && ./configure --enable-shared
+	$(MAKE) -C $(GIT_YAML) 
+	cp $(GIT_YAML)/src/.libs/libyaml.so $(LIB_DIR)
+
 $(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
 	$(AR) -crs $@ $^
 
