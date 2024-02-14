@@ -55,6 +55,9 @@ $(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
 $(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
 	$(AR) -crs $@ $^
 
+$(LIB_DIR)/libbul.so: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.so | $(LIB_DIR)
+	$(CC) -shared -o $@ $(OBJ_DIR)/core.o -L$(LIB_DIR) -lyaml
+
 $(GIT_YAML):
 	git submodule init $(GIT_YAML)
 	git submodule update $(GIT_YAML)
