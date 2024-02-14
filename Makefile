@@ -23,7 +23,7 @@ LDLIBS 	:= -lyaml
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
 cibuildwheel: CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
-cibuildwheel: $(LIB_SO)
+cibuildwheel: $(LIB)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
