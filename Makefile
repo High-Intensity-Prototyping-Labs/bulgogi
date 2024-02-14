@@ -12,6 +12,7 @@ SRC += $(wildcard $(addsuffix *.c, $(SRC_DIR)/))
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SRC)))
 OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
+LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
 
 CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
@@ -22,7 +23,7 @@ LDLIBS 	:= -lyaml
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
 cibuildwheel: CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
-cibuildwheel: $(LIB)
+cibuildwheel: $(LIB_SO)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
