@@ -1,4 +1,4 @@
 Bulgogi Laws:
 
 1. Everything is a target.
-2. No forward declarations.
+2. No implicit forward declarations.

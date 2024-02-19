@@ -1,5 +1,3 @@
-LIBTOOL := libtool
-
 SRC_DIR := src
 INC_DIR := inc
 OBJ_DIR := obj
@@ -14,6 +12,7 @@ SRC += $(wildcard $(addsuffix *.c, $(SRC_DIR)/))
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SRC)))
 OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
+LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
 
 CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
@@ -23,6 +22,8 @@ LDLIBS 	:= -lyaml
 
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
+cibuildwheel: CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
+cibuildwheel: $(LIB)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
@@ -44,15 +45,26 @@ $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
 	$(MAKE) -C $(GIT_YAML) 
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
+$(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
+	cd $(GIT_YAML) && ./bootstrap && ./configure --enable-shared
+	$(MAKE) -C $(GIT_YAML) 
+	if [ -f $(GIT_YAML)/src/.libs/libyaml.dylib ]; then \
+		mv $(GIT_YAML)/src/.libs/libyaml.dylib $(GIT_YAML)/src/.libs/libyaml.so; \
+	fi
+	cp $(GIT_YAML)/src/.libs/libyaml.so $(LIB_DIR)
+
 $(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
-	$(LIBTOOL) -static -o $@ $^
+	$(AR) -crs $@ $^
+
+$(LIB_DIR)/libbul.so: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.so | $(LIB_DIR)
+	$(CC) -shared -o $@ $(OBJ_DIR)/core.o -L$(LIB_DIR) -lyaml
 
 $(GIT_YAML):
 	git submodule init $(GIT_YAML)
 	git submodule update $(GIT_YAML)
 
 clean:
-	@$(RM) -rv $(BIN) $(OBJ) $(OBJ_DIR)
+	@$(RM) -rv $(BIN) $(OBJ) $(OBJ_DIR) $(LIB_DIR)
 
 clean_deps:
 	@$(RM) -rv $(LIB) $(GIT_YAML)
@@ -69,4 +81,4 @@ doc:
 	doxygen doxygen > /dev/null 2> /dev/null
 
 
-.PHONY: all clean clean_deps doc debug libs
+.PHONY: all clean clean_deps doc debug libs cibuildwheel
