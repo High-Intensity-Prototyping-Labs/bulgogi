@@ -1,4 +1,4 @@
-C v0.2.5
+C v0.2.6
 
 # Synopsis 
 Bulgogi reads YAML files and understands them in terms of targets and dependencies.
@@ -98,8 +98,8 @@ Only root-level target declarations are publicly visible in every scope.
 ---
 ```
 
-## No Forward Declarations
-For simplicty, readiblity and the preservation of logical order, forward declarations are not possible when using references.
+## No Implicit Forward Declarations
+For simplicty, readiblity and the preservation of logical order, implicit forward declarations are not possible when using references.
 
 
 ```yaml 
@@ -111,6 +111,26 @@ For simplicty, readiblity and the preservation of logical order, forward declara
 
 - target2:
   - target1     # Reference to public target1
+---
+```
+
+This isn't to say forward declarations can't be done explicitly.
+
+
+```yaml 
+---
+# Forward Declarations
+- target0
+- target1
+- target2
+
+- target0:
+  - target1     # Reference to target1
+
+- target1       # Reference to target1
+
+- target2:
+  - target1     # Reference to target1
 ---
 ```
 

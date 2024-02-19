@@ -1,7 +1,7 @@
 ![bulgogi logo](./img/logo.png)
 
 # bulgogi
-C v0.2.5
+C v0.2.6
 
 ## Overview
 Bulgogi is a YAML parser for project build configurations.
