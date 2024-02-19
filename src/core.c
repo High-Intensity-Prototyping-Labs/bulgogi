@@ -94,7 +94,10 @@ void bul_core_scalar(bul_core_s *core, yaml_event_t *event) {
                 parent_id = core->stack[core->level-1];
                 /* Parent is the previous entry in the stack */
                 parent = &core->targets[parent_id];
-                bul_target_add_dep(parent, id);
+
+		if(!bul_core_target_in_scope(core, parent, id)) {
+			bul_target_add_dep(parent, id);
+		}
         }
 
         if(core->map) {
@@ -172,6 +175,24 @@ bul_target_s *bul_core_target_find(bul_core_s *core, char *name) {
         }
 
         return match;
+}
+
+bul_target_s *bul_core_target_in_scope(bul_core_s *core, bul_target_s *scope, bul_id_t target_id) {
+	size_t x;
+	bul_id_t dep_id = BUL_MAX_ID;
+	bul_target_s *dep = NULL;
+	bul_target_s *match = NULL;
+
+	for(x = 0; x < scope->size; x++) {
+		dep_id = scope->deps[x];
+		dep = &core->targets[dep_id];
+		if(dep->id == target_id) {
+			match = dep;
+			break;
+		}
+	}
+
+	return match;
 }
 
 void bul_core_free(bul_core_s *core) {

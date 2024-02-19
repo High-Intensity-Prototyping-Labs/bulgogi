@@ -156,6 +156,18 @@ bul_id_t bul_core_target_add(bul_core_s *core, char *name);
 bul_target_s *bul_core_target_find(bul_core_s *core, char *name);
 
 /**
+ * @brief Returns whether a target with a matching ID is found in scope.
+ *
+ * As opposed to `bul_core_target_find`, this function will search in the provided scope.
+ *
+ * @param[in] core Core context to use.
+ * @param[in] scope Target scope to search within.
+ * @param[in] target_id Target ID to match against.
+ * @return Pointer to first match in scope or `NULL` in case of no match.
+ */
+bul_target_s *bul_core_target_in_scope(bul_core_s *core, bul_target_s *scope, bul_id_t target_id);
+
+/**
  * @brief Frees an initialized core struct.
  *
  * @param[in] core Core struct to initialize.
