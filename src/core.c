@@ -94,7 +94,10 @@ void bul_core_scalar(bul_core_s *core, yaml_event_t *event) {
                 parent_id = core->stack[core->level-1];
                 /* Parent is the previous entry in the stack */
                 parent = &core->targets[parent_id];
-                bul_target_add_dep(parent, id);
+
+		if(!bul_core_target_in_scope(core, parent, id)) {
+			bul_target_add_dep(parent, id);
+		}
         }
 
         if(core->map) {
