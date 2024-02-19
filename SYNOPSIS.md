@@ -1,3 +1,5 @@
+C v0.2.5
+
 # Synopsis 
 Bulgogi reads YAML files and understands them in terms of targets and dependencies.
 
