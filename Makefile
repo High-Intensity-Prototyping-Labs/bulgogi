@@ -41,7 +41,7 @@ $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR):
 	mkdir -p $@
 
 $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
-	cd $(GIT_YAML) && ./bootstrap && ./configure --with-pic
+	cd $(GIT_YAML) && ./bootstrap && CFLAGS="-arch x86_64 -arch arm64" ./configure --with-pic && file src/.libs/libyaml.a
 	$(MAKE) -C $(GIT_YAML) 
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
