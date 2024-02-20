@@ -10,7 +10,8 @@ BIN := $(BIN_DIR)/bul
 SRC := $(wildcard $(addsuffix *.cpp, $(SRC_DIR)/))
 SRC += $(wildcard $(addsuffix *.c, $(SRC_DIR)/))
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SRC)))
-OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%arm64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%x86_64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
 
@@ -34,8 +35,11 @@ $(BIN): $(OBJ) | $(BIN_DIR)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)/%x86_64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -target x86_64-apple-macos10.12 -c $< -o $@
+
+$(OBJ_DIR)/%arm64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -target arm64-apple-macos11 -c $< -o $@
 
 $(BIN_DIR) $(OBJ_DIR) $(LIB_DIR):
 	mkdir -p $@
@@ -53,8 +57,8 @@ $(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
 	fi
 	cp $(GIT_YAML)/src/.libs/libyaml.so $(LIB_DIR)
 
-$(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.a | $(LIB_DIR)
-	$(AR) -crs $@ $^
+$(LIB_DIR)/libbul.a: $(OBJ_DIR)/corearm64.o $(OBJ_DIR)/corex86_64.o | $(LIB_DIR)
+	lipo -create -output $@ $^
 
 $(LIB_DIR)/libbul.so: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.so | $(LIB_DIR)
 	$(CC) -shared -o $@ $(OBJ_DIR)/core.o -L$(LIB_DIR) -lyaml
