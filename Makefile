@@ -50,7 +50,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 $(MACOS_DIR)/%_x86_64.o: $(SRC_DIR)/%.c | $(MACOS_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -target x86_64-apple-macos10.12 -c $< -o $@
