@@ -84,7 +84,7 @@ $(GIT_YAML):
 	git submodule init $(GIT_YAML)
 	git submodule update $(GIT_YAML)
 
-clean:
+clean: clean_deps
 	@$(RM) -rv $(BIN) $(OBJ) $(OBJ_DIR) $(LIB_DIR)
 
 clean_deps:
