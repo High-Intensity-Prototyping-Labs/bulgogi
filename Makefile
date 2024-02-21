@@ -15,7 +15,7 @@ OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
 
-OBJ_MACOS_x86_64 := $(patsubst $(SRC_DIR)/%_x86_64.c,$(MACOS_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+OBJ_MACOS_x86_64 := $(patsubst $(SRC_DIR)/%_x86_64.c,$(MACOS_DIR)/%_x86_64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 OBJ_MACOS_ARM64 := $(patsubst $(SRC_DIR)/%.c,$(MACOS_DIR)/%_arm64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 
 ARCHIVE := $(AR) -crs
