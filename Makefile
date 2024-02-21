@@ -1,3 +1,5 @@
+.SECONDEXPANSION:
+
 SRC_DIR := src
 INC_DIR := inc
 OBJ_DIR := obj
@@ -14,31 +16,29 @@ OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SR
 OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
+LIB_MACOS := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul_universal.a
 
 OBJ_MACOS_x86_64 := $(patsubst $(SRC_DIR)/%_x86_64.c,$(MACOS_DIR)/%_x86_64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 OBJ_MACOS_ARM64 := $(patsubst $(SRC_DIR)/%.c,$(MACOS_DIR)/%_arm64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
-
-ARCHIVE := $(AR) -crs
 
 CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
 CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g 
 LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
-LIBBUL_DEPS := $(OBJ_DIR)/core.o
 
 CIBUILDWHEEL_CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
 LIBYAML_CFLAGS := -g -O2
 
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
+
 cibuildwheel: CFLAGS := $(CIBUILDWHEEL_CFLAGS)
 cibuildwheel: $(LIB)
+
 cibuildwheel-macos: LIBYAML_CFLAGS += -arch x86_64 -arch arm64
 cibuildwheel-macos: CFLAGS := $(CIBUILDWHEEL_CFLAGS)
-cibuildwheel-macos: LIBBUL_DEPS := $(MACOS_DIR)/core_arm64.o $(MACOS_DIR)/core_x86_64.o
-cibuildwheel-macos: ARCHIVE := lipo -create -output
-cibuildwheel-macos: $(LIB)
+cibuildwheel-macos: $(LIB_MACOS)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
@@ -74,8 +74,11 @@ $(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
 	fi
 	cp $(GIT_YAML)/src/.libs/libyaml.so $(LIB_DIR)
 
-$(LIB_DIR)/libbul.a: $(LIBBUL_DEPS) | $(LIB_DIR)
-	$(ARCHIVE) $@ $^
+$(LIB_DIR)/libbul.a: $(OBJ_DIR)/core.o | $(LIB_DIR)
+	$(AR) -crs $@ $^
+
+$(LIB_DIR)/libbul_universal.a: $(MACOS_DIR)/core_x86_64.o $(MACOS_DIR)/core_arm64.o | $(MACOS_DIR)
+	lipo -create -output $@ $^
 
 $(LIB_DIR)/libbul.so: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.so | $(LIB_DIR)
 	$(CC) -shared -o $@ $(OBJ_DIR)/core.o -L$(LIB_DIR) -lyaml
@@ -100,6 +103,5 @@ prints:
 
 doc:
 	doxygen doxygen > /dev/null 2> /dev/null
-
 
 .PHONY: all clean clean_deps doc debug libs cibuildwheel cibuildwheel-macos
