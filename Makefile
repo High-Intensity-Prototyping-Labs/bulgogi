@@ -3,6 +3,7 @@ INC_DIR := inc
 OBJ_DIR := obj
 LIB_DIR := lib
 BIN_DIR := .
+MACOS_DIR := macos
 
 GIT_YAML := libyaml
 
@@ -10,21 +11,34 @@ BIN := $(BIN_DIR)/bul
 SRC := $(wildcard $(addsuffix *.cpp, $(SRC_DIR)/))
 SRC += $(wildcard $(addsuffix *.c, $(SRC_DIR)/))
 OBJ := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.cpp,$(SRC)))
-OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%arm64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
-OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%x86_64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+OBJ += $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
 LIB := $(LIB_DIR)/libyaml.a $(LIB_DIR)/libbul.a
 LIB_SO := $(LIB_DIR)/libyaml.so $(LIB_DIR)/libbul.so
+
+OBJ_MACOS_x86_64 := $(patsubst $(SRC_DIR)/%_x86_64.c,$(OBJ_DIR)/$(MACOS_DIR)/%.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+OBJ_MACOS_ARM64 := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/$(MACOS_DIR)/%_arm64.o,$(filter $(SRC_DIR)/%.c,$(SRC)))
+
+ARCHIVE := $(AR) -crs
 
 CPPFLAGS:= -I$(INC_DIR)
 CFLAGS := -std=gnu89 -O2 -Wall -pedantic -Wextra -Werror
 CXXFLAGS:= -std=c++20 -Wall -pedantic -Wextra -Werror -g 
 LDFLAGS := -Llib -fsanitize=address
 LDLIBS 	:= -lyaml
+LIBBUL_DEPS := $(OBJ_DIR)/core.o
+
+CIBUILDWHEEL_CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
+LIBYAML_CFLAGS := -g -O2
 
 all: doc $(BIN) $(LIB) 
 libs: $(LIB)
-cibuildwheel: CFLAGS := -std=gnu99 -O2 -Wall -pedantic -Wextra -fPIC
+cibuildwheel: CFLAGS := $(CIBUILDWHEEL_CFLAGS)
 cibuildwheel: $(LIB)
+cibuildwheel-macos: LIBYAML_CFLAGS += -arch x86_64 -arch arm64
+cibuildwheel-macos: CFLAGS := $(CIBUILDWHEEL_CFLAGS)
+cibuildwheel-macos: LIBBUL_DEPS := $(OBJ_DIR)/$(MACOS_DIR)/core_arm64.o $(OBJ_DIR)/$(MACOS_DIR)/core_x86_64.o
+cibuildwheel-macos: ARCHIVE := lipo -create -output
+cibuildwheel-macos: $(LIB)
 
 debug: CPPFLAGS += -DDEBUG -g
 debug: doc $(BIN) $(LIB)
@@ -35,17 +49,20 @@ $(BIN): $(OBJ) | $(BIN_DIR)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%x86_64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+
+$(OBJ_DIR)/$(MACOS_DIR)/%_x86_64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)/$(MACOS_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -target x86_64-apple-macos10.12 -c $< -o $@
 
-$(OBJ_DIR)/%arm64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/$(MACOS_DIR)/%_arm64.o: $(SRC_DIR)/%.c | $(OBJ_DIR)/$(MACOS_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -target arm64-apple-macos11 -c $< -o $@
 
-$(BIN_DIR) $(OBJ_DIR) $(LIB_DIR):
+$(BIN_DIR) $(OBJ_DIR) $(LIB_DIR) $(OBJ_DIR)/$(MACOS_DIR):
 	mkdir -p $@
 
 $(LIB_DIR)/libyaml.a: $(GIT_YAML) | $(LIB_DIR)
-	cd $(GIT_YAML) && ./bootstrap && CFLAGS="-arch x86_64 -arch arm64" ./configure --with-pic && file src/.libs/libyaml.a
+	cd $(GIT_YAML) && ./bootstrap && CFLAGS="$(LIBYAML_CFLAGS)" ./configure --with-pic
 	$(MAKE) -C $(GIT_YAML) 
 	cp $(GIT_YAML)/src/.libs/libyaml.a $(LIB_DIR)
 
@@ -57,8 +74,8 @@ $(LIB_DIR)/libyaml.so: $(GIT_YAML) | $(LIB_DIR)
 	fi
 	cp $(GIT_YAML)/src/.libs/libyaml.so $(LIB_DIR)
 
-$(LIB_DIR)/libbul.a: $(OBJ_DIR)/corearm64.o $(OBJ_DIR)/corex86_64.o | $(LIB_DIR)
-	lipo -create -output $@ $^
+$(LIB_DIR)/libbul.a: $(LIBBUL_DEPS) | $(LIB_DIR)
+	$(ARCHIVE) $@ $^
 
 $(LIB_DIR)/libbul.so: $(OBJ_DIR)/core.o $(LIB_DIR)/libyaml.so | $(LIB_DIR)
 	$(CC) -shared -o $@ $(OBJ_DIR)/core.o -L$(LIB_DIR) -lyaml
@@ -85,4 +102,4 @@ doc:
 	doxygen doxygen > /dev/null 2> /dev/null
 
 
-.PHONY: all clean clean_deps doc debug libs cibuildwheel
+.PHONY: all clean clean_deps doc debug libs cibuildwheel cibuildwheel-macos
